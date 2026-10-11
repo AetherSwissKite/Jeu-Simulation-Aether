@@ -30,6 +30,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 18 | Vent plus fort et plus de risées : environ 2× plus vite au kite | 10-11 23:25:14 | 10-11 23:40:38 | 15 min 24 s |
 | 19 | Retour en arrière, vent juste assez fort pour +20 % au kite | 10-11 23:43:23 | 10-11 23:58:01 | 14 min 38 s |
 | 20 | Retour à la version d'avant les changements de vent | 10-12 00:03:19 | 10-12 00:03:39 | 0 min 20 s |
+| 21 | Retrait des temps de TJL en mode débutant | 10-12 00:06:47 | 10-12 00:07:23 | 0 min 36 s |
 
 ---
 
@@ -375,4 +376,13 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - On retrouve le vent de 12 à 18 nœuds, les 46 risées d'origine, le kite et les tensions d'origine (95 kN en débutant, environ 1,15 kN par m² en expert) et la maniabilité du kite expert du prompt 14.
   - Le journal garde la trace des prompts 18 et 19.
 - **Vérification** : aucun écart entre le code et le commit `6a538cb` en dehors de ce journal ; cette version avait été testée au prompt 17.
+
+## 21. Retrait des temps de TJL en mode débutant
+- **Heure du prompt** : 2026-10-12 00:06:47 · **Heure du résultat** : 2026-10-12 00:07:23 · **Temps de calcul** : 0 min 36 s
+- **Demande** : retirer tous les temps de TJL de l'historique du mode débutant.
+- **Modifications** :
+  - La base en ligne n'est pas accessible directement (page Admin retirée). On passe donc par un nettoyage ponctuel exécuté une seule fois au démarrage du serveur (`CLEANUPS` dans `app/storage.py`).
+  - Il supprime toutes les courses du mode débutant au pseudo TJL, sans tenir compte des majuscules, puis le note dans la base pour ne jamais recommencer.
+  - Les courses de TJL en expert, celles des autres joueurs et les futures courses de TJL ne sont pas touchées.
+- **Vérification** : test sur une base de copie. TJL et tjl en débutant sont supprimés ; MCN et TJL en expert sont gardés ; une nouvelle course de TJL en débutant est conservée aux redémarrages suivants.
 

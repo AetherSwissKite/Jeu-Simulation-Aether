@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 """
 # à incrémenter quand le calcul des scores change : toutes les courses enregistrées sont alors effacées
 DATA_VERSION = "2"   # v2 : le CO₂ ne compte plus que le moteur (plus de groupe de bord)
+# (clé unique, mode, pseudo) : retire tout l'historique d'un joueur dans un mode, une seule fois
+CLEANUPS = [("cleanup_tjl_beginner_2026_10_12", "beginner", "TJL")]
 
 
 def _conn():
@@ -58,6 +60,11 @@ def init():
         if not row or row[0] != DATA_VERSION:
             c.execute("DELETE FROM runs")
             c.execute("INSERT OR REPLACE INTO meta VALUES ('data_version', ?)", (DATA_VERSION,))
+        # nettoyages ponctuels demandés : exécutés une seule fois par base (les nouvelles courses ne sont pas touchées)
+        for key, mode, name in CLEANUPS:
+            if not c.execute("SELECT 1 FROM meta WHERE key = ?", (key,)).fetchone():
+                c.execute("DELETE FROM runs WHERE mode = ? AND lower(name) = ?", (mode, name.lower()))
+                c.execute("INSERT INTO meta VALUES (?, 'done')", (key,))
 
 
 def clean_text(value, max_len):

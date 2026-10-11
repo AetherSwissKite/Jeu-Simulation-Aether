@@ -25,6 +25,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 13 | Score CO₂ × temps, tentatives datées, bleu marine, EPFL, pirate, italien | 10-10 21:46:38 | 10-10 22:06:08 | 19 min 30 s |
 | 14 | Page Classements, visiteurs, pirate, bac à sable vivant, kite maniable, HUD | 10-11 08:21:44 | 10-11 08:38:06 | 16 min 22 s |
 | 15 | Scène pleine hauteur, fin de partie défilable, menu principal / rejouer | 10-11 09:43:33 | 10-11 09:46:56 | 3 min 23 s |
+| 16 | CO₂ nul moteur coupé, historique remis à zéro | 10-11 19:47:33 | 10-11 19:49:20 | 1 min 47 s |
 
 ---
 
@@ -295,4 +296,20 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - **Fenêtres** (fin de partie, classements, tutoriel, pause) : elles ne dépassent plus jamais la partie visible de l'écran et défilent à la molette si leur contenu est plus long.
   - **Fin de partie** : barre de boutons collée en bas, toujours visible : « Menu principal » et « Rejouer ». Raccourcis : Entrée = rejouer, Échap = menu principal. Textes traduits en FR / EN / DE / IT.
 - **Vérification** : traversée débutant complète en 1366 × 768. La fenêtre de fin défile, ses boutons sont visibles (bas à 750 px sur 768) et « Menu principal » ramène à l'accueil. Aucune erreur JavaScript.
+
+## 16. CO₂ nul moteur coupé, historique des performances remis à zéro
+- **Heure du prompt** : 2026-10-11 19:47:33 · **Heure du résultat** : 2026-10-11 19:49:20 · **Temps de calcul** : 1 min 47 s
+- **Demande** : en traversée, le CO₂ continue d'augmenter même avec le moteur à 0 %. Corriger, puis remettre à zéro l'historique de tout le monde.
+- **Cause** : le groupe électrogène de bord de 60 kW, toujours allumé, ajouté au prompt 13.
+- **Modifications** :
+  - Groupe de bord supprimé : seul le moteur émet du CO₂. Moteur à 0 % (ou en marche arrière) = 0 kg.
+  - Textes « CO₂ émis par le moteur » et hypothèses du modèle mis à jour dans les 4 langues.
+  - **Égalités** : à indice CO₂ × temps égal (par exemple 0 t·s pour une traversée au kite seul), le plus rapide passe devant. Ce départage existait déjà, il est maintenant expliqué.
+  - **Historique remis à zéro** :
+    - Côté serveur, la base porte un numéro de version des données (v2). Au démarrage, une base d'une version antérieure voit toutes ses courses effacées. Le compteur de visiteurs est conservé.
+    - Côté navigateur (jeu ouvert sans serveur), les classements et traces stockés localement changent de clé et repartent de zéro.
+- **Vérification** :
+  - En course, moteur à 0 % pendant 5 s : le carburant reste exactement à 1,765 kg, puis augmente dès qu'on remet les gaz.
+  - Test de la base : une base v1 contenant une course est vidée au démarrage, les visiteurs sont gardés ; une course v2 est conservée aux redémarrages suivants ; une traversée au kite seul obtient bien un indice de 0.
+  - Aucune erreur JavaScript.
 

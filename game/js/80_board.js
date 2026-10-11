@@ -5,7 +5,7 @@
 // ================================================================
 const PLAYER = { name: store.get("aether.name") || "", team: store.get("aether.team") || "" };
 const BOARD = { remote: false, runs: [], mode: "beginner", period: "all", group: "players", sort: "score" };
-const LS_RUNS = "aether.runs.v1", LS_GHOSTS = "aether.ghosts.v1";
+const LS_RUNS = "aether.runs.v2", LS_GHOSTS = "aether.ghosts.v2";   // v2 : historique remis à zéro (correction du CO₂)
 const host = (() => { try { return window.parent !== window ? window.parent : null; } catch { return null; } })();
 function hostSend(msg) { if (host) { try { host.postMessage({ source: "aether", ...msg }, "*"); } catch { /* hôte indisponible */ } } }
 function cleanRun(e) {

@@ -39,7 +39,10 @@ CREATE TABLE IF NOT EXISTS runs (
 CREATE INDEX IF NOT EXISTS runs_mode_total ON runs(mode, total_s);
 CREATE INDEX IF NOT EXISTS runs_ts ON runs(ts);
 CREATE TABLE IF NOT EXISTS visits (vid TEXT PRIMARY KEY, ts INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 """
+# à incrémenter quand le calcul des scores change : toutes les courses enregistrées sont alors effacées
+DATA_VERSION = "2"   # v2 : le CO₂ ne compte plus que le moteur (plus de groupe de bord)
 
 
 def _conn():
@@ -51,6 +54,10 @@ def _conn():
 def init():
     with _LOCK, _conn() as c:
         c.executescript(SCHEMA)
+        row = c.execute("SELECT value FROM meta WHERE key = 'data_version'").fetchone()
+        if not row or row[0] != DATA_VERSION:
+            c.execute("DELETE FROM runs")
+            c.execute("INSERT OR REPLACE INTO meta VALUES ('data_version', ?)", (DATA_VERSION,))
 
 
 def clean_text(value, max_len):

@@ -8,9 +8,9 @@ STRINGS = {
         "lang": "Langue",
         "model_title": "📐 Hypothèses physiques du modèle",
         "model_md": """
-- **Barge à gravier** : 40 m, chargée. Résistance de carène ∝ V² (4,2 kN par (m/s)²), moteur de 500 kW (80 kN de poussée, environ 8,5 nœuds sans kite) et groupe de bord de 60 kW toujours en marche.
+- **Barge à gravier** : 40 m, chargée. Résistance de carène ∝ V² (4,2 kN par (m/s)²), moteur de 500 kW (80 kN de poussée, environ 8,5 nœuds sans kite).
   Dans les traversées, l'inertie est réglée par une *masse effective* (80 t en débutant, 190 t en expert) : le temps est compressé pour qu'une traversée dure 1 ou 3 minutes.
-- **Classement** : indice CO₂ × temps (tonnes de CO₂ émises × secondes) : aller vite au moteur coûte du CO₂, aller trop lentement coûte du temps ; le kite fait baisser les deux.
+- **Classement** : indice CO₂ × temps (tonnes de CO₂ émises × secondes) : le moteur coûte du CO₂, la lenteur coûte du temps ; le kite fait baisser les deux. À indice égal (par exemple 0 au kite seul), le plus rapide passe devant.
 - **Kite** : 150 m² et 200 m de lignes en traversée débutant ; en expert, tu choisis 10, 25 ou 100 m² et des lignes de 25, 100 ou 300 m ; 90 m² dans le bac à sable. Vent à l'altitude du kite selon une loi en puissance 1/7, puis vent apparent (on retranche la vitesse de la barge).
   Traction = ½·ρ·S·C_L·Va², où Va combine le vent apparent et la vitesse propre de l'aile en travers du vent (d'où l'intérêt des 8). Fenêtre de vol : puissance ∝ cos(élévation)·cos(écart au centre).
 - **Pilotage expert** : les lignes arrière font virer l'aile, les lignes avant règlent l'incidence (choquer/border). Un petit kite vire vite mais tire peu ; des lignes longues montent chercher plus de vent mais l'aile traverse la fenêtre plus lentement. Au-delà d'environ 1,15 kN par m² de kite, la ligne casse.
@@ -23,9 +23,9 @@ STRINGS = {
         "lang": "Language",
         "model_title": "📐 Physical assumptions of the model",
         "model_md": """
-- **Gravel barge**: 40 m, loaded. Hull resistance ∝ V² (4.2 kN per (m/s)²), 500 kW engine (80 kN thrust, about 8.5 knots without kite) and a 60 kW onboard generator always running.
+- **Gravel barge**: 40 m, loaded. Hull resistance ∝ V² (4.2 kN per (m/s)²), 500 kW engine (80 kN thrust, about 8.5 knots without kite).
   In the crossings, inertia is set by an *effective mass* (80 t beginner, 190 t expert): time is compressed so that a crossing lasts 1 or 3 minutes.
-- **Ranking**: CO₂ × time index (tonnes of CO₂ emitted × seconds): going fast on the engine costs CO₂, going too slow costs time; the kite lowers both.
+- **Ranking**: CO₂ × time index (tonnes of CO₂ emitted × seconds): the engine costs CO₂, slowness costs time; the kite lowers both. On equal index (e.g. 0 on kite alone), the fastest ranks first.
 - **Kite**: 150 m² on 200 m lines in the beginner crossing; in expert you pick 10, 25 or 100 m² and 25, 100 or 300 m lines; 90 m² in the sandbox. Wind at kite altitude from a 1/7 power law, then apparent wind (barge speed subtracted).
   Pull = ½·ρ·S·C_L·Va², where Va combines the apparent wind and the wing's own crosswind speed (hence figure-eights). Wind window: power ∝ cos(elevation)·cos(offset from centre).
 - **Expert flying**: back lines turn the wing, front lines set the angle of attack (depower/power). A small kite turns fast but pulls little; long lines reach stronger wind but the wing crosses the window more slowly. Above about 1.15 kN per m² of kite the line snaps.
@@ -38,9 +38,9 @@ STRINGS = {
         "lang": "Sprache",
         "model_title": "📐 Physikalische Annahmen des Modells",
         "model_md": """
-- **Kiesschiff**: 40 m, beladen. Rumpfwiderstand ∝ V² (4,2 kN pro (m/s)²), 500-kW-Motor (80 kN Schub, etwa 8,5 Knoten ohne Kite) und ein ständig laufender 60-kW-Bordgenerator.
+- **Kiesschiff**: 40 m, beladen. Rumpfwiderstand ∝ V² (4,2 kN pro (m/s)²), 500-kW-Motor (80 kN Schub, etwa 8,5 Knoten ohne Kite).
   Bei den Überfahrten wird die Trägheit über eine *effektive Masse* eingestellt (80 t Einsteiger, 190 t Profi): die Zeit ist komprimiert, damit eine Überfahrt 1 bzw. 3 Minuten dauert.
-- **Wertung**: Index CO₂ × Zeit (Tonnen CO₂ × Sekunden): schnell mit Motor kostet CO₂, zu langsam kostet Zeit; der Kite senkt beides.
+- **Wertung**: Index CO₂ × Zeit (Tonnen CO₂ × Sekunden): der Motor kostet CO₂, Langsamkeit kostet Zeit; der Kite senkt beides. Bei gleichem Index (z. B. 0 nur mit Kite) liegt der Schnellere vorn.
 - **Kite**: 150 m² an 200-m-Leinen bei der Einsteiger-Überfahrt; als Profi wählst du 10, 25 oder 100 m² und Leinen von 25, 100 oder 300 m; 90 m² im Sandkasten. Wind in Kite-Höhe nach einem 1/7-Potenzgesetz, dann scheinbarer Wind (Schiffsgeschwindigkeit abgezogen).
   Zug = ½·ρ·S·C_L·Va², wobei Va den scheinbaren Wind und die Eigengeschwindigkeit des Schirms quer zum Wind kombiniert (daher die Achten). Windfenster: Leistung ∝ cos(Höhe)·cos(Abweichung von der Mitte).
 - **Profi-Steuerung**: die hinteren Leinen lenken den Schirm, die vorderen stellen den Anstellwinkel ein (fieren/dichtholen). Ein kleiner Kite dreht schnell, zieht aber wenig; lange Leinen erreichen stärkeren Wind, doch der Schirm quert das Fenster langsamer. Ab etwa 1,15 kN pro m² Kite reisst die Leine.
@@ -53,9 +53,9 @@ STRINGS = {
         "lang": "Lingua",
         "model_title": "📐 Ipotesi fisiche del modello",
         "model_md": """
-- **Chiatta di ghiaia**: 40 m, carica. Resistenza dello scafo ∝ V² (4,2 kN per (m/s)²), motore da 500 kW (80 kN di spinta, circa 8,5 nodi senza kite) e generatore di bordo da 60 kW sempre acceso.
+- **Chiatta di ghiaia**: 40 m, carica. Resistenza dello scafo ∝ V² (4,2 kN per (m/s)²), motore da 500 kW (80 kN di spinta, circa 8,5 nodi senza kite).
   Nelle traversate l'inerzia è data da una *massa efficace* (80 t principiante, 190 t esperto): il tempo è compresso perché una traversata duri 1 o 3 minuti.
-- **Classifica**: indice CO₂ × tempo (tonnellate di CO₂ × secondi): andare veloci col motore costa CO₂, andare troppo piano costa tempo; il kite abbassa entrambi.
+- **Classifica**: indice CO₂ × tempo (tonnellate di CO₂ × secondi): il motore costa CO₂, la lentezza costa tempo; il kite abbassa entrambi. A parità di indice (per esempio 0 col solo kite), passa davanti il più veloce.
 - **Kite**: 150 m² e 200 m di cavi nella traversata principiante; da esperto scegli 10, 25 o 100 m² e cavi da 25, 100 o 300 m; 90 m² nella sandbox. Vento alla quota del kite secondo una legge di potenza 1/7, poi vento apparente (si sottrae la velocità della chiatta).
   Trazione = ½·ρ·S·C_L·Va², dove Va combina il vento apparente e la velocità propria dell'ala trasversale al vento (da qui l'interesse degli 8). Finestra di volo: potenza ∝ cos(elevazione)·cos(scarto dal centro).
 - **Pilotaggio esperto**: i cavi posteriori fanno virare l'ala, quelli anteriori regolano l'incidenza (lascare/cazzare). Un kite piccolo vira in fretta ma tira poco; cavi lunghi raggiungono vento più forte ma l'ala attraversa la finestra più lentamente. Oltre circa 1,15 kN per m² di kite il cavo si rompe.

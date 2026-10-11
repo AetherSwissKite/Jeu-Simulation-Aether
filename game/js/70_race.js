@@ -1,8 +1,7 @@
 // ================================================================
 //  TRAVERSÉES DU LÉMAN (débutant / expert) : physique de la barge, commandes, caméras, course
 // ================================================================
-// AUX : groupe électrogène de bord (treuil et pilote automatique du kite, timonerie), toujours en marche
-const BARGE = { CD: 4.2, FE: 80, PMAX: 500, AUX: 60, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, AF: 70, CX: 0.9 };
+const BARGE = { CD: 4.2, FE: 80, PMAX: 500, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, AF: 70, CX: 0.9 };
 // Les deux modes partagent la même physique ; seules la masse effective (inertie ressentie), l'agilité
 // et la compression du temps changent pour adapter les sensations au public.
 const MODES = {
@@ -95,7 +94,7 @@ function stepRace(dt) {
   B.heave = Math.sin(RACE.t * 1.1) * sea.A * 0.6;
   // énergie : carburant du moteur et CO2 évité grâce au kite (convertis en temps réel de traversée)
   const ft = FTIME() * dt;
-  RACE.fuel += (Math.max(0, RACE.throttle) * BARGE.PMAX + BARGE.AUX) * ft / 3600 * BARGE.SFOC;
+  RACE.fuel += Math.max(0, RACE.throttle) * BARGE.PMAX * ft / 3600 * BARGE.SFOC;   // moteur à 0 % = aucun CO₂
   RACE.saved += Math.max(0, KS.fwd) * Math.max(0, B.u) / BARGE.ETA * ft / 3600 * BARGE.SFOC * BARGE.CO2F;
   collisions(dt);
   // annonces : vents du Léman, tempête, dauphins

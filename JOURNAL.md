@@ -31,6 +31,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 19 | Retour en arrière, vent juste assez fort pour +20 % au kite | 10-11 23:43:23 | 10-11 23:58:01 | 14 min 38 s |
 | 20 | Retour à la version d'avant les changements de vent | 10-12 00:03:19 | 10-12 00:03:39 | 0 min 20 s |
 | 21 | Retrait des temps de TJL en mode débutant | 10-12 00:06:47 | 10-12 00:07:23 | 0 min 36 s |
+| 22 | Remise à zéro de tout l'historique de course | 10-12 00:09:24 | 10-12 00:09:50 | 0 min 26 s |
 
 ---
 
@@ -385,4 +386,12 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Il supprime toutes les courses du mode débutant au pseudo TJL, sans tenir compte des majuscules, puis le note dans la base pour ne jamais recommencer.
   - Les courses de TJL en expert, celles des autres joueurs et les futures courses de TJL ne sont pas touchées.
 - **Vérification** : test sur une base de copie. TJL et tjl en débutant sont supprimés ; MCN et TJL en expert sont gardés ; une nouvelle course de TJL en débutant est conservée aux redémarrages suivants.
+
+## 22. Remise à zéro de tout l'historique de course
+- **Heure du prompt** : 2026-10-12 00:09:24 · **Heure du résultat** : 2026-10-12 00:09:50 · **Temps de calcul** : 0 min 26 s
+- **Demande** : remettre à zéro tout l'historique de course.
+- **Modifications** :
+  - **Serveur** : version des données passée de 2 à 3. Au démarrage, la base en ligne efface toutes les courses (débutant et expert, tous les joueurs). Le compteur de visiteurs est conservé.
+  - **Navigateur** : les clés de stockage local (classement hors ligne, traces, scores en attente d'envoi) passent en v3, pour qu'aucun ancien score en attente ne soit renvoyé après la remise à zéro.
+- **Vérification** : test sur une base de copie en version 2 contenant deux courses : elles sont effacées au démarrage, le visiteur est gardé, et une nouvelle course est conservée aux redémarrages suivants.
 

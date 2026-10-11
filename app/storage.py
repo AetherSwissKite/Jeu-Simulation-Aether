@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS visits (vid TEXT PRIMARY KEY, ts INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 """
 # à incrémenter quand le calcul des scores change : toutes les courses enregistrées sont alors effacées
-DATA_VERSION = "2"   # v2 : le CO₂ ne compte plus que le moteur (plus de groupe de bord)
+DATA_VERSION = "3"   # v2 : le CO₂ ne compte plus que le moteur ; v3 : remise à zéro demandée le 12.10.2026
 # (clé unique, mode, pseudo) : retire tout l'historique d'un joueur dans un mode, une seule fois
 CLEANUPS = [("cleanup_tjl_beginner_2026_10_12", "beginner", "TJL")]
 

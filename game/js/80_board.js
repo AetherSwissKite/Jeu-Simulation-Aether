@@ -5,7 +5,7 @@
 // ================================================================
 const PLAYER = { name: store.get("aether.name") || "", team: store.get("aether.team") || "" };
 const BOARD = { remote: false, runs: [], mode: "beginner", period: "all", group: "players", sort: "score" };
-const LS_RUNS = "aether.runs.v2", LS_GHOSTS = "aether.ghosts.v2";   // v2 : historique remis à zéro (correction du CO₂)
+const LS_RUNS = "aether.runs.v3", LS_GHOSTS = "aether.ghosts.v3";   // v3 : historique remis à zéro (12.10.2026)
 const host = (() => { try { return window.parent !== window ? window.parent : null; } catch { return null; } })();
 function hostSend(msg) { if (host) { try { host.postMessage({ source: "aether", ...msg }, "*"); } catch { /* hôte indisponible */ } } }
 function cleanRun(e) {
@@ -68,7 +68,7 @@ function sendVisit() {
   visitSent = true; setTimeout(() => hostSend({ type: "visit", vid }), 2500);   // après un éventuel score en attente
 }
 // file d'attente des scores à envoyer au serveur : un score n'est retiré qu'une fois revenu dans le classement du serveur
-const LS_PENDING = "aether.pending.v2";
+const LS_PENDING = "aether.pending.v3";
 let PENDING = []; try { PENDING = JSON.parse(store.get(LS_PENDING) || "[]") || []; } catch { PENDING = []; }
 const savePending = () => store.set(LS_PENDING, JSON.stringify(PENDING.slice(-20)));
 function flushPending() {

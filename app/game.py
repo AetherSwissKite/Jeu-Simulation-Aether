@@ -72,10 +72,16 @@ def _on_visit():
     storage.add_visit((st.session_state.get("aether_bridge") or {}).get("visit"))
 
 
-def game_page():
+@st.fragment(run_every=15)
+def _live_bridge():
+    """Rafraîchi toutes les 15 s : chaque joueur voit arriver les scores des autres sans recharger la page."""
     _bridge(data={"runs": storage.list_runs(), "ghosts": storage.ghosts(), "routes": storage.routes(), "visits": storage.visits(),
                   "lang": st.session_state.get("lang", "fr")},
             key="aether_bridge", on_score_change=_on_score, on_lang_change=_on_lang, on_visit_change=_on_visit)
+
+
+def game_page():
+    _live_bridge()
     # Tout le jeu (animation, physique, commandes) tourne dans le navigateur : il reste fluide et
     # ne se recharge pas quand Python se relance (le HTML transmis est identique d'un passage à l'autre).
     st.iframe(game_html(), height="content")

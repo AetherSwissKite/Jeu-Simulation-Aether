@@ -15,8 +15,11 @@ function fitRace() {
   const w = $("app").clientWidth;
   // 80 % de la place libre : la scène, le tableau de bord et le haut de page tiennent ensemble à l'écran
   // toute la place libre (3 % de marge) : la scène reste large et le tableau de bord visible en bas
-  const h = clamp((vh - used) * 0.97, 360, w / 1.45);
-  document.documentElement.style.setProperty("--race-h", `${Math.round(h)}px`);
+  const h = `${Math.round(clamp((vh - used) * 0.97, 360, w / 1.45))}px`;
+  if (document.documentElement.style.getPropertyValue("--race-h") !== h) {   // ne retouche la mise en page que si la taille change
+    document.documentElement.style.setProperty("--race-h", h);
+    if (WORLD) requestAnimationFrame(() => { WORLD.resize(); MINI.resize(); });
+  }
   fitModals();
 }
 // fenêtres (fin de partie, classements, tutoriel) : jamais plus hautes que la partie visible de l'écran, défilables sinon

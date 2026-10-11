@@ -44,6 +44,9 @@ function init() {
   const refit = () => { if (VIEW === "beginner" || VIEW === "expert") fitRace(); else fitModals(); };
   window.addEventListener("resize", refit);
   try { window.parent.addEventListener("resize", refit); } catch { /* parent inaccessible */ }
+  // la page Streamlit autour du jeu se met en place en plusieurs temps : on revérifie la taille chaque seconde
+  setInterval(refit, 1000);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
   requestAnimationFrame(frame);
   // accès pour les tests automatisés uniquement (adresse contenant aetherdebug=1)
   try {

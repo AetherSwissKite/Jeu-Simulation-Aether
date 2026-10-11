@@ -35,9 +35,12 @@ window.addEventListener("message", ev => {
   if (m.type === "board") {
     BOARD.remote = true;
     if (Array.isArray(m.runs)) {
-      const incoming = m.runs.map(cleanRun).filter(Boolean);
-      const mine = RACE.result && !incoming.some(e => e.id === RACE.result.id) ? [cleanRun({ ...RACE.result, ts: Date.now() / 1000 })] : [];
-      BOARD.runs = [...incoming, ...mine.filter(Boolean)];
+      const incoming = m.runs.map(cleanRun).filter(Boolean), ids = new Set(incoming.map(e => e.id));
+      // scores en attente : confirmés dès qu'ils reviennent du serveur, sinon renvoyés (6 essais au plus)
+      PENDING = PENDING.filter(p => !ids.has(p.entry.id) && p.tries < 6); savePending();
+      const mine = PENDING.map(p => cleanRun({ ...p.entry, ts: p.ts })).filter(Boolean);
+      BOARD.runs = [...incoming, ...mine];
+      setTimeout(flushPending, 400);
     }
     if (m.ghosts && typeof m.ghosts === "object") {
       for (const mode of ["beginner", "expert"]) {
@@ -49,14 +52,29 @@ window.addEventListener("message", ev => {
     if (m.lang && m.lang !== LANG) setLang(m.lang, true);
     renderBoards();
     if (VIEW === "board") renderRoutes();
+    sendVisit();
   }
 });
+// Prise de contact avec Streamlit : répétée tant que le serveur n'a pas répondu (le pont peut être prêt après le jeu)
+let helloTries = 0;
+const helloTimer = setInterval(() => { if (BOARD.remote || ++helloTries > 60) clearInterval(helloTimer); else hostSend({ type: "hello" }); }, 1000);
 hostSend({ type: "hello" });
 // compteur de visiteurs : un identifiant anonyme par navigateur, compté une seule fois par le serveur
-{
+let visitSent = false;
+function sendVisit() {
+  if (visitSent || !BOARD.remote) return;
   let vid = store.get("aether.vid");
   if (!vid) { vid = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`; store.set("aether.vid", vid); }
-  hostSend({ type: "visit", vid });
+  visitSent = true; setTimeout(() => hostSend({ type: "visit", vid }), 2500);   // après un éventuel score en attente
+}
+// file d'attente des scores à envoyer au serveur : un score n'est retiré qu'une fois revenu dans le classement du serveur
+const LS_PENDING = "aether.pending.v2";
+let PENDING = []; try { PENDING = JSON.parse(store.get(LS_PENDING) || "[]") || []; } catch { PENDING = []; }
+const savePending = () => store.set(LS_PENDING, JSON.stringify(PENDING.slice(-20)));
+function flushPending() {
+  if (!BOARD.remote || !PENDING.length) return;
+  const p = PENDING[0]; p.tries = (p.tries || 0) + 1; savePending();
+  hostSend({ type: "score", entry: p.entry });
 }
 function showVisits() { const el = $("visitCount"); if (el && Number.isFinite(BOARD.visits)) el.textContent = `👁 ${T("visits", { n: fmt0(BOARD.visits) })}`; }
 // page Classements : routes des meilleures tentatives (mode, période et critère du classement choisis)
@@ -77,7 +95,7 @@ function renderRoutes() {
 
 function submitScore(entry) {
   BOARD.runs.push(cleanRun({ ...entry, ts: Date.now() / 1000 }));
-  if (BOARD.remote) hostSend({ type: "score", entry });
+  if (host) { PENDING.push({ entry, ts: Date.now() / 1000, tries: 0 }); savePending(); flushPending(); }   // dans Streamlit : envoi garanti
   else {
     store.set(LS_RUNS, JSON.stringify(BOARD.runs.slice(-500)));
     // fantômes locaux : on garde les 3 meilleures traces de chaque mode

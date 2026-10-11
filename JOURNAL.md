@@ -26,6 +26,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 14 | Page Classements, visiteurs, pirate, bac à sable vivant, kite maniable, HUD | 10-11 08:21:44 | 10-11 08:38:06 | 16 min 22 s |
 | 15 | Scène pleine hauteur, fin de partie défilable, menu principal / rejouer | 10-11 09:43:33 | 10-11 09:46:56 | 3 min 23 s |
 | 16 | CO₂ nul moteur coupé, historique remis à zéro | 10-11 19:47:33 | 10-11 19:49:20 | 1 min 47 s |
+| 17 | Scores perdus, classement en direct, taille de la scène stable | 10-11 20:49:25 | 10-11 20:52:43 | 3 min 18 s |
 
 ---
 
@@ -312,4 +313,19 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - En course, moteur à 0 % pendant 5 s : le carburant reste exactement à 1,765 kg, puis augmente dès qu'on remet les gaz.
   - Test de la base : une base v1 contenant une course est vidée au démarrage, les visiteurs sont gardés ; une course v2 est conservée aux redémarrages suivants ; une traversée au kite seul obtient bien un indice de 0.
   - Aucune erreur JavaScript.
+
+## 17. Scores qui n'apparaissent pas, classement en direct, taille de la scène stable
+- **Heure du prompt** : 2026-10-11 20:49:25 · **Heure du résultat** : 2026-10-11 20:52:43 · **Temps de calcul** : 3 min 18 s
+- **Demande** : les temps du joueur MCN n'apparaissent pas ; la taille de la scène en traversée est aléatoire ; expliquer où sont stockés les résultats.
+- **Causes trouvées** :
+  - Au chargement, le jeu n'envoyait qu'un seul message de prise de contact à Streamlit. S'il partait avant que le pont soit prêt, le jeu se croyait hors ligne et gardait les scores dans le navigateur, sans les envoyer au serveur.
+  - Les autres joueurs ne recevaient le classement qu'au chargement de leur page.
+  - La taille de la scène n'était mesurée qu'à l'entrée dans la traversée, parfois avant que la page Streamlit ait fini de se placer.
+  - Autre cause possible pour MCN : une course jouée juste avant la mise en ligne du prompt 16 a été effacée par la remise à zéro voulue.
+- **Modifications** :
+  - Prise de contact répétée chaque seconde jusqu'à la réponse du serveur. Le compteur de visiteurs n'est envoyé qu'une fois la liaison établie.
+  - **File d'attente des scores** : chaque score est gardé dans le navigateur tant que le serveur ne l'a pas renvoyé dans son classement. Il est renvoyé automatiquement (6 essais au plus, même après un rechargement). Le serveur ignore les doublons.
+  - **Classement en direct** : le pont Streamlit se rafraîchit toutes les 15 s (`st.fragment`), sans recharger le jeu. Chacun voit arriver les scores des autres.
+  - **Taille de la scène** : revérifiée chaque seconde et quand les polices finissent de charger. La mise en page n'est retouchée que si la taille change vraiment.
+- **Vérification** : deux onglets (un spectateur ouvert d'abord, un joueur « MCN »). La course de MCN est arrivée dans la base, sa file d'attente s'est vidée, et le spectateur l'a vue apparaître en moins de 17 s sans recharger. Taille de la scène identique avant et après la course (569 px en 1366 × 768). Aucune erreur JavaScript.
 

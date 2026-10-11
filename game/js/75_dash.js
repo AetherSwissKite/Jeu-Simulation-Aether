@@ -142,7 +142,7 @@ function updateDash() {
   // en haut à gauche
   gArc(DASH.cv.time, f, [[0, "#a8e6d3"], [1, "#3d5f94"]], { text: `${fmt0(f * 100)}` });
   set("time", fmtClock(RACE.t), `${RACE.pen ? `+${fmt1(RACE.pen)} s · ` : ""}${fmt1((1 - f) * COURSE_LEN / SCALE)} km`);
-  gArc(DASH.cv.speed, kn / 20, SPEED_STOPS, { needle: true, zones: [[8.5 / 20, 1, "#3d5f94"]] });   // au-delà de 8,5 nd : c'est le kite
+  gArc(DASH.cv.speed, kn / 12, SPEED_STOPS, { needle: true, zones: [[8.5 / 12, 1, "#3d5f94"]] });
   set("speed", `${fmt1(kn)} ${T("u_kn")}`, `⚙ ${fmt0(Math.max(0, RACE.Fe || 0))} kN`);
   gWind(DASH.cv.wind, norm180(wd.from - B.hdg), wd.kn);
   set("wind", `${fmt0(wd.kn)} ${T("u_kn")} ${cardinal(wd.from)}`, wd.gust > 0.3 ? `💨 ${T("d_gust")}` : wd.storm > 0.3 ? `⛈ ${T("d_storm")}` : "");
@@ -171,6 +171,6 @@ function updateDash() {
   const tMax = Math.max(10, rig.tmax * 0.6, ...col(0));
   gChart(DASH.cv.tchart, [{ vals: col(0), col: "#f07d9c" }, { vals: col(1), col: "#3d5f94" }], tMax);
   $("s_tchart").innerHTML = `<i style="color:#f07d9c">● ${T("d_tension")} ${fmt0(KS.T)}</i> <i style="color:#3d5f94">● ${T("d_thrust")} ${fmt0(Math.max(0, KS.fwd))}</i> kN`;
-  gChart(DASH.cv.schart, [{ vals: col(2), col: "#39a0c8" }, { vals: col(3), col: "#4cbf7f", dash: [4, 3] }], Math.max(20, ...col(2), ...col(3)));
+  gChart(DASH.cv.schart, [{ vals: col(2), col: "#39a0c8" }, { vals: col(3), col: "#4cbf7f", dash: [4, 3] }], Math.max(12, ...col(3)));
   $("s_schart").innerHTML = `<i style="color:#39a0c8">● ${fmt1(kn)}</i> <i style="color:#4cbf7f">● ${T("d_wind").toLowerCase()} ${fmt0(wd.kn)}</i> ${T("u_kn")}`;
 }

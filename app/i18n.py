@@ -13,7 +13,7 @@ STRINGS = {
 - **Classement** : indice CO₂ × temps (tonnes de CO₂ émises × secondes) : le moteur coûte du CO₂, la lenteur coûte du temps ; le kite fait baisser les deux. À indice égal (par exemple 0 au kite seul), le plus rapide passe devant.
 - **Kite** : 150 m² et 200 m de lignes en traversée débutant ; en expert, tu choisis 10, 25 ou 100 m² et des lignes de 25, 100 ou 300 m ; 90 m² dans le bac à sable. Vent à l'altitude du kite selon une loi en puissance 1/7, puis vent apparent (on retranche la vitesse de la barge).
   Traction = ½·ρ·S·C_L·Va², où Va combine le vent apparent et la vitesse propre de l'aile en travers du vent (d'où l'intérêt des 8). Fenêtre de vol : puissance ∝ cos(élévation)·cos(écart au centre).
-- **Pilotage expert** : les lignes arrière font virer l'aile, les lignes avant règlent l'incidence (choquer/border). Un petit kite vire vite mais tire peu ; des lignes longues montent chercher plus de vent mais l'aile traverse la fenêtre plus lentement. Au-delà d'environ 4,5 kN par m² de kite, la ligne casse.
+- **Pilotage expert** : les lignes arrière font virer l'aile, les lignes avant règlent l'incidence (choquer/border). Un petit kite vire vite mais tire peu ; des lignes longues montent chercher plus de vent mais l'aile traverse la fenêtre plus lentement. Au-delà d'environ 1,6 kN par m² de kite, la ligne casse.
 - **Météo** : même scénario pour tous (Vaudaire, Vent, coup de Joran, Bise ; risées et pétole), qui se déroule selon le temps de course normalisé.
 - **Bac à sable** : puissance ∝ V³, gazole par traversée ∝ V² ; répartition du gain = moyenne des deux ordres (ralentir puis kite, kite puis ralentir).
 """,
@@ -28,7 +28,7 @@ STRINGS = {
 - **Ranking**: CO₂ × time index (tonnes of CO₂ emitted × seconds): the engine costs CO₂, slowness costs time; the kite lowers both. On equal index (e.g. 0 on kite alone), the fastest ranks first.
 - **Kite**: 150 m² on 200 m lines in the beginner crossing; in expert you pick 10, 25 or 100 m² and 25, 100 or 300 m lines; 90 m² in the sandbox. Wind at kite altitude from a 1/7 power law, then apparent wind (barge speed subtracted).
   Pull = ½·ρ·S·C_L·Va², where Va combines the apparent wind and the wing's own crosswind speed (hence figure-eights). Wind window: power ∝ cos(elevation)·cos(offset from centre).
-- **Expert flying**: back lines turn the wing, front lines set the angle of attack (depower/power). A small kite turns fast but pulls little; long lines reach stronger wind but the wing crosses the window more slowly. Above about 4.5 kN per m² of kite the line snaps.
+- **Expert flying**: back lines turn the wing, front lines set the angle of attack (depower/power). A small kite turns fast but pulls little; long lines reach stronger wind but the wing crosses the window more slowly. Above about 1.6 kN per m² of kite the line snaps.
 - **Weather**: the same scenario for everyone (Vaudaire, Vent, Joran squall, Bise; gusts and calm patches), driven by normalised race time.
 - **Sandbox**: power ∝ V³, diesel per crossing ∝ V²; share of the gain = average of both orders (slow down then kite, kite then slow down).
 """,
@@ -43,7 +43,7 @@ STRINGS = {
 - **Wertung**: Index CO₂ × Zeit (Tonnen CO₂ × Sekunden): der Motor kostet CO₂, Langsamkeit kostet Zeit; der Kite senkt beides. Bei gleichem Index (z. B. 0 nur mit Kite) liegt der Schnellere vorn.
 - **Kite**: 150 m² an 200-m-Leinen bei der Einsteiger-Überfahrt; als Profi wählst du 10, 25 oder 100 m² und Leinen von 25, 100 oder 300 m; 90 m² im Sandkasten. Wind in Kite-Höhe nach einem 1/7-Potenzgesetz, dann scheinbarer Wind (Schiffsgeschwindigkeit abgezogen).
   Zug = ½·ρ·S·C_L·Va², wobei Va den scheinbaren Wind und die Eigengeschwindigkeit des Schirms quer zum Wind kombiniert (daher die Achten). Windfenster: Leistung ∝ cos(Höhe)·cos(Abweichung von der Mitte).
-- **Profi-Steuerung**: die hinteren Leinen lenken den Schirm, die vorderen stellen den Anstellwinkel ein (fieren/dichtholen). Ein kleiner Kite dreht schnell, zieht aber wenig; lange Leinen erreichen stärkeren Wind, doch der Schirm quert das Fenster langsamer. Ab etwa 4,5 kN pro m² Kite reisst die Leine.
+- **Profi-Steuerung**: die hinteren Leinen lenken den Schirm, die vorderen stellen den Anstellwinkel ein (fieren/dichtholen). Ein kleiner Kite dreht schnell, zieht aber wenig; lange Leinen erreichen stärkeren Wind, doch der Schirm quert das Fenster langsamer. Ab etwa 1,6 kN pro m² Kite reisst die Leine.
 - **Wetter**: dasselbe Szenario für alle (Vaudaire, Vent, Joran-Bö, Bise; Böen und Flautenfelder), gesteuert durch die normierte Fahrzeit.
 - **Sandkasten**: Leistung ∝ V³, Diesel pro Überfahrt ∝ V²; Anteile am Gewinn = Mittel beider Reihenfolgen (erst langsamer, dann Kite und umgekehrt).
 """,
@@ -58,7 +58,7 @@ STRINGS = {
 - **Classifica**: indice CO₂ × tempo (tonnellate di CO₂ × secondi): il motore costa CO₂, la lentezza costa tempo; il kite abbassa entrambi. A parità di indice (per esempio 0 col solo kite), passa davanti il più veloce.
 - **Kite**: 150 m² e 200 m di cavi nella traversata principiante; da esperto scegli 10, 25 o 100 m² e cavi da 25, 100 o 300 m; 90 m² nella sandbox. Vento alla quota del kite secondo una legge di potenza 1/7, poi vento apparente (si sottrae la velocità della chiatta).
   Trazione = ½·ρ·S·C_L·Va², dove Va combina il vento apparente e la velocità propria dell'ala trasversale al vento (da qui l'interesse degli 8). Finestra di volo: potenza ∝ cos(elevazione)·cos(scarto dal centro).
-- **Pilotaggio esperto**: i cavi posteriori fanno virare l'ala, quelli anteriori regolano l'incidenza (lascare/cazzare). Un kite piccolo vira in fretta ma tira poco; cavi lunghi raggiungono vento più forte ma l'ala attraversa la finestra più lentamente. Oltre circa 4,5 kN per m² di kite il cavo si rompe.
+- **Pilotaggio esperto**: i cavi posteriori fanno virare l'ala, quelli anteriori regolano l'incidenza (lascare/cazzare). Un kite piccolo vira in fretta ma tira poco; cavi lunghi raggiungono vento più forte ma l'ala attraversa la finestra più lentamente. Oltre circa 1,6 kN per m² di kite il cavo si rompe.
 - **Meteo**: stesso scenario per tutti (Vaudaire, Vent, colpo di Joran, Bise; raffiche e bonacce), che si svolge secondo il tempo di gara normalizzato.
 - **Sandbox**: potenza ∝ V³, gasolio per traversata ∝ V²; ripartizione del guadagno = media dei due ordini (prima rallentare poi kite, e viceversa).
 """,

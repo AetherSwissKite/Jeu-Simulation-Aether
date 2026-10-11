@@ -107,7 +107,7 @@ def page_archi(pdf):
     box(ax, 4, 44, 28, 12, "Test.py", "Configuration de la page, langue (?lang=),\naffiche le jeu (sans onglets Streamlit).", "lilac")
     box(ax, 4, 28, 28, 14, "app/game.py", "Assemble index.html + leman_geo.json\n+ js/*.js (ordre des numéros) en un seul\ndocument, mis en cache selon les dates\nde modification. Monte le pont.", "lilac")
     box(ax, 4, 9, 28, 17, "app/storage · i18n",
-        "SQLite : validation (pseudo 1–16, temps\nplausible : ≥ 18 s / ≥ 55 s, total recalculé\ncôté serveur), classements, fantômes.\n"
+        "SQLite : validation (pseudo 1–16, temps\nplausible : ≥ 35 s / ≥ 105 s, total recalculé\ncôté serveur), classements, fantômes.\n"
         "Visiteurs uniques, routes des meilleures\ntentatives envoyées au jeu.", "lilac", fs=7.9)
     ax.text(37, 57.5, "PONT", fontsize=8.5, color=MUTED, fontweight="bold")
     box(ax, 37, 28, 22, 28, "Pont aether_bridge",
@@ -167,7 +167,7 @@ def page_physics(pdf):
         ("Masse effective ressentie", "80 t", "190 t", "barge à gravier chargée, inertie"),
         ("Pilotage du kite", "automatique (8)", "manuel (flèches)", "fenêtre de vol, choquer / border"),
         ("Kite · lignes", "150 m² · 200 m", "10/25/100 m² · 25/100/300 m", "petit = vif, grand = puissant"),
-        ("Tension max avant casse", "520 kN", "≈ 4,5 kN/m²", "pénalités : +4 s / +3 s / +2 s"),
+        ("Tension max avant casse", "140 kN", "≈ 1,6 kN/m²", "pénalités : +4 s / +3 s / +2 s"),
         ("Taux de lacet max", "17 °/s", "9,5 °/s", "la barre n'agit qu'avec de la vitesse"),
         ("Moteur · résistance", "500 kW · 80 kN", "idem", "R = 4,2 kN/(m/s)² · u²"),
         ("Carburant · CO$_2$", "0,215 kg/kWh", "3,17 kg/kg", "CO$_2$ évité = poussée utile du kite"),

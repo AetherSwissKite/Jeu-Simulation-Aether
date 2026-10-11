@@ -28,6 +28,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 16 | CO₂ nul moteur coupé, historique remis à zéro | 10-11 19:47:33 | 10-11 19:49:20 | 1 min 47 s |
 | 17 | Scores perdus, classement en direct, taille de la scène stable | 10-11 20:49:25 | 10-11 20:52:43 | 3 min 18 s |
 | 18 | Vent plus fort et plus de risées : environ 2× plus vite au kite | 10-11 23:25:14 | 10-11 23:40:38 | 15 min 24 s |
+| 19 | Retour en arrière, vent juste assez fort pour +20 % au kite | 10-11 23:43:23 | 10-11 23:58:01 | 14 min 38 s |
 
 ---
 
@@ -348,4 +349,20 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Kite expert : en vol 97 % du temps (100 m², lignes de 100 et 300 m) et 83 % (25 m², 100 m).
   - Aucune erreur JavaScript.
 - **Note** : les temps ne sont plus comparables à ceux d'avant ; la mise en ligne efface de toute façon l'ancien classement.
+
+## 19. Retour à la version d'avant, avec juste assez de vent pour aller ~20 % plus vite au kite
+- **Heure du prompt** : 2026-10-11 23:43:23 · **Heure du résultat** : 2026-10-11 23:58:01 · **Temps de calcul** : 14 min 38 s
+- **Demande** : le prompt 18 allait beaucoup trop loin. Revenir à la version d'avant, avec juste assez de vent pour aller environ 20 % plus vite avec le kite.
+- **Modifications** :
+  - **Retour en arrière** : tout le prompt 18 est annulé (`git revert`) : traction et finesse du kite d'origine, tensions, temps minimum du serveur, jauges et textes.
+  - **Vent** : 20 à 28 nœuds de base au lieu de 12 à 18 (environ +60 %). Mêmes directions qu'avant (vent portant, travers devant Lausanne), Joran inchangé.
+  - **Risées** : 80 au lieu de 46, un peu plus fortes (+8 à +15 nœuds au lieu de +6 à +13). Elles restent plus longtemps, pour qu'on les croise même en allant plus vite que l'allure nominale.
+  - **Tension de rupture** : relevée modérément pour que ce vent reste utilisable : 140 kN en débutant (au lieu de 95), environ 1,6 kN par m² en expert (au lieu de 1,15).
+  - **Kite expert** : on garde le réglage de maniabilité pour vent soutenu (65°/s au plus dans la fenêtre, effet de sol près de l'eau). Sans lui, le kite de 100 m² sur 100 m ne volait plus que 39 % du temps.
+- **Mesures** (pilote automatique de test, traversée débutant complète avec kite, plein gaz) :
+  - avant : 7,9 nœuds de moyenne, 72,8 s ;
+  - maintenant : 9,3 nœuds de moyenne (+18 %), pointes à 12,3 nœuds, 62,5 s ;
+  - étapes intermédiaires : +60 % de vent seul = +11 % de vitesse ; avec les risées = +18 %.
+  - Kite expert : en vol 97 % du temps (100 m² sur 100 ou 300 m) et 83 % (25 m², 100 m).
+  - Aucune erreur JavaScript.
 

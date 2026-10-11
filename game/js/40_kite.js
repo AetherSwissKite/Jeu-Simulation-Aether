@@ -106,7 +106,7 @@ function drawParagliderSide(ctx, x, y, span, angle) {
 }
 
 // --- Physique de traction en course ---
-const KITE = { area: 150, LREAL: 200, LVIS: 72, CL: 1.0, LD0: 6, FAST: 6, KC_AUTO: 13 };   // aile de traction haute performance
+const KITE = { area: 150, LREAL: 200, LVIS: 72, CL: 1.0, LD0: 4.2, FAST: 6, KC_AUTO: 3.2 };
 // Gréement choisi en mode expert : 3 surfaces et 3 longueurs de lignes (le débutant garde 150 m² sur 200 m)
 const RIG_AREAS = [10, 25, 100], RIG_LINES = [25, 100, 300];
 const RIG = (() => { let r = {}; try { r = JSON.parse(store.get("aether.rig") || "{}") || {}; } catch { /* valeur illisible */ } return { area: RIG_AREAS.includes(r.area) ? r.area : 25, line: RIG_LINES.includes(r.line) ? r.line : 100 }; })();
@@ -115,7 +115,7 @@ function kiteRig() {
   if (RACE.mode !== "expert") return { area: KITE.area, L: KITE.LREAL, Lvis: KITE.LVIS, tmax: cfg().TMAX, agil: 1 };
   return {
     area: RIG.area, L: RIG.line, Lvis: 18 + RIG.line * 0.27,
-    tmax: cfg().TMAX * RIG.area / 100,                         // lignes dimensionnées pour l'aile : ≈ 4,5 kN par m²
+    tmax: cfg().TMAX * RIG.area / 100,                         // lignes dimensionnées pour l'aile : ≈ 1,6 kN par m²
     agil: clamp(Math.pow(25 / RIG.area, 0.3), 0.6, 1.45)       // petite aile = virages vifs, grande aile = lente
   };
 }
@@ -195,7 +195,7 @@ function kiteStepManual(dt, air, steer, trimDir, rig) {
   // vitesse angulaire dans la fenêtre (°/s, rythme de jeu), volontairement compressée pour rester maniable :
   // jamais figée au bord (≈ 20°/s minimum), jamais incontrôlable au centre (65°/s au plus) ; lignes courtes = plus vive
   const lineF = clamp(Math.sqrt(KITE.LREAL / rig.L), 0.75, 1.5);
-  const om = Math.min(65, (18 + 28 * Math.sqrt(clamp(vt / 34, 0, 1.6))) * lineF);   // calibré pour le vent fort (25–40 nd)
+  const om = Math.min(65, (18 + 28 * Math.sqrt(clamp(vt / 34, 0, 1.6))) * lineF);   // calibré pour un vent soutenu (20–35 nd)
   KS.psi = norm180(KS.psi + steer * (80 + 50 * clamp(vt / 25, 0, 1)) * rig.agil * dt);
   // près de l'eau, la descente ralentit (effet de sol) : on a le temps de redresser l'aile avant de toucher
   const down = Math.cos(rad(KS.psi)) < 0 ? clamp(KS.theta / 10, 0.25, 1) : 1;

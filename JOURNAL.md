@@ -27,6 +27,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 15 | Scène pleine hauteur, fin de partie défilable, menu principal / rejouer | 10-11 09:43:33 | 10-11 09:46:56 | 3 min 23 s |
 | 16 | CO₂ nul moteur coupé, historique remis à zéro | 10-11 19:47:33 | 10-11 19:49:20 | 1 min 47 s |
 | 17 | Scores perdus, classement en direct, taille de la scène stable | 10-11 20:49:25 | 10-11 20:52:43 | 3 min 18 s |
+| 18 | Vent plus fort et plus de risées : environ 2× plus vite au kite | 10-11 23:25:14 | 10-11 23:40:38 | 15 min 24 s |
 
 ---
 
@@ -328,4 +329,23 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - **Classement en direct** : le pont Streamlit se rafraîchit toutes les 15 s (`st.fragment`), sans recharger le jeu. Chacun voit arriver les scores des autres.
   - **Taille de la scène** : revérifiée chaque seconde et quand les polices finissent de charger. La mise en page n'est retouchée que si la taille change vraiment.
 - **Vérification** : deux onglets (un spectateur ouvert d'abord, un joueur « MCN »). La course de MCN est arrivée dans la base, sa file d'attente s'est vidée, et le spectateur l'a vue apparaître en moins de 17 s sans recharger. Taille de la scène identique avant et après la course (569 px en 1366 × 768). Aucune erreur JavaScript.
+
+## 18. Vent plus fort et plus de risées : environ 2× plus vite avec le kite
+- **Heure du prompt** : 2026-10-11 23:25:14 · **Heure du résultat** : 2026-10-11 23:40:38 · **Temps de calcul** : 15 min 24 s
+- **Demande** : augmenter la force du vent et le nombre de risées pour aller environ 2 fois plus vite avec le kite en traversée.
+- **Analyse** : la résistance de la coque croît avec le carré de la vitesse. Doubler la vitesse demande donc environ 4 fois plus de poussée. Un calcul d'équilibre montrait qu'avec le kite d'avant, même 30 nœuds de vent ne donnaient qu'environ 11 nœuds. Il fallait renforcer le vent ET la traction du kite.
+- **Modifications** :
+  - **Vent de base** : 26 à 31 nœuds (au lieu de 12 à 18). Vent portant de grand largue (~140° de l'étrave) presque partout, vent de travers devant Lausanne, coup de Joran inchangé (22 à 24 nœuds, plus les rafales de tempête).
+  - **Risées** : 110 au lieu de 46, plus fortes (+12 à +21 nœuds au lieu de +6 à +13). Leur fenêtre de temps couvre une barge lente comme une barge deux fois plus rapide : on en croise quelle que soit son allure.
+  - **Kite** : traction de l'aile automatique (débutant) ×4, finesse de l'aile pilotée (expert) 4,2 → 6. Tension de rupture relevée : 520 kN en débutant, environ 4,5 kN par m² en expert (au lieu de 95 kN et 1,15 kN/m²).
+  - **Kite expert** : vitesse dans la fenêtre recalibrée pour ce vent fort (65°/s au plus), et léger effet de sol (la descente ralentit sous 10° d'altitude). L'aile reste ainsi maniable.
+  - **Serveur** : temps minimum accepté abaissé à 18 s en débutant et 55 s en expert (une barge très bien tractée va deux fois plus vite).
+  - **Affichage** : compteur de vitesse et graphique jusqu'à 20 nœuds ; astuce du tutoriel et hypothèses du modèle mises à jour (4 langues).
+- **Mesures** (pilote automatique de test, traversée débutant complète, plein gaz) :
+  - moteur seul : 7,5 nœuds de moyenne, 77,2 s ;
+  - avec le kite : 12,8 nœuds de moyenne, pointes à 19,1 nœuds, 46,3 s (avant ce prompt : environ 8 nœuds, 72,5 s).
+  - Le pilote automatique rentre le kite pendant la tempête : un joueur qui le garde en l'air dans les risées s'approche du doublement.
+  - Kite expert : en vol 97 % du temps (100 m², lignes de 100 et 300 m) et 83 % (25 m², 100 m).
+  - Aucune erreur JavaScript.
+- **Note** : les temps ne sont plus comparables à ceux d'avant ; la mise en ligne efface de toute façon l'ancien classement.
 

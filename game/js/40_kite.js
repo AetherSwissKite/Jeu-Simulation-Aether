@@ -106,7 +106,7 @@ function drawParagliderSide(ctx, x, y, span, angle) {
 }
 
 // --- Physique de traction en course ---
-const KITE = { area: 150, LREAL: 200, LVIS: 72, CL: 1.0, LD0: 4.2, FAST: 6, KC_AUTO: 3.2 };
+const KITE = { area: 150, LREAL: 200, LVIS: 72, CL: 1.0, LD0: 6, FAST: 6, KC_AUTO: 13 };   // aile de traction haute performance
 // Gréement choisi en mode expert : 3 surfaces et 3 longueurs de lignes (le débutant garde 150 m² sur 200 m)
 const RIG_AREAS = [10, 25, 100], RIG_LINES = [25, 100, 300];
 const RIG = (() => { let r = {}; try { r = JSON.parse(store.get("aether.rig") || "{}") || {}; } catch { /* valeur illisible */ } return { area: RIG_AREAS.includes(r.area) ? r.area : 25, line: RIG_LINES.includes(r.line) ? r.line : 100 }; })();
@@ -115,7 +115,7 @@ function kiteRig() {
   if (RACE.mode !== "expert") return { area: KITE.area, L: KITE.LREAL, Lvis: KITE.LVIS, tmax: cfg().TMAX, agil: 1 };
   return {
     area: RIG.area, L: RIG.line, Lvis: 18 + RIG.line * 0.27,
-    tmax: cfg().TMAX * RIG.area / 100,                         // lignes dimensionnées pour l'aile : ≈ 1,15 kN par m²
+    tmax: cfg().TMAX * RIG.area / 100,                         // lignes dimensionnées pour l'aile : ≈ 4,5 kN par m²
     agil: clamp(Math.pow(25 / RIG.area, 0.3), 0.6, 1.45)       // petite aile = virages vifs, grande aile = lente
   };
 }
@@ -193,11 +193,13 @@ function kiteStepManual(dt, air, steer, trimDir, rig) {
   const LD = KITE.LD0 * (0.5 + 0.5 * KS.trim);
   const vt = air.Wa * wf * LD + 0.12 * air.Wa;                // vitesse de l'aile en travers du vent (m/s)
   // vitesse angulaire dans la fenêtre (°/s, rythme de jeu), volontairement compressée pour rester maniable :
-  // jamais figée au bord (≈ 20°/s minimum), jamais incontrôlable au centre (75°/s au plus) ; lignes courtes = plus vive
+  // jamais figée au bord (≈ 20°/s minimum), jamais incontrôlable au centre (65°/s au plus) ; lignes courtes = plus vive
   const lineF = clamp(Math.sqrt(KITE.LREAL / rig.L), 0.75, 1.5);
-  const om = Math.min(75, (18 + 30 * Math.sqrt(clamp(vt / 22, 0, 1.6))) * lineF);
+  const om = Math.min(65, (18 + 28 * Math.sqrt(clamp(vt / 34, 0, 1.6))) * lineF);   // calibré pour le vent fort (25–40 nd)
   KS.psi = norm180(KS.psi + steer * (80 + 50 * clamp(vt / 25, 0, 1)) * rig.agil * dt);
-  KS.theta += om * Math.cos(rad(KS.psi)) * dt;
+  // près de l'eau, la descente ralentit (effet de sol) : on a le temps de redresser l'aile avant de toucher
+  const down = Math.cos(rad(KS.psi)) < 0 ? clamp(KS.theta / 10, 0.25, 1) : 1;
+  KS.theta += om * Math.cos(rad(KS.psi)) * down * dt;
   KS.phi += om * Math.sin(rad(KS.psi)) * dt / Math.max(Math.cos(rad(KS.theta)), 0.3);
   if (vt < 2.5) KS.theta -= (2.5 - vt) * 2 * dt;             // vraiment trop lent : l'aile retombe doucement
   if (Math.abs(KS.phi) > 88) KS.phi = Math.sign(KS.phi) * 88; // bord de la fenêtre : l'aile décroche

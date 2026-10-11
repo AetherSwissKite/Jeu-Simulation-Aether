@@ -18,7 +18,7 @@ from pathlib import Path
 DB_PATH = Path(__file__).resolve().parent.parent / "aether_scores.db"
 MODES = ("beginner", "expert")
 # temps de course plausibles (s) : en dessous, la course est refusée (vitesse impossible pour la barge)
-TIME_RANGE = {"beginner": (35, 1800), "expert": (105, 1800)}
+TIME_RANGE = {"beginner": (18, 1800), "expert": (55, 1800)}   # une barge bien tractée peut aller deux fois plus vite
 _LOCK = threading.Lock()
 _CTRL = re.compile(r"[\x00-\x1f\x7f]")
 SCHEMA = """

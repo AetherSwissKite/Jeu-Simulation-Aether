@@ -94,7 +94,7 @@ Object.assign(I18N.fr, {
   rr_minimap: "<b>Mini-carte</b> : ta position, les risées (points colorés), la zone de tempête (rouge) et les vapeurs CGN (points blancs).",
   rr_wind: "<b>Traits sur l'eau</b> : le vent, coloré de bleu (faible) à rouge et violet (fort) ; taches sombres = risées, plaques claires = pétole.",
   rr_kitebox: "<b>Encadré du kite</b> : tension de ligne (rouge = danger), zone de vol, puissance réglée.", rr_databar: "<b>Tableau de bord du bas</b> : chrono et progression, vitesse, potard des gaz, vent, tension et part du kite, CO₂ émis et évité, gîte, pénalités, fluidité.",
-  rr_beginner: "Astuce : le moteur seul plafonne vers 8,5 nœuds ; le kite bien placé t'en donne 2 à 4 de plus.", rr_expert: "Astuce : en plein centre et à pleine puissance, la ligne casse vite. Joue avec le bord de la fenêtre et choque dans les rafales."
+  rr_beginner: "Astuce : le moteur seul plafonne vers 8,5 nœuds ; bien mené dans les risées, le kite peut presque doubler ta vitesse.", rr_expert: "Astuce : en plein centre et à pleine puissance, la ligne casse vite. Joue avec le bord de la fenêtre et choque dans les rafales."
 });
 
 Object.assign(I18N.en, {
@@ -190,7 +190,7 @@ Object.assign(I18N.en, {
   rr_minimap: "<b>Mini-map</b>: your position, gusts (coloured dots), the storm area (red) and CGN steamers (white dots).",
   rr_wind: "<b>Streaks on the water</b>: the wind, from blue (light) to red and purple (strong); dark patches = gusts, glassy patches = calm.",
   rr_kitebox: "<b>Kite box</b>: line tension (red = danger), wind window zone, power setting.", rr_databar: "<b>Bottom dashboard</b>: time and progress, speed, throttle knob, wind, kite tension and share, CO₂ emitted and avoided, heel, penalties, smoothness.",
-  rr_beginner: "Tip: the engine alone tops out around 8.5 knots; a well-placed kite adds 2 to 4 more.", rr_expert: "Tip: dead centre at full power, the line snaps quickly. Play with the window edge and depower in the gusts."
+  rr_beginner: "Tip: the engine alone tops out around 8.5 knots; flown well through the gusts, the kite can almost double your speed.", rr_expert: "Tip: dead centre at full power, the line snaps quickly. Play with the window edge and depower in the gusts."
 });
 
 Object.assign(I18N.de, {
@@ -286,7 +286,7 @@ Object.assign(I18N.de, {
   rr_minimap: "<b>Minikarte</b>: deine Position, Böen (farbige Punkte), Sturmzone (rot) und CGN-Dampfer (weisse Punkte).",
   rr_wind: "<b>Striche auf dem Wasser</b>: der Wind, von blau (schwach) bis rot und violett (stark); dunkle Flecken = Böen, glatte Flächen = Flaute.",
   rr_kitebox: "<b>Kite-Box</b>: Leinenzug (rot = Gefahr), Zone im Windfenster, eingestellte Leistung.", rr_databar: "<b>Armaturenbrett unten</b>: Zeit und Fortschritt, Tempo, Gashebel, Wind, Kite-Zug und -Anteil, CO₂ ausgestossen und vermieden, Krängung, Strafzeiten, Flüssigkeit.",
-  rr_beginner: "Tipp: Mit dem Motor allein sind etwa 8,5 Knoten drin; ein gut platzierter Kite bringt 2 bis 4 mehr.", rr_expert: "Tipp: Genau in der Mitte bei voller Leistung reisst die Leine schnell. Spiele mit dem Fensterrand und fiere in den Böen."
+  rr_beginner: "Tipp: der Motor allein schafft etwa 8,5 Knoten; gut durch die Böen geflogen, kann der Kite dein Tempo fast verdoppeln.", rr_expert: "Tipp: Genau in der Mitte bei voller Leistung reisst die Leine schnell. Spiele mit dem Fensterrand und fiere in den Böen."
 });
 
 Object.assign(I18N.it, {
@@ -382,5 +382,5 @@ Object.assign(I18N.it, {
   rr_minimap: "<b>Minimappa</b>: la tua posizione, le raffiche (punti colorati), la zona di tempesta (rosso) e i piroscafi CGN (punti bianchi).",
   rr_wind: "<b>Strisce sull'acqua</b>: il vento, dal blu (debole) al rosso e viola (forte); macchie scure = raffiche, chiazze lisce = bonaccia.",
   rr_kitebox: "<b>Riquadro del kite</b>: tensione del cavo (rosso = pericolo), zona di volo, potenza regolata.", rr_databar: "<b>Cruscotto in basso</b>: tempo e avanzamento, velocità, gas, vento, tensione e quota del kite, CO₂ emessa ed evitata, sbandamento, penalità, fluidità.",
-  rr_beginner: "Consiglio: col solo motore si arriva a circa 8,5 nodi; un kite ben piazzato ne aggiunge 2-4.", rr_expert: "Consiglio: al centro a piena potenza il cavo si rompe in fretta. Gioca col bordo della finestra e lasca nelle raffiche."
+  rr_beginner: "Consiglio: col solo motore si arriva a circa 8,5 nodi; ben condotto nelle raffiche, il kite può quasi raddoppiare la tua velocità.", rr_expert: "Consiglio: al centro a piena potenza il cavo si rompe in fretta. Gioca col bordo della finestra e lasca nelle raffiche."
 });

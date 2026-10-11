@@ -2,6 +2,7 @@
 //  TEXTES DE L'INTERFACE — français, anglais, allemand, italien
 // ================================================================
 Object.assign(I18N.fr, {
+ main_menu: "Menu principal",
   help_skip: "Passer le tutoriel ⏭", players_n_rec: "{p} joueur(s) · {n} tentative(s) enregistrée(s)", visits: "{n} visiteurs depuis le lancement", nav_board: "Classements", routes_title: "Routes des meilleures tentatives", routes_note: "Chaque trait est la route d'une tentative, colorée selon la vitesse de la barge (bleu = lent, rouge = rapide).", no_routes: "Pas encore de route enregistrée pour cette sélection.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Vitesse · 30 s", d_thrust: "poussée", d_tension: "tension",
   ev_pirate: "🏴‍☠️ Abordage par le bateau pirate !", sharks_toast: "🦈 Des requins rôdent dans la tempête… et un bateau pirate croise au large !",
   space_pop: "Appuie sur la <b>barre d'espace</b> pour lancer le kite !",
@@ -97,6 +98,7 @@ Object.assign(I18N.fr, {
 });
 
 Object.assign(I18N.en, {
+ main_menu: "Main menu",
   help_skip: "Skip tutorial ⏭", players_n_rec: "{p} player(s) · {n} attempt(s) recorded", visits: "{n} visitors since launch", nav_board: "Leaderboards", routes_title: "Routes of the best attempts", routes_note: "Each line is one attempt's route, coloured by barge speed (blue = slow, red = fast).", no_routes: "No route recorded for this selection yet.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Speed · 30 s", d_thrust: "thrust", d_tension: "tension",
   ev_pirate: "🏴‍☠️ Boarded by the pirate ship!", sharks_toast: "🦈 Sharks are prowling in the storm… and a pirate ship is cruising nearby!",
   space_pop: "Press the <b>space bar</b> to launch the kite!",
@@ -192,6 +194,7 @@ Object.assign(I18N.en, {
 });
 
 Object.assign(I18N.de, {
+ main_menu: "Hauptmenü",
   help_skip: "Tutorial überspringen ⏭", players_n_rec: "{p} Spieler · {n} Versuch(e) erfasst", visits: "{n} Besucher seit dem Start", nav_board: "Ranglisten", routes_title: "Routen der besten Versuche", routes_note: "Jede Linie ist die Route eines Versuchs, eingefärbt nach Schiffsgeschwindigkeit (blau = langsam, rot = schnell).", no_routes: "Für diese Auswahl gibt es noch keine Route.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Tempo · 30 s", d_thrust: "Schub", d_tension: "Zug",
   ev_pirate: "🏴‍☠️ Vom Piratenschiff geentert!", sharks_toast: "🦈 Haie lauern im Sturm … und ein Piratenschiff kreuzt in der Nähe!",
   space_pop: "Drücke die <b>Leertaste</b>, um den Kite zu starten!",
@@ -287,6 +290,7 @@ Object.assign(I18N.de, {
 });
 
 Object.assign(I18N.it, {
+ main_menu: "Menu principale",
   help_skip: "Salta il tutorial ⏭", players_n_rec: "{p} giocatore/i · {n} tentativo/i registrato/i", visits: "{n} visitatori dal lancio", nav_board: "Classifiche", routes_title: "Rotte dei migliori tentativi", routes_note: "Ogni linea è la rotta di un tentativo, colorata secondo la velocità della chiatta (blu = lenta, rosso = veloce).", no_routes: "Ancora nessuna rotta per questa selezione.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Velocità · 30 s", d_thrust: "spinta", d_tension: "tensione",
   ev_pirate: "🏴‍☠️ Abbordaggio della nave pirata!", sharks_toast: "🦈 Squali in agguato nella tempesta… e una nave pirata incrocia al largo!",
   space_pop: "Premi la <b>barra spaziatrice</b> per lanciare il kite!",

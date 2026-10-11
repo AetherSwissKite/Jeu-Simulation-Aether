@@ -14,8 +14,19 @@ function fitRace() {
   const used = top + ((bar && bar.offsetHeight) || 50) + ((dash && dash.offsetHeight) || 90) + 30;
   const w = $("app").clientWidth;
   // 80 % de la place libre : la scène, le tableau de bord et le haut de page tiennent ensemble à l'écran
-  const h = clamp((vh - used) * 0.8, 360, w / 1.6);
+  // toute la place libre (3 % de marge) : la scène reste large et le tableau de bord visible en bas
+  const h = clamp((vh - used) * 0.97, 360, w / 1.45);
   document.documentElement.style.setProperty("--race-h", `${Math.round(h)}px`);
+  fitModals();
+}
+// fenêtres (fin de partie, classements, tutoriel) : jamais plus hautes que la partie visible de l'écran, défilables sinon
+function fitModals() {
+  let vh = window.innerHeight, top = 0;
+  try { const fe = window.frameElement; if (fe) { vh = window.parent.innerHeight; top = Math.max(0, fe.getBoundingClientRect().top); } } catch { /* parent inaccessible */ }
+  const visible = clamp(vh - top, 320, document.documentElement.scrollHeight || vh);
+  const root = document.documentElement.style;
+  root.setProperty("--modal-top", `${Math.round(clamp(visible * 0.05, 12, 60))}px`);
+  root.setProperty("--modal-max", `${Math.round(visible - clamp(visible * 0.05, 12, 60) - 16)}px`);
 }
 function goView(v) {
   if ((RACE.state === "run" || RACE.state === "pause" || RACE.state === "intro") && VIEW !== v) toast(T("race_abandoned"), "warn", null);
@@ -49,6 +60,7 @@ function goView(v) {
 // ---------------- Fenêtres ----------------
 let overlay = null;
 function showOverlay(id) {
+  if (id) fitModals();
   $("layer").hidden = !id;
   for (const o of ["ovName", "ovHelp", "ovPause", "ovEnd", "ovBoard"]) $(o).hidden = o !== id;
   overlay = id;
@@ -211,6 +223,7 @@ function initKeyboard() {
     }
     if (overlay === "ovBoard" && (k === "Escape" || k === "Enter")) { e.preventDefault(); closeBoard(); return; }
     if (overlay === "ovEnd" && k === "Enter") { e.preventDefault(); goView(RACE.mode); return; }
+    if (overlay === "ovEnd" && k === "Escape") { e.preventDefault(); goView("home"); return; }
     if ((RACE.state === "run" || RACE.state === "pause") && (lk === "p" || k === "Escape")) { e.preventDefault(); togglePause(); return; }
     if (overlay) return;
     if (VIEW === "beginner" || VIEW === "expert") {

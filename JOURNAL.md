@@ -24,6 +24,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 12 | Pages retirées, gréement expert, caméra, tableau de bord | 10-10 18:09:19 | 10-10 21:44:53 | 10 min 54 s |
 | 13 | Score CO₂ × temps, tentatives datées, bleu marine, EPFL, pirate, italien | 10-10 21:46:38 | 10-10 22:06:08 | 19 min 30 s |
 | 14 | Page Classements, visiteurs, pirate, bac à sable vivant, kite maniable, HUD | 10-11 08:21:44 | 10-11 08:38:06 | 16 min 22 s |
+| 15 | Scène pleine hauteur, fin de partie défilable, menu principal / rejouer | 10-11 09:43:33 | 10-11 09:46:56 | 3 min 23 s |
 
 ---
 
@@ -283,3 +284,15 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - pirate qui canonne le vapeur ;
   - maniabilité du kite avec trois gréements.
   - Aucune erreur JavaScript.
+
+## 15. Scène pleine hauteur, fin de partie défilable, boutons menu principal / rejouer
+- **Heure du prompt** : 2026-10-11 09:43:33 · **Heure du résultat** : 2026-10-11 09:46:56 · **Temps de calcul** : 3 min 23 s
+- **Demande** : la scène des traversées est trop petite en hauteur par rapport à l'écran. En fin de partie, le classement bloque l'écran et le bas de la fenêtre ne s'affiche pas. Il faut un bouton menu principal ou rejouer.
+- **Modifications** :
+  - **Scène** : elle reprend 97 % de la hauteur libre (au lieu de 80 %), le tableau de bord restant visible en bas. Mesures :
+    - 1366 × 768 : scène de 1345 × 570, bas du tableau de bord à 743 px ;
+    - 1920 × 1080 : scène de 1899 × 873, bas du tableau de bord à 1046 px.
+  - **Fenêtres** (fin de partie, classements, tutoriel, pause) : elles ne dépassent plus jamais la partie visible de l'écran et défilent à la molette si leur contenu est plus long.
+  - **Fin de partie** : barre de boutons collée en bas, toujours visible : « Menu principal » et « Rejouer ». Raccourcis : Entrée = rejouer, Échap = menu principal. Textes traduits en FR / EN / DE / IT.
+- **Vérification** : traversée débutant complète en 1366 × 768. La fenêtre de fin défile, ses boutons sont visibles (bas à 750 px sur 768) et « Menu principal » ramène à l'accueil. Aucune erreur JavaScript.
+

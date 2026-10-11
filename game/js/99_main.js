@@ -41,7 +41,7 @@ function init() {
   requestAnimationFrame(() => drawCards());
   new ResizeObserver(() => drawCards()).observe($("viewHome"));
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { curveDirty = true; drawCards(); });
-  const refit = () => { if (VIEW === "beginner" || VIEW === "expert") fitRace(); };
+  const refit = () => { if (VIEW === "beginner" || VIEW === "expert") fitRace(); else fitModals(); };
   window.addEventListener("resize", refit);
   try { window.parent.addEventListener("resize", refit); } catch { /* parent inaccessible */ }
   requestAnimationFrame(frame);

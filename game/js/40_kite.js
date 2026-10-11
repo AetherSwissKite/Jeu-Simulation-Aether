@@ -177,7 +177,7 @@ function kiteStepManual(dt, air, steer, trimDir, rig) {
   const tmax = rig.tmax;
   KS.damaged = Math.max(0, KS.damaged - dt);
   KS.dep = clamp(KS.dep + (KS.deployed ? 0.8 : -0.9) * dt, 0, 1);
-  KS.trim = clamp(KS.trim + trimDir * 0.55 * dt, 0.3, 1);
+  KS.trim = clamp(KS.trim + trimDir * 0.7 * dt, 0, 1);   // réglage de puissance de 0 (tout choqué) à 1 (bordé)
   if (!KS.deployed || KS.dep < 0.6) {
     KS.state = KS.deployed ? "launch" : "stowed"; KS.T = KS.fwd = KS.lat = 0;
     KS.azRel = air.down; KS.el = 80;
@@ -190,19 +190,21 @@ function kiteStepManual(dt, air, steer, trimDir, rig) {
   }
   KS.state = "flying";
   const wf = Math.max(0, Math.cos(rad(KS.theta)) * Math.cos(rad(KS.phi)));
-  const LD = KITE.LD0 * (0.55 + 0.45 * KS.trim);
+  const LD = KITE.LD0 * (0.5 + 0.5 * KS.trim);
   const vt = air.Wa * wf * LD + 0.12 * air.Wa;                // vitesse de l'aile en travers du vent (m/s)
-  // vitesse angulaire dans la fenêtre (°/s, rythme de jeu) : lignes courtes = l'aile traverse vite la fenêtre
-  const om = Math.min(130, deg(vt / rig.L) * KITE.FAST * Math.sqrt(rig.L / KITE.LREAL));
-  KS.psi = norm180(KS.psi + steer * (55 + 115 * clamp(vt / 25, 0, 1)) * rig.agil * dt);
+  // vitesse angulaire dans la fenêtre (°/s, rythme de jeu), volontairement compressée pour rester maniable :
+  // jamais figée au bord (≈ 20°/s minimum), jamais incontrôlable au centre (75°/s au plus) ; lignes courtes = plus vive
+  const lineF = clamp(Math.sqrt(KITE.LREAL / rig.L), 0.75, 1.5);
+  const om = Math.min(75, (18 + 30 * Math.sqrt(clamp(vt / 22, 0, 1.6))) * lineF);
+  KS.psi = norm180(KS.psi + steer * (80 + 50 * clamp(vt / 25, 0, 1)) * rig.agil * dt);
   KS.theta += om * Math.cos(rad(KS.psi)) * dt;
   KS.phi += om * Math.sin(rad(KS.psi)) * dt / Math.max(Math.cos(rad(KS.theta)), 0.3);
-  if (vt < 5) KS.theta -= (5 - vt) * 2.6 * dt;                // trop lent : l'aile retombe
+  if (vt < 2.5) KS.theta -= (2.5 - vt) * 2 * dt;             // vraiment trop lent : l'aile retombe doucement
   if (Math.abs(KS.phi) > 88) KS.phi = Math.sign(KS.phi) * 88; // bord de la fenêtre : l'aile décroche
   if (KS.theta > 88) KS.theta = 88;
   KS.wf = wf;
   KS.Va = air.Wa * wf * Math.sqrt(1 + LD * LD);
-  KS.T = 0.5 * RHO * rig.area * KITE.CL * (0.2 + 0.8 * KS.trim) * KS.Va * KS.Va / 1000;
+  KS.T = 0.5 * RHO * rig.area * KITE.CL * (0.1 + 0.9 * KS.trim) * KS.Va * KS.Va / 1000;
   KS.azRel = air.down + KS.phi; KS.el = KS.theta;
   const Th = KS.T * Math.cos(rad(KS.theta));
   KS.fwd = Th * Math.cos(rad(KS.azRel)); KS.lat = Th * Math.sin(rad(KS.azRel));

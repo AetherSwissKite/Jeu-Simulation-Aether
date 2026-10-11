@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS runs (
 );
 CREATE INDEX IF NOT EXISTS runs_mode_total ON runs(mode, total_s);
 CREATE INDEX IF NOT EXISTS runs_ts ON runs(ts);
+CREATE TABLE IF NOT EXISTS visits (vid TEXT PRIMARY KEY, ts INTEGER NOT NULL);
 """
 
 
@@ -145,3 +146,26 @@ def ranked_runs(mode, since_ts=0, sort="score", limit=None, with_track=False):
     key = {"score": "score", "co2": "co2_kg", "time": "total_s"}.get(sort, "score")
     rows.sort(key=lambda d: (d[key] if d[key] is not None else 1e18, d["total_s"]))
     return rows[:limit] if limit else rows
+
+
+def add_visit(vid):
+    """Compte un visiteur (identifiant anonyme tiré au hasard par le navigateur), une seule fois."""
+    vid = re.sub(r"[^a-z0-9]", "", str(vid or "").lower())[:40]
+    if len(vid) < 8:
+        return False
+    with _LOCK, _conn() as c:
+        return c.execute("INSERT OR IGNORE INTO visits VALUES (?, ?)", (vid, int(time.time()))).rowcount == 1
+
+
+def visits():
+    with _conn() as c:
+        return c.execute("SELECT COUNT(*) FROM visits").fetchone()[0]
+
+
+def routes(limit=24):
+    """Routes des meilleures tentatives de chaque mode (indice CO₂ × temps), pour la page Classements du jeu."""
+    out = {}
+    for m in MODES:
+        out[m] = [{"name": r["name"], "team": r["team"], "ts": r["ts"], "total": r["total_s"], "co2": r["co2_kg"], "track": r["track"]}
+                  for r in ranked_runs(m, sort="score", limit=limit, with_track=True)]
+    return out

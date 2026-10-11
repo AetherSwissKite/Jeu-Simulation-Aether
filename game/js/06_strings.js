@@ -2,9 +2,10 @@
 //  TEXTES DE L'INTERFACE — français, anglais, allemand, italien
 // ================================================================
 Object.assign(I18N.fr, {
+  help_skip: "Passer le tutoriel ⏭", players_n_rec: "{p} joueur(s) · {n} tentative(s) enregistrée(s)", visits: "{n} visiteurs depuis le lancement", nav_board: "Classements", routes_title: "Routes des meilleures tentatives", routes_note: "Chaque trait est la route d'une tentative, colorée selon la vitesse de la barge (bleu = lent, rouge = rapide).", no_routes: "Pas encore de route enregistrée pour cette sélection.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Vitesse · 30 s", d_thrust: "poussée", d_tension: "tension",
   ev_pirate: "🏴‍☠️ Abordage par le bateau pirate !", sharks_toast: "🦈 Des requins rôdent dans la tempête… et un bateau pirate croise au large !",
   space_pop: "Appuie sur la <b>barre d'espace</b> pour lancer le kite !",
-  s_score: "CO₂ × temps", s_co2: "CO₂", s_time: "Temps", col_attempt: "Tentative", avg: "Moyenne", best: "Meilleur", podium_rule: "Podium : indice CO₂ × temps (t·s), le plus petit gagne", e_score: "Indice CO₂ × temps",
+  s_score: "CO₂ × temps", s_co2: "CO₂", s_time: "Temps", col_attempt: "Tentative", avg: "Moyenne", best: "Meilleur", podium_rule: "Podium : indice CO₂ × temps = tonnes de CO₂ émises × secondes de course (t·s). Le plus petit gagne : va vite en brûlant peu.", e_score: "Indice CO₂ × temps",
   brand_sub: "Simulateur de traction par kite · Léman", nav_home: "Accueil", nav_sandbox: "Bac à sable", nav_beginner: "Traversée débutant", nav_expert: "Traversée expert",
   help: "Aide", board: "Classements", tutorial: "Tutoriel", play: "Jouer", explore: "Explorer", next: "Suivant ▶", back: "◀ Retour", got_it: "Compris ⏎", lets_go: "C'est parti ⏎",
   cancel: "Annuler", close: "Fermer", home: "Accueil", play_again: "Rejouer ⏎", pause: "Pause", resume: "Reprendre", quit: "Quitter", key_space: "Espace", key_esc: "Échap", u_kn: "nd",
@@ -52,7 +53,7 @@ Object.assign(I18N.fr, {
   team_none: "— Sans équipe —", team_members: "{t} · {n} membre(s)", team_create: "＋ Créer une nouvelle équipe…", err_name: "Écris un pseudo pour enregistrer ton temps.", err_team: "Donne un nom à ta nouvelle équipe (ou choisis « Sans équipe »).",
   pause_title: "Tout est <em>figé</em>", pause_text: "Appuie sur <kbd>P</kbd> ou <kbd>Échap</kbd> pour reprendre.",
   race_abandoned: "Traversée abandonnée",
-  w_vaudaire: "La Vaudaire souffle du sud-est : vent dans le dos, sors le kite !", w_vent: "Le « Vent » du sud-ouest arrive de face : le kite tire peu, garde de la vitesse au moteur.",
+  w_vaudaire: "La Vaudaire souffle du sud-est : vent dans le dos, sors le kite !", w_vent: "Devant Lausanne, le Vent du sud-ouest souffle de travers : le kite tire encore, garde-le en l'air !",
   w_joran: "Coup de Joran ! Le vent du nord-ouest forcit brutalement.", w_bise: "La Bise du nord-est te pousse vers Genève : c'est le moment d'attraper les risées.",
   storm_warn: "⚠ Tempête de Joran droit devant : rentre le kite (Espace) si la tension monte !", storm_warn_expert: "⚠ Tempête de Joran : choque les lignes avant (↑) et sors de la zone de puissance.",
   dolphins: "🐬 Des dauphins t'accompagnent !", gust_caught: "Risée attrapée ! 💨",
@@ -96,9 +97,10 @@ Object.assign(I18N.fr, {
 });
 
 Object.assign(I18N.en, {
+  help_skip: "Skip tutorial ⏭", players_n_rec: "{p} player(s) · {n} attempt(s) recorded", visits: "{n} visitors since launch", nav_board: "Leaderboards", routes_title: "Routes of the best attempts", routes_note: "Each line is one attempt's route, coloured by barge speed (blue = slow, red = fast).", no_routes: "No route recorded for this selection yet.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Speed · 30 s", d_thrust: "thrust", d_tension: "tension",
   ev_pirate: "🏴‍☠️ Boarded by the pirate ship!", sharks_toast: "🦈 Sharks are prowling in the storm… and a pirate ship is cruising nearby!",
   space_pop: "Press the <b>space bar</b> to launch the kite!",
-  s_score: "CO₂ × time", s_co2: "CO₂", s_time: "Time", col_attempt: "Attempt", avg: "Average", best: "Best", podium_rule: "Podium: CO₂ × time index (t·s), lowest wins", e_score: "CO₂ × time index",
+  s_score: "CO₂ × time", s_co2: "CO₂", s_time: "Time", col_attempt: "Attempt", avg: "Average", best: "Best", podium_rule: "Podium: CO₂ × time index = tonnes of CO₂ emitted × seconds of racing (t·s). Lowest wins: be fast while burning little.", e_score: "CO₂ × time index",
   brand_sub: "Kite traction simulator · Lake Geneva", nav_home: "Home", nav_sandbox: "Sandbox", nav_beginner: "Beginner crossing", nav_expert: "Expert crossing",
   help: "Help", board: "Leaderboards", tutorial: "Tutorial", play: "Play", explore: "Explore", next: "Next ▶", back: "◀ Back", got_it: "Got it ⏎", lets_go: "Let's go ⏎",
   cancel: "Cancel", close: "Close", home: "Home", play_again: "Play again ⏎", pause: "Pause", resume: "Resume", quit: "Quit", key_space: "Space", key_esc: "Esc", u_kn: "kn",
@@ -146,7 +148,7 @@ Object.assign(I18N.en, {
   team_none: "— No team —", team_members: "{t} · {n} member(s)", team_create: "＋ Create a new team…", err_name: "Enter a name to record your time.", err_team: "Give your new team a name (or pick “No team”).",
   pause_title: "Everything is <em>frozen</em>", pause_text: "Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume.",
   race_abandoned: "Crossing abandoned",
-  w_vaudaire: "The Vaudaire blows from the south-east: wind from behind, launch the kite!", w_vent: "The south-westerly “Vent” comes head-on: the kite pulls little, keep speed with the engine.",
+  w_vaudaire: "The Vaudaire blows from the south-east: wind from behind, launch the kite!", w_vent: "Off Lausanne, the south-westerly “Vent” blows abeam: the kite still pulls, keep it flying!",
   w_joran: "Joran squall! The north-westerly wind picks up suddenly.", w_bise: "The north-easterly Bise pushes you towards Geneva: time to catch the gusts.",
   storm_warn: "⚠ Joran storm ahead: stow the kite (Space) if tension rises!", storm_warn_expert: "⚠ Joran storm: depower (↑) and leave the power zone.",
   dolphins: "🐬 Dolphins are joining you!", gust_caught: "Gust caught! 💨",
@@ -190,9 +192,10 @@ Object.assign(I18N.en, {
 });
 
 Object.assign(I18N.de, {
+  help_skip: "Tutorial überspringen ⏭", players_n_rec: "{p} Spieler · {n} Versuch(e) erfasst", visits: "{n} Besucher seit dem Start", nav_board: "Ranglisten", routes_title: "Routen der besten Versuche", routes_note: "Jede Linie ist die Route eines Versuchs, eingefärbt nach Schiffsgeschwindigkeit (blau = langsam, rot = schnell).", no_routes: "Für diese Auswahl gibt es noch keine Route.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Tempo · 30 s", d_thrust: "Schub", d_tension: "Zug",
   ev_pirate: "🏴‍☠️ Vom Piratenschiff geentert!", sharks_toast: "🦈 Haie lauern im Sturm … und ein Piratenschiff kreuzt in der Nähe!",
   space_pop: "Drücke die <b>Leertaste</b>, um den Kite zu starten!",
-  s_score: "CO₂ × Zeit", s_co2: "CO₂", s_time: "Zeit", col_attempt: "Versuch", avg: "Mittel", best: "Bestwert", podium_rule: "Podest: Index CO₂ × Zeit (t·s), der kleinste gewinnt", e_score: "Index CO₂ × Zeit",
+  s_score: "CO₂ × Zeit", s_co2: "CO₂", s_time: "Zeit", col_attempt: "Versuch", avg: "Mittel", best: "Bestwert", podium_rule: "Podest: Index CO₂ × Zeit = ausgestossene Tonnen CO₂ × Fahrsekunden (t·s). Der kleinste gewinnt: schnell sein und wenig verbrennen.", e_score: "Index CO₂ × Zeit",
   brand_sub: "Zugdrachen-Simulator · Genfersee", nav_home: "Start", nav_sandbox: "Sandkasten", nav_beginner: "Überfahrt Einsteiger", nav_expert: "Überfahrt Profi",
   help: "Hilfe", board: "Ranglisten", tutorial: "Anleitung", play: "Spielen", explore: "Entdecken", next: "Weiter ▶", back: "◀ Zurück", got_it: "Verstanden ⏎", lets_go: "Los geht's ⏎",
   cancel: "Abbrechen", close: "Schliessen", home: "Start", play_again: "Nochmal ⏎", pause: "Pause", resume: "Weiter", quit: "Beenden", key_space: "Leertaste", key_esc: "Esc", u_kn: "kn",
@@ -240,7 +243,7 @@ Object.assign(I18N.de, {
   team_none: "— Kein Team —", team_members: "{t} · {n} Mitglied(er)", team_create: "＋ Neues Team erstellen …", err_name: "Gib einen Namen ein, um deine Zeit zu speichern.", err_team: "Gib deinem neuen Team einen Namen (oder wähle « Kein Team »).",
   pause_title: "Alles <em>angehalten</em>", pause_text: "Drücke <kbd>P</kbd> oder <kbd>Esc</kbd>, um weiterzuspielen.",
   race_abandoned: "Überfahrt abgebrochen",
-  w_vaudaire: "Die Vaudaire weht aus Südost: Rückenwind, setze den Kite!", w_vent: "Der südwestliche « Vent » kommt von vorn: der Kite zieht wenig, halte das Tempo mit dem Motor.",
+  w_vaudaire: "Die Vaudaire weht aus Südost: Rückenwind, setze den Kite!", w_vent: "Vor Lausanne weht der Südwestwind „Vent“ von der Seite: der Kite zieht noch, halte ihn in der Luft!",
   w_joran: "Joran-Bö! Der Nordwestwind frischt schlagartig auf.", w_bise: "Die Bise aus Nordost schiebt dich nach Genf: jetzt die Böen erwischen.",
   storm_warn: "⚠ Joran-Sturm voraus: berge den Kite (Leertaste), wenn der Zug steigt!", storm_warn_expert: "⚠ Joran-Sturm: fiere die vorderen Leinen (↑) und verlasse die Powerzone.",
   dolphins: "🐬 Delfine begleiten dich!", gust_caught: "Bö erwischt! 💨",
@@ -284,9 +287,10 @@ Object.assign(I18N.de, {
 });
 
 Object.assign(I18N.it, {
+  help_skip: "Salta il tutorial ⏭", players_n_rec: "{p} giocatore/i · {n} tentativo/i registrato/i", visits: "{n} visitatori dal lancio", nav_board: "Classifiche", routes_title: "Rotte dei migliori tentativi", routes_note: "Ogni linea è la rotta di un tentativo, colorata secondo la velocità della chiatta (blu = lenta, rosso = veloce).", no_routes: "Ancora nessuna rotta per questa selezione.", d_thrust_chart: "Kite · 30 s", d_speed_chart: "Velocità · 30 s", d_thrust: "spinta", d_tension: "tensione",
   ev_pirate: "🏴‍☠️ Abbordaggio della nave pirata!", sharks_toast: "🦈 Squali in agguato nella tempesta… e una nave pirata incrocia al largo!",
   space_pop: "Premi la <b>barra spaziatrice</b> per lanciare il kite!",
-  s_score: "CO₂ × tempo", s_co2: "CO₂", s_time: "Tempo", col_attempt: "Tentativo", avg: "Media", best: "Migliore", podium_rule: "Podio: indice CO₂ × tempo (t·s), vince il più basso", e_score: "Indice CO₂ × tempo",
+  s_score: "CO₂ × tempo", s_co2: "CO₂", s_time: "Tempo", col_attempt: "Tentativo", avg: "Media", best: "Migliore", podium_rule: "Podio: indice CO₂ × tempo = tonnellate di CO₂ emesse × secondi di gara (t·s). Vince il più basso: veloce bruciando poco.", e_score: "Indice CO₂ × tempo",
   brand_sub: "Simulatore di trazione a kite · Lago Lemano", nav_home: "Home", nav_sandbox: "Sandbox", nav_beginner: "Traversata principiante", nav_expert: "Traversata esperto",
   help: "Aiuto", board: "Classifiche", tutorial: "Tutorial", play: "Gioca", explore: "Esplora", next: "Avanti ▶", back: "◀ Indietro", got_it: "Capito ⏎", lets_go: "Si parte ⏎",
   cancel: "Annulla", close: "Chiudi", home: "Home", play_again: "Rigioca ⏎", pause: "Pausa", resume: "Riprendi", quit: "Esci", key_space: "Spazio", key_esc: "Esc", u_kn: "nd",
@@ -334,7 +338,7 @@ Object.assign(I18N.it, {
   team_none: "— Nessuna squadra —", team_members: "{t} · {n} membro/i", team_create: "＋ Crea una nuova squadra…", err_name: "Inserisci un nome per registrare il tuo tempo.", err_team: "Dai un nome alla nuova squadra (o scegli «Nessuna squadra»).",
   pause_title: "Tutto è <em>fermo</em>", pause_text: "Premi <kbd>P</kbd> o <kbd>Esc</kbd> per riprendere.",
   race_abandoned: "Traversata abbandonata",
-  w_vaudaire: "Soffia la Vaudaire da sud-est: vento in poppa, lancia il kite!", w_vent: "Il «Vent» da sud-ovest arriva di prua: il kite tira poco, mantieni la velocità col motore.",
+  w_vaudaire: "Soffia la Vaudaire da sud-est: vento in poppa, lancia il kite!", w_vent: "Davanti a Losanna il «Vent» da sud-ovest soffia di traverso: il kite tira ancora, tienilo in volo!",
   w_joran: "Colpo di Joran! Il vento da nord-ovest rinforza all'improvviso.", w_bise: "La Bise da nord-est ti spinge verso Ginevra: è il momento di cogliere le raffiche.",
   storm_warn: "⚠ Tempesta di Joran in arrivo: ritira il kite (Spazio) se la tensione sale!", storm_warn_expert: "⚠ Tempesta di Joran: lasca (↑) ed esci dalla zona di potenza.",
   dolphins: "🐬 Dei delfini ti accompagnano!", gust_caught: "Raffica presa! 💨",

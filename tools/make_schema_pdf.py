@@ -1,7 +1,7 @@
 """Génère docs/schema_fonctionnel.pdf : schéma fonctionnel d'Æther Swiss Kite Simulator.
 
 Usage : python tools/make_schema_pdf.py
-Quatre pages A4 paysage dessinées avec matplotlib (déjà nécessaire à l'application, aucune dépendance en plus) :
+Quatre pages A4 paysage dessinées avec matplotlib (outil local, pas nécessaire à l'application en ligne) :
 1. boucle macro VS Code ↔ GitHub ↔ Streamlit ↔ joueurs ;  2. architecture logicielle ;
 3. modèles physiques ;  4. modèles visuels, performances et outils.
 """
@@ -75,7 +75,7 @@ def page_macro(pdf):
             "Serveur Python : pages, stockage SQLite,\nvalidation des scores.\n"
             "Disque éphémère : la base repart à zéro\nà chaque redéploiement.", "mint")
     d = box(ax, 71, 9, 25, 22, "Navigateur des joueurs",
-            "Pages : Jeu · Résultats.\n"
+            "Une seule page : le jeu (accueil, bac à\nsable, traversées, classements).\n"
             "Le jeu tourne dans une iframe\n(Canvas 2D, physique et rendu locaux,\n30 à 60 images/s).\n"
             "Langue FR / EN / DE / IT partagée\nentre Streamlit et le jeu.", "peach")
     e = box(ax, 37.5, 9, 25, 22, "Données partagées",
@@ -83,7 +83,7 @@ def page_macro(pdf):
             "Classement CO$_2$ × temps, CO$_2$ ou temps,\nchaque tentative datée ; jour / semaine /\nhistorique, par joueur et par équipe.\n"
             "Traces des 3 meilleurs = fantômes.", "sand")
     f = box(ax, 4, 9, 25, 22, "Utilisateur (porteur du projet)",
-            "Joue, observe les classements et\nla page Résultats.\n"
+            "Joue, observe les classements et\nles routes des meilleures tentatives.\n"
             "Rédige le prompt suivant (nouvelles\nfonctions, corrections, design).\n"
             "Consulte le suivi des prompts\net ce schéma (PDF).", "rose")
     arrow(ax, (a[0] + a[2], 52), (b[0], 52), "commit + push")
@@ -104,11 +104,11 @@ def page_archi(pdf):
     fig, ax = page(pdf, "2. Architecture logicielle",
                    "Python sert les pages et garde les scores ; tout le jeu (physique, rendu, commandes) tourne dans le navigateur.", 2)
     ax.text(4, 57.5, "SERVEUR STREAMLIT (PYTHON)", fontsize=8.5, color=MUTED, fontweight="bold")
-    box(ax, 4, 44, 28, 12, "Test.py", "Configuration de la page, langue (?lang=),\nnavigation en haut : Jeu, Résultats.", "lilac")
+    box(ax, 4, 44, 28, 12, "Test.py", "Configuration de la page, langue (?lang=),\naffiche le jeu (sans onglets Streamlit).", "lilac")
     box(ax, 4, 28, 28, 14, "app/game.py", "Assemble index.html + leman_geo.json\n+ js/*.js (ordre des numéros) en un seul\ndocument, mis en cache selon les dates\nde modification. Monte le pont.", "lilac")
-    box(ax, 4, 9, 28, 17, "app/storage · pages · i18n",
+    box(ax, 4, 9, 28, 17, "app/storage · i18n",
         "SQLite : validation (pseudo 1–16, temps\nplausible : ≥ 35 s / ≥ 105 s, total recalculé\ncôté serveur), classements, fantômes.\n"
-        "Résultats : routes colorées (matplotlib).", "lilac", fs=7.9)
+        "Visiteurs uniques, routes des meilleures\ntentatives envoyées au jeu.", "lilac", fs=7.9)
     ax.text(37, 57.5, "PONT", fontsize=8.5, color=MUTED, fontweight="bold")
     box(ax, 37, 28, 22, 28, "Pont aether_bridge",
         "st.components.v2\n\nPython → jeu :\n  data = {runs, ghosts, lang}\n  relayé par postMessage\n\n"
@@ -217,9 +217,9 @@ def page_visual(pdf):
         "Niveau 2 / 1 / 0 : résolution ×1,5/1,25/1,\nrangées d'eau 30/22/16, traits de vent\n260/180/110, pluie 160/110/70.\n"
         "Objets lointains ignorés (distance).", "peach", fs=7.9)
     box(ax, 4, 6.5, 92, 12.5, "Outils et liens",
-        "VS Code + Claude Code (édition, tests) · Git / GitHub (dépôt theodorejl/5-Code) · Streamlit 1.65 (pages, st.navigation, "
+        "VS Code + Claude Code (édition, tests) · Git / GitHub (dépôt theodorejl/5-Code) · Streamlit 1.65 ("
         "st.components.v2, st.iframe)\n"
-        "Python : SQLite (scores), pandas (tableaux), matplotlib (routes colorées, ce PDF) · Navigateur : HTML, CSS, JavaScript, Canvas 2D, "
+        "Python : SQLite (scores, visiteurs), matplotlib (ce PDF) · Navigateur : HTML, CSS, JavaScript, Canvas 2D, "
         "postMessage\n"
         "Tests : Chrome sans écran + protocole DevTools (CDP) : parcours automatisés des 3 modes, 4 langues, 3 gréements et classement ; "
         "captures d'écran vérifiées.\n"

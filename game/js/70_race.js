@@ -10,7 +10,7 @@ const MODES = {
   expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 115, camD: 62, camH: 20 }
 };
 const INTRO_DUR = 4.2, FINISH_DUR = 3.8;
-const GHOST_COLS = ["#d9a520", "#9aa1b5", "#c47a45"];
+const GHOST_COLS = ["#1e9e5a", "#46c37b", "#8fdcaa"];   // traces du top 3 en vert, du plus foncé (1er) au plus clair
 const KEYS = new Set();
 const RACE = {
   mode: "attract", state: "idle", t: 0, tau: 0.02, pen: 0, coll: 0, fuel: 0, saved: 0, track: [], trackT: 0,
@@ -133,9 +133,9 @@ function collisions(dt) {
     }
   }
   // bateau pirate (zone de tempête)
-  const pir = pirateState(RACE.tau, performance.now() / 1000);
-  if (Math.hypot(pir.x - B.x, pir.y - B.y) < 60) {
-    const ppts = [-10, 0, 10].map(ly => bargeToWorld({ ...pir, heelR: 0, pitchR: 0, heave: 0 }, 0, ly, 0));
+  const pir = PIRATE;
+  if (pir.init && Math.hypot(pir.x - B.x, pir.y - B.y) < 60) {
+    const ppts = [-10, 0, 10].map(ly => bargeToWorld({ x: pir.x, y: pir.y, hdg: pir.hdg, heelR: 0, pitchR: 0, heave: 0 }, 0, ly, 0));
     if (pts.some(a => ppts.some(c => Math.hypot(a[0] - c[0], a[1] - c[1]) < 9)) && !(RACE.cool.pirate > 0)) {
       RACE.cool.pirate = 3; RACE.pen += 5; RACE.coll++; B.u *= 0.4; RACE.shake = 0.9;
       toast(T("ev_pirate") + " +5 s", "bad", null);
@@ -439,26 +439,19 @@ function updateRaceHud(dt) {
   setThrottleUi(); setHelmUi();
   if (hudT < 0.1) return;
   hudT = 0;
-  const B = RACE.boat, w = RACE.wind, kn = B.u / KN;
-  $("hTime").textContent = fmtClock(RACE.t);
-  $("hSpeed").innerHTML = `${fmt1(kn)}<i>${T("u_kn")}</i>`;
-  const rel = norm180(w.from - B.hdg);
-  $("hWind").innerHTML = `${fmt0(w.kn)}<i>${T("u_kn")} ${windArrow(rel)}</i>`;
-  $("hKite").innerHTML = `${fmt0(KS.fwd)}<i>kN</i>`;
   $("hProg").textContent = `${fmt0(clamp(RACE.f, 0, 1) * 100)} %`;
   $("hProgFill").style.width = `${clamp(RACE.f, 0, 1) * 100}%`;
   updateDash();
   const tm = kiteRig().tmax;
   $("kbTension").style.width = `${clamp(KS.T / tm, 0, 1) * 100}%`;
   $("kbTension").style.background = KS.T > tm * 0.85 ? "#f07d9c" : KS.T > tm * 0.6 ? "#f2c14e" : "#5fc9a8";
-  $("kbTrim").style.width = `${KS.trim * 100}%`;
+  $("kbTrim").style.width = `${KS.trim * 100}%`; $("kbTrimVal").textContent = `${fmt0(KS.trim * 100)} %`;
   $("kbZone").textContent = KS.state === "flying" ? `${fmt0(clamp(KS.wf, 0, 1) * 100)} %` : T("ks_" + KS.state);
   $("kiteBtn").innerHTML = `<kbd>${T("key_space")}</kbd> ${T(KS.deployed ? "kite_retract" : "kite_deploy")}`;
   const warn = $("kwarn");
   if (KS.overload > 0.15 && RACE.state === "run") { warn.hidden = false; warn.className = "glass kwarn only-race over"; warn.innerHTML = `${T("overload")} ${fmt0(KS.T)} kN<small>${T(RACE.mode === "expert" ? "overload_hint_expert" : "overload_hint")}</small>`; }
   else warn.hidden = true;
 }
-const windArrow = rel => ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"][Math.round(norm360(rel) / 45) % 8];
 function setThrottleUi() {
   const f = (1 - RACE.throttle) / 1.4;
   $("thrKnob").style.top = `${clamp(f, 0, 1) * 100}%`;
@@ -478,6 +471,10 @@ function initRaceControls() {
   hr.addEventListener("pointerup", () => { delete hr.dataset.drag; });
   hr.addEventListener("dblclick", () => { RACE.rudder = 0; });
   $("kiteBtn").addEventListener("click", () => { if (RACE.state === "run") toggleKiteDeploy(); });
+  // réglage de puissance à la souris : glisser sur la barre (expert)
+  const trimBar = $("kbTrimBar"), setTrim = e => { const r = trimBar.getBoundingClientRect(); KS.trim = clamp((e.clientX - r.left) / r.width, 0, 1); };
+  trimBar.addEventListener("pointerdown", e => { trimBar.setPointerCapture(e.pointerId); setTrim(e); });
+  trimBar.addEventListener("pointermove", e => { if (e.buttons) setTrim(e); });
   document.querySelectorAll("[data-rig]").forEach(btn => btn.addEventListener("click", () => setRig(btn.dataset.rig, +btn.dataset.v)));
   updateRigUi();
   $("tGhost").addEventListener("click", toggleGhosts);

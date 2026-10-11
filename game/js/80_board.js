@@ -44,11 +44,36 @@ window.addEventListener("message", ev => {
         RACE.ghosts[mode] = (m.ghosts[mode] || []).filter(g => Array.isArray(g.track)).map(g => ({ name: cleanText(g.name, 16), track: g.track.filter(q => Array.isArray(q) && q.length >= 3).map(q => q.map(Number)) }));
       }
     }
+    if (m.routes && typeof m.routes === "object") BOARD.routes = m.routes;
+    if (Number.isFinite(m.visits)) { BOARD.visits = m.visits; showVisits(); }
     if (m.lang && m.lang !== LANG) setLang(m.lang, true);
     renderBoards();
+    if (VIEW === "board") renderRoutes();
   }
 });
 hostSend({ type: "hello" });
+// compteur de visiteurs : un identifiant anonyme par navigateur, compté une seule fois par le serveur
+{
+  let vid = store.get("aether.vid");
+  if (!vid) { vid = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`; store.set("aether.vid", vid); }
+  hostSend({ type: "visit", vid });
+}
+function showVisits() { const el = $("visitCount"); if (el && Number.isFinite(BOARD.visits)) el.textContent = `👁 ${T("visits", { n: fmt0(BOARD.visits) })}`; }
+// page Classements : routes des meilleures tentatives (mode, période et critère du classement choisis)
+function renderRoutes() {
+  const all = (BOARD.routes && BOARD.routes[BOARD.mode]) || [];
+  const f = METRICS[BOARD.sort] || METRICS.score;
+  const list = all.map(e => ({ ...e, ...cleanRun({ ...e, mode: BOARD.mode }), track: e.track })).filter(e => e.track && e.track.length > 1 && inPeriod(e.ts, BOARD.period)).sort((a, b) => f(a) - f(b)).slice(0, 8);
+  $("routesEmpty").hidden = list.length > 0;
+  const big = $("routesMap"), grid = $("routesGrid");
+  const vs = list.flatMap(e => e.track.map(q => q[2])), range = vs.length ? [Math.min(...vs), Math.max(...vs, Math.min(...vs) + 0.1)] : null;
+  grid.innerHTML = list.map((e, i) => `<figure><canvas></canvas><figcaption><b>${i + 1}.</b> ${cleanText(attemptLabel(e), 60)}<br><span>${fmtMetric("score", e.score)} · ${fmtMetric("co2", e.co2 ?? NaN)} · ${fmtTime(e.total)}</span></figcaption></figure>`).join("");
+  requestAnimationFrame(() => {
+    drawRouteMap(big, list.map(e => e.track), range);
+    grid.querySelectorAll("canvas").forEach((cv, i) => drawRouteMap(cv, list[i].track, range));
+    if (range) { $("routesVmin").textContent = `${fmt1(range[0])} ${T("u_kn")}`; $("routesVmax").textContent = `${fmt1(range[1])} ${T("u_kn")}`; }
+  });
+}
 
 function submitScore(entry) {
   BOARD.runs.push(cleanRun({ ...entry, ts: Date.now() / 1000 }));
@@ -115,6 +140,7 @@ function renderBoard(container, opts) {
       <div class="seg small" data-k="period"><button data-v="day">${T("p_day")}</button><button data-v="week">${T("p_week")}</button><button data-v="all">${T("p_all")}</button></div>
       <div class="seg small" data-k="group"><button data-v="players">${T("g_players")}</button><button data-v="teams">${T("g_teams")}</button></div>
     </div>
+    <p class="board-src board-count"></p>
     <div class="board-body">
       <div><div class="podium"></div><p class="board-src" style="margin:4px 0 0;text-align:center">${T("podium_rule")}</p></div>
       <div class="board-scroll"><table class="board"><thead></thead><tbody></tbody></table><p class="board-src" style="margin:6px 0 0"></p></div>
@@ -128,9 +154,12 @@ function renderBoard(container, opts) {
         if (k === "mode") { BOARD.mode = b.dataset.v; opts.mode = null; } else BOARD[k] = b.dataset.v;
         renderBoard(container, opts);   // ce bloc d'abord (même s'il n'est pas enregistré), puis les autres
         renderBoards();
+        if (VIEW === "board") renderRoutes();
       });
     });
   });
+  const pcount = new Set(attempts(mode, BOARD.period).map(keyOf)).size;
+  container.querySelector(".board-count").textContent = `👥 ${T("players_n_rec", { p: pcount, n: attempts(mode, BOARD.period).length })}`;
   const list = attempts(mode, BOARD.period, sort), mine = RACE.result && RACE.result.mode === mode ? RACE.result.id : null;
   // podium : toujours selon l'indice CO₂ × temps
   const pod = container.querySelector(".podium"), top = attempts(mode, BOARD.period, "score").filter(e => Number.isFinite(e.score));
@@ -202,13 +231,15 @@ function showEnd() {
   $("endBreak").innerHTML = rows.map(([a, b]) => `<span>${a}</span><span>${b}</span>`).join("");
   $("endRank").textContent = rank > 0 ? T("end_rank", { r: rank, n: pl.length }) : "";
   showOverlay("ovEnd");
-  requestAnimationFrame(() => drawRouteMap($("endMap"), r.track));
+  requestAnimationFrame(() => { const rg = drawRouteMap($("endMap"), r.track); if (rg) { $("endVmin").textContent = `${fmt1(rg[0])} ${T("u_kn")}`; $("endVmax").textContent = `${fmt1(rg[1])} ${T("u_kn")}`; } });
   BOARD.mode = r.mode;
   renderBoards();
 }
 // carte du lac avec la route colorée selon la vitesse (même échelle que la page « Résultats »)
-function drawRouteMap(cv, track) {
+// carte du lac avec une ou plusieurs routes colorées selon la vitesse (vmin/vmax communs si fournis)
+function drawRouteMap(cv, tracks, range) {
   const rr = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  if (rr.width < 4) return null;
   cv.width = Math.round(rr.width * dpr); cv.height = Math.round(rr.height * dpr);
   const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const w = rr.width, h = rr.height;
@@ -218,12 +249,14 @@ function drawRouteMap(cv, track) {
   const X = x => ox + x * sc, Y = y => oy - y * sc;
   ctx.fillStyle = "#cfe3ec"; ctx.strokeStyle = "#8fb0c2";
   ctx.beginPath(); LAKE_POLY.forEach(([x, y], i) => i ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y))); ctx.closePath(); ctx.fill(); ctx.stroke();
-  if (!track || track.length < 2) return;
-  const vs = track.map(q => q[2]), vmin = Math.min(...vs), vmax = Math.max(...vs, vmin + 0.1);
-  $("endVmin").textContent = `${fmt1(vmin)} ${T("u_kn")}`; $("endVmax").textContent = `${fmt1(vmax)} ${T("u_kn")}`;
-  ctx.lineWidth = 3; ctx.lineCap = "round";
-  for (let i = 1; i < track.length; i++) {
-    ctx.strokeStyle = colorAt(WIND_STOPS, 0.05 + 0.8 * (track[i][2] - vmin) / (vmax - vmin));
+  const list = (Array.isArray(tracks?.[0]?.[0]) ? tracks : [tracks]).filter(t => t && t.length > 1);
+  if (!list.length) return null;
+  const vs = list.flat().map(q => q[2]);
+  const vmin = range ? range[0] : Math.min(...vs), vmax = range ? range[1] : Math.max(...vs, vmin + 0.1);
+  ctx.lineWidth = list.length > 1 ? 2 : 3; ctx.lineCap = "round";
+  for (const track of list) for (let i = 1; i < track.length; i++) {
+    ctx.strokeStyle = colorAt(WIND_STOPS, 0.05 + 0.8 * clamp((track[i][2] - vmin) / (vmax - vmin), 0, 1));
     ctx.beginPath(); ctx.moveTo(X(track[i - 1][0]), Y(track[i - 1][1])); ctx.lineTo(X(track[i][0]), Y(track[i][1])); ctx.stroke();
   }
+  return [vmin, vmax];
 }

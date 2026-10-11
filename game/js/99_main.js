@@ -32,10 +32,11 @@ function init() {
   initSandbox();
   initForms();
   initKeyboard();
-  mountBoard($("homeBoard"), {}); mountBoard($("modalBoard"), {}); mountBoard($("endBoard"), {});
+  mountBoard($("homeBoard"), {}); mountBoard($("pageBoard"), {}); mountBoard($("modalBoard"), {}); mountBoard($("endBoard"), {});
   const saved = store.get("aether.lang");
   setLang(I18N[saved] && Object.keys(I18N[saved]).length ? saved : "fr", true);
   if (PLAYER.name) { $("playerChip").hidden = false; $("playerChip").textContent = PLAYER.team ? `${PLAYER.name} · ${PLAYER.team}` : PLAYER.name; }
+  langListeners.push(showVisits, () => { if (VIEW === "board") renderRoutes(); });
   goView("home");
   requestAnimationFrame(() => drawCards());
   new ResizeObserver(() => drawCards()).observe($("viewHome"));
@@ -47,7 +48,7 @@ function init() {
   // accès pour les tests automatisés uniquement (adresse contenant aetherdebug=1)
   try {
     const q = (window.parent && window.parent.location.search) || location.search;
-    if (/aetherdebug=1/.test(q)) window.__AE = { RACE, KS, kiteRig, PERF, QUALITY, BOARD, coursePoint, courseProject, COURSE_LEN, toggleKiteDeploy, goView, setLang };
+    if (/aetherdebug=1/.test(q)) window.__AE = { RACE, KS, kiteRig, PIRATE, cgnState, CGN_LINES, PIRATE_PREY, PERF, QUALITY, BOARD, coursePoint, courseProject, COURSE_LEN, toggleKiteDeploy, goView, setLang };
   } catch { /* parent d'une autre origine */ }
 }
 init();

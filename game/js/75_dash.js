@@ -1,23 +1,28 @@
 // ================================================================
-//  TABLEAU DE BORD SOUS LA SCÈNE : cadrans, jauges et potards colorés (rafraîchis 10 fois par seconde)
+//  INSTRUMENTS DE BORD : en haut à gauche de la scène (chrono, vitesse, vent, poussée du kite)
+//  et tableau de bord sous la scène (potards, jauges, graphiques d'évolution), rafraîchis 10 fois par seconde
 // ================================================================
 const DASH_CELLS = [
-  { id: "time", tone: "lilac", label: "d_time" },
-  { id: "speed", tone: "sky", label: "d_speed" },
+  { id: "time", tone: "lilac", label: "d_time", hud: true },
+  { id: "speed", tone: "sky", label: "d_speed", hud: true },
+  { id: "wind", tone: "mint", label: "d_wind", hud: true },
+  { id: "thrust", tone: "rose", label: "d_kite", hud: true },
   { id: "engine", tone: "peach", label: "d_engine" },
-  { id: "wind", tone: "mint", label: "d_wind" },
   { id: "kite", tone: "rose", label: "kb_tension" },
   { id: "share", tone: "lilac", label: "d_share" },
   { id: "co2", tone: "sand", label: "d_co2" },
   { id: "heel", tone: "sky", label: "d_heel" },
   { id: "pen", tone: "peach", label: "d_pen" },
-  { id: "perf", tone: "grey", label: "d_perf" }
+  { id: "tchart", tone: "rose", label: "d_thrust_chart", chart: true },
+  { id: "schart", tone: "sky", label: "d_speed_chart", chart: true }
 ];
-const DASH = { cv: {}, fpsHist: [] };
+const DASH = { cv: {}, hist: [] };
 function initDash() {
-  const root = $("databar");
-  root.innerHTML = DASH_CELLS.map(c =>
-    `<div class="inst t-${c.tone}"><canvas id="g_${c.id}"></canvas><div class="tx"><small data-i="${c.label}"></small><b id="v_${c.id}">–</b><em id="s_${c.id}"></em></div></div>`).join("");
+  const cell = c => c.chart
+    ? `<div class="inst chart t-${c.tone}"><div class="tx"><small data-i="${c.label}"></small><em id="s_${c.id}"></em></div><canvas id="g_${c.id}"></canvas></div>`
+    : `<div class="inst t-${c.tone}${c.hud ? " glass hudinst" : ""}"><canvas id="g_${c.id}"></canvas><div class="tx"><small data-i="${c.label}"></small><b id="v_${c.id}">–</b><em id="s_${c.id}"></em></div></div>`;
+  $("hudTl").innerHTML = DASH_CELLS.filter(c => c.hud).map(cell).join("");
+  $("databar").innerHTML = DASH_CELLS.filter(c => !c.hud).map(cell).join("");
   for (const c of DASH_CELLS) DASH.cv[c.id] = setupCanvas($("g_" + c.id));
 }
 const GTRACK = "rgba(38,43,69,.09)", GINK = "#262b45";
@@ -105,14 +110,26 @@ function gPen(g, pen, coll) {
   for (let i = 0; i < Math.min(coll, 6); i++) { const a = -Math.PI / 2 + i * Math.PI / 3; ctx.fillStyle = "#e05a5a"; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * r * 0.45, cy + Math.sin(a) * r * 0.45, 2.6, 0, Math.PI * 2); ctx.fill(); }
   if (!coll) { ctx.fillStyle = col; ctx.font = `700 ${Math.round(r * 0.8)}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(pen > 0 ? "!" : "✓", cx, cy + 1); }
 }
-// courbe des images par seconde sur les 10 dernières secondes
-function gSpark(g, hist) {
-  const { ctx, w, h } = g;
-  ctx.fillStyle = "rgba(95,201,168,.12)"; ctx.fillRect(2, h * 0.1, w - 4, h * 0.4);   // zone 45-60 i/s
-  ctx.strokeStyle = "rgba(240,125,156,.5)"; ctx.setLineDash([2, 2]); ctx.beginPath(); ctx.moveTo(2, h * 0.6); ctx.lineTo(w - 2, h * 0.6); ctx.stroke(); ctx.setLineDash([]);   // 30 i/s
-  ctx.strokeStyle = "#1f3a68"; ctx.lineWidth = 1.6; ctx.beginPath();
-  hist.forEach((f, i) => { const x = 2 + (w - 4) * i / Math.max(hist.length - 1, 1), y = h * (1 - 0.8 * clamp(f / 60, 0, 1.05)); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
-  ctx.stroke();
+// courbes défilantes : première série en aire pleine, les suivantes en traits
+function gChart(g, series, vmax) {
+  const { ctx, w, h } = g, n = 300, pad = 2, X = i => pad + (w - 2 * pad) * i / (n - 1), Y = v => h - 3 - (h - 6) * clamp(v / vmax, 0, 1.05);
+  ctx.strokeStyle = GTRACK; ctx.lineWidth = 1;
+  for (const f of [0.5, 1]) { ctx.beginPath(); ctx.moveTo(pad, Y(vmax * f)); ctx.lineTo(w - pad, Y(vmax * f)); ctx.stroke(); }
+  ctx.fillStyle = "rgba(38,43,69,.45)"; ctx.font = '500 8.5px "JetBrains Mono", monospace'; ctx.textAlign = "left"; ctx.textBaseline = "top";
+  ctx.fillText(fmt0(vmax), pad + 2, 1);
+  series.forEach((sr, k) => {
+    const v = sr.vals, off = n - v.length;
+    if (v.length < 2) return;
+    ctx.beginPath(); v.forEach((y, i) => i ? ctx.lineTo(X(off + i), Y(y)) : ctx.moveTo(X(off + i), Y(y)));
+    if (k === 0) {
+      ctx.lineTo(X(n - 1), h - 3); ctx.lineTo(X(off), h - 3); ctx.closePath();
+      const gr = ctx.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, sr.col + "88"); gr.addColorStop(1, sr.col + "10");
+      ctx.fillStyle = gr; ctx.fill();
+      ctx.beginPath(); v.forEach((y, i) => i ? ctx.lineTo(X(off + i), Y(y)) : ctx.moveTo(X(off + i), Y(y)));
+    }
+    ctx.strokeStyle = sr.col; ctx.lineWidth = k === 0 ? 1.6 : 1.4; ctx.setLineDash(sr.dash || []); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = sr.col; ctx.beginPath(); ctx.arc(X(n - 1), Y(v[v.length - 1]), 2.4, 0, Math.PI * 2); ctx.fill();
+  });
 }
 const SPEED_STOPS = [[0, "#6271b7"], [0.35, "#39a0c8"], [0.6, "#4cbf7f"], [0.8, "#e1c54a"], [1, "#e08a3c"]];
 const THR_STOPS = [[0, "#f6a6bd"], [0.3, "#e2e7f0"], [0.5, "#bfeee0"], [1, "#5fc9a8"]];
@@ -121,17 +138,21 @@ function updateDash() {
   if (!DASH.cv.time) return;
   for (const id in DASH.cv) { const g = DASH.cv[id]; g.ctx.clearRect(0, 0, g.w, g.h); }
   const B = RACE.boat, wd = RACE.wind, kn = B.u / KN, rig = kiteRig(), f = clamp(RACE.f, 0, 1);
-  const set = (id, v, sub) => { $("v_" + id).textContent = v; $("s_" + id).textContent = sub || ""; };
+  const set = (id, v, sub) => { const vb = $("v_" + id); if (vb) vb.textContent = v; $("s_" + id).textContent = sub || ""; };
+  // en haut à gauche
   gArc(DASH.cv.time, f, [[0, "#a8e6d3"], [1, "#3d5f94"]], { text: `${fmt0(f * 100)}` });
-  set("time", fmtClock(RACE.t), `${fmt1((1 - f) * COURSE_LEN / SCALE)} km`);
+  set("time", fmtClock(RACE.t), `${RACE.pen ? `+${fmt1(RACE.pen)} s · ` : ""}${fmt1((1 - f) * COURSE_LEN / SCALE)} km`);
   gArc(DASH.cv.speed, kn / 12, SPEED_STOPS, { needle: true, zones: [[8.5 / 12, 1, "#3d5f94"]] });
   set("speed", `${fmt1(kn)} ${T("u_kn")}`, `⚙ ${fmt0(Math.max(0, RACE.Fe || 0))} kN`);
-  gKnob(DASH.cv.engine, (RACE.throttle + 0.4) / 1.4, THR_STOPS);
-  set("engine", `${fmt0(RACE.throttle * 100)} %`, `${fmt0(Math.max(0, RACE.throttle) * BARGE.PMAX)} kW`);
   gWind(DASH.cv.wind, norm180(wd.from - B.hdg), wd.kn);
   set("wind", `${fmt0(wd.kn)} ${T("u_kn")} ${cardinal(wd.from)}`, wd.gust > 0.3 ? `💨 ${T("d_gust")}` : wd.storm > 0.3 ? `⛈ ${T("d_storm")}` : "");
+  gArc(DASH.cv.thrust, Math.max(0, KS.fwd) / Math.max(rig.tmax * 0.8, 1), [[0, "#c9d6ec"], [1, "#5fc9a8"]], { needle: true });
+  set("thrust", `${fmt0(KS.fwd)} kN`, T("d_thrust"));
+  // tableau du bas
+  gKnob(DASH.cv.engine, (RACE.throttle + 0.4) / 1.4, THR_STOPS);
+  set("engine", `${fmt0(RACE.throttle * 100)} %`, `${fmt0(Math.max(0, RACE.throttle) * BARGE.PMAX)} kW`);
   gArc(DASH.cv.kite, KS.T / (rig.tmax * 1.2), TENS_STOPS, { needle: true, zones: [[0.7, 0.83, "#f2c14e"], [0.83, 1, "#f07d9c"]] });
-  set("kite", `${fmt0(KS.T)} kN`, `→ ${fmt0(KS.fwd)} · max ${fmt0(rig.tmax)}`);
+  set("kite", `${fmt0(KS.T)} kN`, `max ${fmt0(rig.tmax)}`);
   const share = KS.fwd > 0 ? KS.fwd / (KS.fwd + Math.max(1, RACE.Fe || 0)) : 0;
   gDonut(DASH.cv.share, share, "#3d5f94", `${fmt0(share * 100)}`);
   set("share", `${fmt0(share * 100)} %`, RACE.mode === "expert" ? `${rig.area} m² · ${rig.L} m` : `${KITE.area} m²`);
@@ -143,7 +164,13 @@ function updateDash() {
   set("heel", `${fmt1(Math.abs(heel))}°`, heel > 0.3 ? "↘" : heel < -0.3 ? "↙" : "");
   gPen(DASH.cv.pen, RACE.pen, RACE.coll);
   set("pen", `+${fmt1(RACE.pen)} s`, `💥 ${RACE.coll}`);
-  DASH.fpsHist.push(PERF.fps); if (DASH.fpsHist.length > 100) DASH.fpsHist.shift();
-  gSpark(DASH.cv.perf, DASH.fpsHist);
-  set("perf", `${fmt0(PERF.fps)} FPS`, `Q${QUALITY.level}`);
+  // graphiques d'évolution (30 dernières secondes, seulement pendant la course)
+  if (RACE.state === "run") { DASH.hist.push([KS.T, Math.max(0, KS.fwd), kn, wd.kn]); if (DASH.hist.length > 300) DASH.hist.shift(); }
+  else if (RACE.state === "intro") DASH.hist.length = 0;
+  const col = i => DASH.hist.map(r => r[i]);
+  const tMax = Math.max(10, rig.tmax * 0.6, ...col(0));
+  gChart(DASH.cv.tchart, [{ vals: col(0), col: "#f07d9c" }, { vals: col(1), col: "#3d5f94" }], tMax);
+  $("s_tchart").innerHTML = `<i style="color:#f07d9c">● ${T("d_tension")} ${fmt0(KS.T)}</i> <i style="color:#3d5f94">● ${T("d_thrust")} ${fmt0(Math.max(0, KS.fwd))}</i> kN`;
+  gChart(DASH.cv.schart, [{ vals: col(2), col: "#39a0c8" }, { vals: col(3), col: "#4cbf7f", dash: [4, 3] }], Math.max(12, ...col(3)));
+  $("s_schart").innerHTML = `<i style="color:#39a0c8">● ${fmt1(kn)}</i> <i style="color:#4cbf7f">● ${T("d_wind").toLowerCase()} ${fmt0(wd.kn)}</i> ${T("u_kn")}`;
 }

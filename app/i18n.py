@@ -1,11 +1,10 @@
-"""Textes des pages Streamlit (le jeu a ses propres traductions dans game/js/06_strings.js)."""
+"""Textes Streamlit autour du jeu (le jeu a ses propres traductions dans game/js/06_strings.js)."""
 import streamlit as st
 
 LANGS = {"fr": "FR", "en": "EN", "de": "DE", "it": "IT"}
 
 STRINGS = {
     "fr": {
-        "page_game": "Jeu", "page_results": "Résultats",
         "lang": "Langue",
         "model_title": "📐 Hypothèses physiques du modèle",
         "model_md": """
@@ -18,15 +17,9 @@ STRINGS = {
 - **Météo** : même scénario pour tous (Vaudaire, Vent, coup de Joran, Bise ; risées et pétole), qui se déroule selon le temps de course normalisé.
 - **Bac à sable** : puissance ∝ V³, gazole par traversée ∝ V² ; répartition du gain = moyenne des deux ordres (ralentir puis kite, kite puis ralentir).
 """,
-        "sort": "Classer par", "sort_score": "CO₂ × temps", "sort_co2": "CO₂", "sort_time": "Temps", "col_attempt": "Tentative", "col_score": "CO₂ × temps (t·s)", "res_title": "Routes des joueurs", "res_intro": "Chaque trait est la route d'une tentative, colorée selon la vitesse de la barge (bleu = lent, rouge = rapide).",
-        "mode": "Mode", "beginner": "Traversée débutant", "expert": "Traversée expert", "period": "Période", "day": "Jour", "week": "Semaine", "all": "Historique",
-        "players_n": "Nombre de tentatives affichées", "no_runs": "Aucune course enregistrée pour cette sélection.", "speed_kn": "Vitesse (nœuds)", "all_routes": "Toutes les routes",
-        "col_rank": "Rang", "col_name": "Pseudo", "col_team": "Équipe", "col_total": "Temps total (s)", "col_time": "Course (s)", "col_pen": "Pénalités (s)",
-        "col_co2": "CO₂ émis (kg)", "col_saved": "CO₂ évité (kg)", "col_coll": "Collisions", "col_date": "Date",
         "none": "—",
     },
     "en": {
-        "page_game": "Game", "page_results": "Results",
         "lang": "Language",
         "model_title": "📐 Physical assumptions of the model",
         "model_md": """
@@ -39,15 +32,9 @@ STRINGS = {
 - **Weather**: the same scenario for everyone (Vaudaire, Vent, Joran squall, Bise; gusts and calm patches), driven by normalised race time.
 - **Sandbox**: power ∝ V³, diesel per crossing ∝ V²; share of the gain = average of both orders (slow down then kite, kite then slow down).
 """,
-        "sort": "Rank by", "sort_score": "CO₂ × time", "sort_co2": "CO₂", "sort_time": "Time", "col_attempt": "Attempt", "col_score": "CO₂ × time (t·s)", "res_title": "Players' routes", "res_intro": "Each line is one attempt's route, coloured by barge speed (blue = slow, red = fast).",
-        "mode": "Mode", "beginner": "Beginner crossing", "expert": "Expert crossing", "period": "Period", "day": "Today", "week": "This week", "all": "All time",
-        "players_n": "Number of attempts shown", "no_runs": "No runs recorded for this selection.", "speed_kn": "Speed (knots)", "all_routes": "All routes",
-        "col_rank": "Rank", "col_name": "Name", "col_team": "Team", "col_total": "Total time (s)", "col_time": "Race (s)", "col_pen": "Penalties (s)",
-        "col_co2": "CO₂ emitted (kg)", "col_saved": "CO₂ avoided (kg)", "col_coll": "Collisions", "col_date": "Date",
         "none": "—",
     },
     "de": {
-        "page_game": "Spiel", "page_results": "Resultate",
         "lang": "Sprache",
         "model_title": "📐 Physikalische Annahmen des Modells",
         "model_md": """
@@ -60,15 +47,9 @@ STRINGS = {
 - **Wetter**: dasselbe Szenario für alle (Vaudaire, Vent, Joran-Bö, Bise; Böen und Flautenfelder), gesteuert durch die normierte Fahrzeit.
 - **Sandkasten**: Leistung ∝ V³, Diesel pro Überfahrt ∝ V²; Anteile am Gewinn = Mittel beider Reihenfolgen (erst langsamer, dann Kite und umgekehrt).
 """,
-        "sort": "Sortieren nach", "sort_score": "CO₂ × Zeit", "sort_co2": "CO₂", "sort_time": "Zeit", "col_attempt": "Versuch", "col_score": "CO₂ × Zeit (t·s)", "res_title": "Routen der Spieler", "res_intro": "Jede Linie ist die Route eines Versuchs, eingefärbt nach Schiffsgeschwindigkeit (blau = langsam, rot = schnell).",
-        "mode": "Modus", "beginner": "Überfahrt Einsteiger", "expert": "Überfahrt Profi", "period": "Zeitraum", "day": "Heute", "week": "Diese Woche", "all": "Ewig",
-        "players_n": "Anzahl angezeigter Versuche", "no_runs": "Keine Fahrten für diese Auswahl.", "speed_kn": "Tempo (Knoten)", "all_routes": "Alle Routen",
-        "col_rank": "Rang", "col_name": "Name", "col_team": "Team", "col_total": "Gesamtzeit (s)", "col_time": "Fahrt (s)", "col_pen": "Strafzeiten (s)",
-        "col_co2": "CO₂ ausgestossen (kg)", "col_saved": "CO₂ vermieden (kg)", "col_coll": "Kollisionen", "col_date": "Datum",
         "none": "—",
     },
     "it": {
-        "page_game": "Gioco", "page_results": "Risultati",
         "lang": "Lingua",
         "model_title": "📐 Ipotesi fisiche del modello",
         "model_md": """
@@ -81,11 +62,6 @@ STRINGS = {
 - **Meteo**: stesso scenario per tutti (Vaudaire, Vent, colpo di Joran, Bise; raffiche e bonacce), che si svolge secondo il tempo di gara normalizzato.
 - **Sandbox**: potenza ∝ V³, gasolio per traversata ∝ V²; ripartizione del guadagno = media dei due ordini (prima rallentare poi kite, e viceversa).
 """,
-        "sort": "Ordina per", "sort_score": "CO₂ × tempo", "sort_co2": "CO₂", "sort_time": "Tempo", "col_attempt": "Tentativo", "col_score": "CO₂ × tempo (t·s)", "res_title": "Rotte dei giocatori", "res_intro": "Ogni linea è la rotta di un tentativo, colorata secondo la velocità della chiatta (blu = lenta, rosso = veloce).",
-        "mode": "Modalità", "beginner": "Traversata principiante", "expert": "Traversata esperto", "period": "Periodo", "day": "Oggi", "week": "Settimana", "all": "Sempre",
-        "players_n": "Numero di tentativi mostrati", "no_runs": "Nessuna corsa registrata per questa selezione.", "speed_kn": "Velocità (nodi)", "all_routes": "Tutte le rotte",
-        "col_rank": "Pos.", "col_name": "Nome", "col_team": "Squadra", "col_total": "Tempo totale (s)", "col_time": "Gara (s)", "col_pen": "Penalità (s)",
-        "col_co2": "CO₂ emessa (kg)", "col_saved": "CO₂ evitata (kg)", "col_coll": "Collisioni", "col_date": "Data",
         "none": "—",
     },
 }

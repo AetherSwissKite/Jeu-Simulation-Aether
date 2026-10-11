@@ -11,9 +11,10 @@ function fitRace() {
     if (fe) { vh = window.parent.innerHeight; top = fe.getBoundingClientRect().top + window.parent.scrollY; }
   } catch { /* parent d'une autre origine : on garde la fenêtre de l'iframe */ }
   const bar = document.querySelector(".topbar"), dash = $("databar");
-  const used = top + (bar ? bar.offsetHeight : 50) + (dash ? dash.offsetHeight : 70) + 30;
+  const used = top + ((bar && bar.offsetHeight) || 50) + ((dash && dash.offsetHeight) || 90) + 30;
   const w = $("app").clientWidth;
-  const h = clamp(vh - used, 420, w / 1.45);
+  // 80 % de la place libre : la scène, le tableau de bord et le haut de page tiennent ensemble à l'écran
+  const h = clamp((vh - used) * 0.8, 360, w / 1.6);
   document.documentElement.style.setProperty("--race-h", `${Math.round(h)}px`);
 }
 function goView(v) {
@@ -33,11 +34,15 @@ function goView(v) {
     RACE.mode = v; resetRace(); RACE.state = "name";
     $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : "view_cabin");
     openNameForm();
+  } else if (v === "board") {
+    $("heroSlot").appendChild(world);
+    RACE.mode = "attract"; resetRace(); RACE.state = "idle";
+    renderBoards(); requestAnimationFrame(renderRoutes);
   } else if (v === "sandbox") {
     recompute();
     if (!seenHelp.sandbox) { seenHelp.sandbox = true; openHelp("sandbox"); }
   }
-  if (race) fitRace();
+  if (race) { fitRace(); requestAnimationFrame(() => { fitRace(); WORLD.resize(); }); }   // remesure une fois la vue affichée
   WORLD.resize(); MINI.resize();
 }
 
@@ -92,14 +97,15 @@ function initForms() {
   });
   $("nameCancel").addEventListener("click", () => goView("home"));
   $("helpOk").addEventListener("click", helpNext);
+  $("helpSkip").addEventListener("click", closeHelp);   // passer le tutoriel d'un coup
   $("helpBack").addEventListener("click", () => setHelpPage(helpPage - 1));
   $("pauseResume").addEventListener("click", togglePause);
   $("pauseQuit").addEventListener("click", () => goView("home"));
   $("endAgain").addEventListener("click", () => goView(RACE.mode === "attract" ? "beginner" : RACE.mode));
   $("endHome").addEventListener("click", () => goView("home"));
   $("boardClose").addEventListener("click", closeBoard);
-  $("btnBoard").addEventListener("click", openBoard);
-  $("btnHelp").addEventListener("click", () => openHelp(VIEW === "home" ? "beginner" : VIEW));
+  $("btnBoard").addEventListener("click", () => (RACE.state === "run" || RACE.state === "pause" || RACE.state === "intro") ? openBoard() : goView("board"));
+  $("btnHelp").addEventListener("click", () => openHelp(VIEW === "home" || VIEW === "board" ? "beginner" : VIEW));
   $("brand").addEventListener("click", () => goView("home"));
   document.querySelectorAll("#navSeg button").forEach(b => b.addEventListener("click", () => goView(b.dataset.view)));
   document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => goView(b.dataset.go)));
@@ -196,7 +202,7 @@ function initKeyboard() {
     if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
     if (e.target.closest && e.target.closest(".knob svg")) return;
     const k = e.key, lk = k.length === 1 ? k.toLowerCase() : k;
-    if (lk === "h" || k === "?") { e.preventDefault(); openHelp(VIEW === "home" ? "beginner" : VIEW); return; }
+    if (lk === "h" || k === "?") { e.preventDefault(); openHelp(VIEW === "home" || VIEW === "board" ? "beginner" : VIEW); return; }
     if (overlay === "ovHelp") {
       if (k === "Enter") { e.preventDefault(); helpNext(); }
       else if (k === "Escape") { e.preventDefault(); closeHelp(); }

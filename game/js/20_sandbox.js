@@ -162,6 +162,19 @@ let SC, CP, GA, CV;
 const sideScene = { clouds: Array.from({ length: 7 }, (_, i) => ({ x: (i * 0.37) % 1, y: 0.1 + ((i * 0.53) % 1) * 0.28, s: 0.6 + ((i * 0.71) % 1) * 1.1 })),
   smoke: [], trail: [], spray: [], time: 0, sea: 0, kt: 0, deploy: 1, smokeAcc: 0, lastKite: null, force: 0 };
 // Silhouette des Dents du Midi (7 sommets) et des collines de Lavaux, en fractions de la largeur
+// panorama du Léman selon le relèvement (0 = nord), hauteurs relatives
+const bump = (b, c, wdt) => Math.exp(-Math.pow(norm180(b - c) / wdt, 2));
+function lemanFar(b) {
+  const alps = bump(b, 185, 42) * (0.62 + 0.38 * Math.pow(Math.abs(Math.sin(rad(b) * 9)), 0.5));
+  const valais = bump(b, 115, 30) * (0.7 + 0.3 * Math.pow(Math.abs(Math.sin(rad(b) * 13 + 1)), 0.6));
+  const jura = bump(b, 320, 55) * 0.38 * (0.9 + 0.1 * Math.sin(rad(b) * 5));
+  const saleve = bump(b, 238, 14) * 0.42;
+  return Math.max(alps, valais, jura, saleve, 0.03) * (0.92 + 0.08 * Math.sin(rad(b) * 23));
+}
+function lemanMid(b) {
+  const open = bump(b, 262, 22);                         // vers Genève : horizon presque plat
+  return (0.045 + 0.035 * Math.sin(rad(b) * 7) + 0.02 * Math.sin(rad(b) * 17 + 2)) * (1 - 0.85 * open) + 0.05 * bump(b, 15, 50);
+}
 function dentsProfile(x) {
   const peaks = [[0.08, 0.55], [0.13, 0.75], [0.17, 0.66], [0.21, 0.92], [0.25, 0.8], [0.29, 1.0], [0.34, 0.7]];
   let y = 0.18 + 0.12 * Math.sin(x * 9);
@@ -176,38 +189,60 @@ function drawSide(dt) {
   const sky = ctx.createLinearGradient(0, 0, 0, horizon);
   sky.addColorStop(0, "#94b9d6"); sky.addColorStop(0.55, "#c4d8e6"); sky.addColorStop(0.85, "#ecdfda"); sky.addColorStop(1, "#f7dccd");
   ctx.fillStyle = sky; ctx.fillRect(0, 0, w, horizon + 2);
-  const sunX = w * 0.78, sunY = horizon - h * 0.22;
-  let g = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, h * 0.55);
-  g.addColorStop(0, "rgba(255,246,228,.95)"); g.addColorStop(0.1, "rgba(255,232,210,.45)"); g.addColorStop(1, "rgba(255,232,210,0)");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, w, horizon);
+  // Vue de profil : on regarde à bâbord (cap − 90°). Le panorama du Léman tourne avec le cap,
+  // et le paysage défile d'autant plus vite que la barge avance (parallaxe : montagnes, collines, bouées).
+  sideScene.hdg = sideScene.hdg === undefined ? P.heading : angLerp(sideScene.hdg, P.heading, damp(2.5, dt));
+  sideScene.dist = (sideScene.dist || 0) + sim.vKn * dt * 16;
+  const viewB = norm360(sideScene.hdg - 90), ppd = w / 110;                     // 110° de champ horizontal
+  const xOfB = b => w / 2 + norm180(b - viewB) * ppd;
+  const sunX = xOfB(195), sunY = horizon - h * 0.24;
+  if (sunX > -h * 0.5 && sunX < w + h * 0.5) {
+    const g0 = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, h * 0.55);
+    g0.addColorStop(0, "rgba(255,246,228,.95)"); g0.addColorStop(0.1, "rgba(255,232,210,.45)"); g0.addColorStop(1, "rgba(255,232,210,0)");
+    ctx.fillStyle = g0; ctx.fillRect(0, 0, w, horizon);
+  }
   const flowFwd = sim.deck.speed * Math.cos(rad(sim.flowRelDeck));
   for (const c of sideScene.clouds) {
-    c.x += flowFwd * dt * 0.0014 * c.s;
+    c.x += (flowFwd * 0.0014 - sim.vKn * 0.0009) * dt * c.s;
     if (c.x > 1.3) c.x -= 1.6; if (c.x < -0.3) c.x += 1.6;
     drawSideCloud(ctx, c.x * w, c.y * horizon, c.s * Math.max(0.6, w / 1100));
   }
-  // Dents du Midi enneigées au loin, puis les terrasses de Lavaux
-  const mH = h * 0.24;
-  ctx.fillStyle = "rgba(150,168,192,.75)";
+  // montagnes lointaines : Alpes au sud, Valais à l'est, Jura au nord-ouest, Salève au sud-ouest ; quasi immobiles
+  const mH = h * 0.3, bAt = x => viewB + (x - w / 2) / ppd + sideScene.dist * 0.0015;
+  ctx.fillStyle = "rgba(150,168,192,.78)";
   ctx.beginPath(); ctx.moveTo(0, horizon);
-  for (let x = 0; x <= w; x += 4) ctx.lineTo(x, horizon - dentsProfile(x / w) * mH);
+  for (let x = 0; x <= w; x += 3) ctx.lineTo(x, horizon - lemanFar(bAt(x)) * mH);
   ctx.lineTo(w, horizon); ctx.closePath(); ctx.fill();
   ctx.save(); ctx.clip();
-  ctx.fillStyle = "rgba(255,255,255,.85)";
-  ctx.beginPath(); ctx.moveTo(0, horizon - mH * 0.62);
-  for (let x = 0; x <= w; x += 4) ctx.lineTo(x, Math.min(horizon - dentsProfile(x / w) * mH, horizon - mH * 0.62));
-  ctx.lineTo(w, horizon - mH * 0.62); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,.88)";
+  ctx.beginPath(); ctx.moveTo(0, horizon - mH * 0.6);
+  for (let x = 0; x <= w; x += 3) ctx.lineTo(x, Math.min(horizon - lemanFar(bAt(x)) * mH, horizon - mH * 0.6));
+  ctx.lineTo(w, horizon - mH * 0.6); ctx.closePath(); ctx.fill();
   ctx.restore();
+  // collines de la rive (vignes de Lavaux côté nord) : défilent plus vite
+  const bMid = x => viewB + (x - w / 2) / ppd + sideScene.dist * 0.012;
   ctx.fillStyle = "#a7bba1";
-  ctx.beginPath(); ctx.moveTo(w * 0.42, horizon);
-  for (let x = w * 0.42; x <= w; x += 6) ctx.lineTo(x, horizon - h * (0.05 + 0.07 * smooth((x / w - 0.42) / 0.3)) - Math.sin(x * 0.02) * 2);
+  ctx.beginPath(); ctx.moveTo(0, horizon);
+  for (let x = 0; x <= w; x += 4) ctx.lineTo(x, horizon - lemanMid(bMid(x)) * h);
   ctx.lineTo(w, horizon); ctx.closePath(); ctx.fill();
   ctx.strokeStyle = "rgba(110,140,95,.45)"; ctx.lineWidth = 1;
-  for (let i = 1; i < 7; i++) {
-    ctx.beginPath();
-    for (let x = w * 0.5; x <= w; x += 8) { const yy = horizon - h * (0.012 * i) * smooth((x / w - 0.45) / 0.3); x === w * 0.5 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy); }
+  for (let i = 1; i < 6; i++) {
+    ctx.beginPath(); let pen = false;
+    for (let x = 0; x <= w; x += 6) {
+      const b = norm360(bMid(x)), vine = b > 300 || b < 60, hh = lemanMid(b) * h;
+      if (!vine || hh < 8) { pen = false; continue; }
+      const yy = horizon - hh * i / 6.5; pen ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); pen = true;
+    }
     ctx.stroke();
   }
+  // ruban de cap en haut de la scène : direction vers laquelle on regarde
+  ctx.font = '600 10px "JetBrains Mono", monospace'; ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (let b = Math.ceil((viewB - 60) / 15) * 15; b <= viewB + 60; b += 15) {
+    const x = xOfB(b), major = norm360(b) % 45 === 0;
+    ctx.fillStyle = `rgba(38,43,69,${major ? 0.55 : 0.25})`; ctx.fillRect(x - 0.5, 6, 1, major ? 9 : 5);
+    if (major) ctx.fillText(cardinal(norm360(b)), x, 17);
+  }
+  ctx.fillStyle = "#1f3a68"; ctx.beginPath(); ctx.moveTo(w / 2 - 5, 2); ctx.lineTo(w / 2 + 5, 2); ctx.lineTo(w / 2, 8); ctx.fill();
   // lac : bleu-vert, peu de vagues sauf par vent fort
   const lake = ctx.createLinearGradient(0, horizon, 0, h);
   lake.addColorStop(0, "#b5cbd6"); lake.addColorStop(0.25, "#7fa9bd"); lake.addColorStop(1, "#3f7590");
@@ -223,6 +258,16 @@ function drawSide(dt) {
       x === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
     }
     ctx.strokeStyle = `rgba(240,248,252,${0.06 + k * 0.08})`; ctx.lineWidth = 1 + k; ctx.stroke();
+  }
+  // bouées et voiliers au mouillage : premier plan, défilent à la vitesse de la barge
+  for (let i = -1; i < Math.ceil(w / 260) + 2; i++) {
+    const n = Math.floor(sideScene.dist / 260) + i, x = n * 260 - sideScene.dist + 130 + Math.sin(n * 12.9898) * 60;
+    const yb = horizon + (h - horizon) * (0.12 + 0.08 * ((n * 7) % 3) / 2), bobb = Math.sin(t * 1.4 + n) * 1.5, kind = ((n % 4) + 4) % 4;
+    if (kind === 0) { ctx.fillStyle = n % 8 === 0 ? "#d9534f" : "#3f9f6b"; ctx.beginPath(); ctx.moveTo(x - 4, yb + bobb); ctx.lineTo(x + 4, yb + bobb); ctx.lineTo(x, yb - 11 + bobb); ctx.fill(); }
+    else if (kind === 2) {
+      ctx.fillStyle = "#f4f4f2"; ctx.beginPath(); ctx.moveTo(x - 14, yb + bobb); ctx.lineTo(x + 14, yb + bobb); ctx.lineTo(x + 10, yb + 4 + bobb); ctx.lineTo(x - 11, yb + 4 + bobb); ctx.fill();
+      ctx.strokeStyle = "#8a8f9c"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, yb + bobb); ctx.lineTo(x, yb - 26 + bobb); ctx.stroke();
+    }
   }
   // barge
   const L = Math.min(w * 0.5, 600), x0 = w * 0.06 + L / 2, wl = horizon + (h - horizon) * 0.45;

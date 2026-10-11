@@ -47,6 +47,7 @@ export default function (component) {
       if (m.type === "hello" && ev.source) send(ev.source);
       if (m.type === "score" && window.__aeSend) window.__aeSend("score", m.entry);
       if (m.type === "lang" && window.__aeSend) window.__aeSend("lang", m.lang);
+      if (m.type === "visit" && window.__aeSend) window.__aeSend("visit", m.vid);
     };
     window.addEventListener("message", window.__aeListener);
   }
@@ -64,13 +65,17 @@ def _on_lang():
     new = (st.session_state.get("aether_bridge") or {}).get("lang")
     if new in LANGS:
         st.session_state["lang"] = new
-        st.session_state["lang_ctrl"] = new
         st.query_params["lang"] = new
 
 
+def _on_visit():
+    storage.add_visit((st.session_state.get("aether_bridge") or {}).get("visit"))
+
+
 def game_page():
-    _bridge(data={"runs": storage.list_runs(), "ghosts": storage.ghosts(), "lang": st.session_state.get("lang", "fr")},
-            key="aether_bridge", on_score_change=_on_score, on_lang_change=_on_lang)
+    _bridge(data={"runs": storage.list_runs(), "ghosts": storage.ghosts(), "routes": storage.routes(), "visits": storage.visits(),
+                  "lang": st.session_state.get("lang", "fr")},
+            key="aether_bridge", on_score_change=_on_score, on_lang_change=_on_lang, on_visit_change=_on_visit)
     # Tout le jeu (animation, physique, commandes) tourne dans le navigateur : il reste fluide et
     # ne se recharge pas quand Python se relance (le HTML transmis est identique d'un passage à l'autre).
     st.iframe(game_html(), height="content")

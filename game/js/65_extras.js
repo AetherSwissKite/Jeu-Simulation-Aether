@@ -77,15 +77,65 @@ const PIRATE_FACES = (() => {
   }
   return F;
 })();
-function pirateState(tau, t) {
-  const base = coursePoint(0.535 * COURSE_LEN), u = Math.sin(tau * 9);
-  const x = base.x + base.nx * 95 + base.dx * 70 * u, y = base.y + base.ny * 95 + base.dy * 70 * u;
-  return { x, y, hdg: norm360(base.bearing + (Math.cos(tau * 9) > 0 ? 0 : 180)), heelR: Math.sin(t * 0.9) * 0.12, pitchR: Math.sin(t * 1.3) * 0.05, heave: Math.sin(t * 1.1) * 0.6 };
+// Le pirate prend en chasse le vapeur CGN qui traverse la zone de tempête (ligne Lausanne – Évian ouest)
+// et lui tire des bordées : fumée sur son flanc, boulets et gerbes d'eau autour du vapeur.
+const PIRATE = { x: 0, y: 0, hdg: 0, heelR: 0, pitchR: 0, heave: 0, init: false, last: 0, cd: 2, side: 1, fx: [] };
+const PIRATE_PREY = 2;   // indice dans CGN_LINES
+function updatePirate(tau, t) {
+  const P = PIRATE, dt = clamp(t - P.last, 0, 0.1); P.last = t;
+  const prey = cgnState(CGN_LINES[PIRATE_PREY], tau), h = rad(prey.hdg);
+  // poste de tir : un peu en arrière du vapeur, sur son flanc, à ~55 m
+  const side = P.side, tx = prey.x - Math.sin(h) * 35 + Math.cos(h) * 55 * side, ty = prey.y - Math.cos(h) * 35 - Math.sin(h) * 55 * side;
+  if (!P.init || Math.hypot(tx - P.x, ty - P.y) > 450) Object.assign(P, { x: tx, y: ty, hdg: prey.hdg, init: true });
+  const dx = tx - P.x, dy = ty - P.y, d = Math.hypot(dx, dy);
+  const want = d > 6 ? deg(Math.atan2(dx, dy)) : prey.hdg;
+  P.hdg = norm360(P.hdg + clamp(norm180(want - P.hdg), -25 * dt, 25 * dt));
+  const v = clamp(d * 0.35, 0, 9);
+  P.x += Math.sin(rad(P.hdg)) * v * dt; P.y += Math.cos(rad(P.hdg)) * v * dt;
+  P.heelR = Math.sin(t * 0.9) * 0.1; P.pitchR = Math.sin(t * 1.3) * 0.05; P.heave = Math.sin(t * 1.1) * 0.5;
+  // bordée toutes les ~3,5 s quand le vapeur est à portée
+  P.cd -= dt;
+  const toPrey = Math.hypot(prey.x - P.x, prey.y - P.y);
+  if (P.cd <= 0 && toPrey < 140) {
+    P.cd = 3.2 + Math.random() * 1.2;
+    const bear = deg(Math.atan2(prey.x - P.x, prey.y - P.y)), rel = norm180(bear - P.hdg), fs = rel > 0 ? 1 : -1;
+    for (let k = 0; k < 4; k++) {
+      const lp = bargeToWorld(P, fs * 4.2, -6 + k * 4, 2.2);
+      P.fx.push({ kind: "smoke", x: lp[0], y: lp[1], z: lp[2], vx: Math.sin(rad(bear)) * 6, vy: Math.cos(rad(bear)) * 6, age: -k * 0.12, life: 2.6 });
+      P.fx.push({ kind: "ball", x0: lp[0], y0: lp[1], x1: prey.x + (Math.random() - 0.5) * 30, y1: prey.y + (Math.random() - 0.5) * 30, age: -k * 0.12, life: 1.1 });
+    }
+  }
+  for (const f of P.fx) {
+    f.age += dt;
+    if (f.kind === "smoke" && f.age > 0) { f.x += f.vx * dt; f.y += f.vy * dt; f.z += 2.5 * dt; f.vx *= 0.97; f.vy *= 0.97; }
+    if (f.kind === "ball" && f.age >= f.life && !f.splashed) { f.splashed = true; P.fx.push({ kind: "splash", x: f.x1, y: f.y1, age: 0, life: 1.2 }); }
+  }
+  P.fx = P.fx.filter(f => f.age < f.life + (f.kind === "ball" ? 0.05 : 0));
+  return P;
 }
 function drawPirate(ctx, cam, L, tau, t) {
-  const b = pirateState(tau, t);
+  const b = updatePirate(tau, t);
   if (Math.hypot(b.x - cam.x, b.y - cam.y) > 1800) return;
   drawModel(ctx, cam, b, PIRATE_FACES, L);
+  // effets de canonnade : fumée, éclairs, boulets, gerbes
+  for (const f of b.fx) {
+    if (f.age < 0) continue;
+    if (f.kind === "smoke") {
+      const p = cam.p(f.x, f.y, f.z); if (Math.abs(p[3]) > 100) continue;
+      const s = cam.k * 57.3 / p[2], u = f.age / f.life;
+      if (f.age < 0.12) { ctx.fillStyle = "rgba(255,190,80,.95)"; ctx.beginPath(); ctx.arc(p[0], p[1], 1.6 * s, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = `rgba(225,225,225,${0.75 * (1 - u)})`; ctx.beginPath(); ctx.arc(p[0], p[1], (1.2 + u * 5) * s, 0, Math.PI * 2); ctx.fill();
+    } else if (f.kind === "ball") {
+      const u = clamp(f.age / f.life, 0, 1), x = lerp(f.x0, f.x1, u), y = lerp(f.y0, f.y1, u), z = 2.2 + Math.sin(u * Math.PI) * 14;
+      const p = cam.p(x, y, z); if (Math.abs(p[3]) > 100) continue;
+      ctx.fillStyle = "#1c1c1c"; ctx.beginPath(); ctx.arc(p[0], p[1], Math.max(1.2, 0.5 * cam.k * 57.3 / p[2]), 0, Math.PI * 2); ctx.fill();
+    } else {
+      const p = cam.p(f.x, f.y, 0), u = f.age / f.life; if (Math.abs(p[3]) > 100) continue;
+      const s = cam.k * 57.3 / p[2];
+      ctx.fillStyle = `rgba(255,255,255,${0.85 * (1 - u)})`;
+      ctx.beginPath(); ctx.ellipse(p[0], p[1] - Math.sin(u * Math.PI) * 4 * s, (0.8 + u * 2) * s, (1 + Math.sin(u * Math.PI) * 4) * s, 0, 0, Math.PI * 2); ctx.fill();
+    }
+  }
   // pavillon noir à tête de mort en haut du grand mât
   const p = cam.p(...bargeToWorld(b, 0, 3.5, 26.5));
   if (Math.abs(p[3]) > 100) return;

@@ -138,7 +138,8 @@ const LANDMARKS = GEO.landmarks.map(l => ({ type: l.type, x: l.x * SCALE, y: l.y
 // ---------------- Météo de course (identique pour tous les joueurs) ----------------
 // τ = temps de course / durée nominale du mode : le même scénario se déroule quel que soit le mode.
 // Les vents du Léman : Vaudaire (sud-est) au départ, Vent (sud-ouest) au milieu, coup de Joran (nord-ouest), Bise (nord-est) vers Genève.
-const WIND_KEYS = [[0, 125, 15], [0.18, 135, 14], [0.27, 230, 9], [0.43, 220, 8], [0.49, 320, 22], [0.6, 330, 20], [0.67, 40, 16], [1, 45, 18]];
+// vent portant presque tout le parcours, un bout de vent de travers devant Lausanne, et le coup de Joran au milieu
+const WIND_KEYS = [[0, 120, 15], [0.18, 115, 15], [0.25, 195, 12], [0.38, 200, 12], [0.44, 110, 14], [0.49, 320, 22], [0.6, 330, 20], [0.67, 45, 16], [1, 45, 18]];
 const WIND_NAMES = [[0, "w_vaudaire"], [0.25, "w_vent"], [0.46, "w_joran"], [0.65, "w_bise"]];
 function baseWind(f) {
   let i = 1;
@@ -195,7 +196,7 @@ const CGN_LINES = [
   { a: [-8.4, 11.6], b: [-9.1, -2.6], period: 0.55, phase: 0.62 },
   { a: [-27.2, -2.3], b: [-21.4, -3.1], period: 0.3, phase: 0.5 },
   { a: [-33.6, -18.6], b: [-31.4, -14.6], period: 0.22, phase: 0.1 }
-].map(l => ({ ax: l.a[0] * SCALE, ay: l.a[1] * SCALE, bx: l.b[0] * SCALE, by: l.b[1] * SCALE, period: l.period, phase: l.phase }));
+].map(l => ({ ax: l.a[0] * SCALE, ay: l.a[1] * SCALE, bx: l.b[0] * SCALE, by: l.b[1] * SCALE, period: l.period * 1.4, phase: l.phase }));   // vapeurs ralenties (×1/1,4)
 function cgnState(l, tau) {
   const u = ((tau + l.phase) / l.period) % 1, k = u < 0.5 ? smooth(u * 2) : smooth(2 - u * 2);
   const fwd = u < 0.5;

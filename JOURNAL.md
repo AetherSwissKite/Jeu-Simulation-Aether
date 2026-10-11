@@ -23,6 +23,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 11 | Æther Swiss Kite Simulator : refonte complète | 10-10 16:47:06 | 10-10 17:49:13 | 1 h 02 min 07 s |
 | 12 | Pages retirées, gréement expert, caméra, tableau de bord | 10-10 18:09:19 | 10-10 21:44:53 | 10 min 54 s |
 | 13 | Score CO₂ × temps, tentatives datées, bleu marine, EPFL, pirate, italien | 10-10 21:46:38 | 10-10 22:06:08 | 19 min 30 s |
+| 14 | Page Classements, visiteurs, pirate, bac à sable vivant, kite maniable, HUD | 10-11 08:21:44 | 10-11 08:38:06 | 16 min 22 s |
 
 ---
 
@@ -226,4 +227,59 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - traversée débutant complète (bulle Espace, bouton Pause, arrivée, indice 146,392 t·s, 2 tentatives datées enregistrées) ;
   - vues EPFL, Valais, Jet d'eau et pirate en italien à 1366 × 768 ;
   - page Résultats en italien.
+  - Aucune erreur JavaScript.
+
+## 14. Page Classements, compteur de visiteurs, pirate qui chasse la CGN, bac à sable vivant, kite plus maniable, nouveau HUD
+- **Heure du prompt** : 2026-10-11 08:21:44 · **Heure du résultat** : 2026-10-11 08:38:06 · **Temps de calcul** : 16 min 22 s
+- **Demande** : liste de 13 améliorations :
+  - supprimer les onglets Jeu / Résultats et mettre les résultats en bas d'une nouvelle page Classements ;
+  - nombre de joueurs par catégorie ;
+  - compteur de visiteurs ;
+  - pirate qui poursuit et canonne un vapeur CGN ; vapeurs plus lents ;
+  - bac à sable : décor qui défile avec la vitesse et suit le cap ;
+  - bouton pour passer le tutoriel ;
+  - vent portant sauf un peu de travers devant Lausanne et la tempête ;
+  - kite expert maniable 70 % du temps ; plus d'amplitude de puissance ;
+  - unité du podium mieux expliquée ;
+  - scène de jeu 20 % moins haute ;
+  - traces du top 3 en vert ;
+  - instruments chrono, vitesse et vent en haut à gauche, graphiques d'évolution en bas, sans FPS.
+- **Modifications** :
+  - **Navigation** :
+    - Plus d'onglets Streamlit ni de barre Streamlit en haut : l'application est une seule page, le jeu.
+    - Nouvelle page « Classements » dans le menu du jeu : classement complet, puis carte des routes des 8 meilleures tentatives (colorées selon la vitesse) et petites cartes individuelles. Les routes suivent le mode, la période et le critère choisis.
+    - Le bouton « Classements » ouvre cette page (ou la fenêtre de classement pendant une course). L'ancienne page Résultats (matplotlib) est supprimée.
+  - **Classements** :
+    - Pour chaque catégorie, nombre de joueurs et de tentatives enregistrées.
+    - Sous le podium : « indice CO₂ × temps = tonnes de CO₂ émises × secondes de course (t·s) ». Les tableaux gardent la notation t·s.
+  - **Compteur de visiteurs** : chaque navigateur tire un identifiant anonyme, compté une seule fois dans la base. Il s'affiche en petit sous l'accueil (« 👁 N visiteurs depuis le lancement »).
+  - **Pirate et CGN** :
+    - Les vapeurs CGN sont 1,4 fois plus lents.
+    - Le bateau pirate prend en chasse le vapeur qui traverse la zone de tempête. Il se place sur son flanc et tire des bordées toutes les 3 à 4 s : éclair, fumée sur le flanc, boulets en cloche, gerbes d'eau autour du vapeur.
+  - **Bac à sable** :
+    - On regarde à bâbord. Le panorama du Léman tourne avec le cap : Alpes au sud, Valais à l'est, Jura au nord-ouest, Salève, horizon plat vers Genève.
+    - Un ruban de cap gradué en haut montre la direction regardée.
+    - Montagnes, collines (vignes côté nord), bouées et voiliers au mouillage défilent d'autant plus vite que la barge va vite. Le soleil se déplace avec le cap.
+  - **Tutoriel** : bouton « Passer le tutoriel ⏭ » sur chaque page du tutoriel.
+  - **Vent** : vent portant au départ et vers Genève. Un passage de vent de travers (sud / sud-ouest) devant Lausanne. Le coup de Joran est inchangé.
+  - **Kite expert** :
+    - Vitesse dans la fenêtre compressée : environ 20°/s au bord (l'aile ne reste plus coincée), 75°/s au plus au centre (au lieu de 130). Virages plus francs (80 à 130°/s).
+    - L'aile ne retombe que si elle est vraiment trop lente.
+    - Puissance réglable de 0 à 100 % (au lieu de 30 à 100 %), aux flèches ou en glissant la barre « Puissance » à la souris.
+    - Avec le pilote automatique de test, le grand kite (100 m², 300 m) vole 97 % du temps au lieu de 69 %, et le 25 m² sur 100 m 83 % du temps.
+  - **Affichage** :
+    - Scène de traversée environ 20 % moins haute, mesurée une fois la vue affichée. Sur un écran de 1440 × 900, tout le tableau de bord est visible.
+    - Traces du top 3 en vert, sur l'eau et sur la mini-carte.
+    - En haut à gauche, 4 instruments au design du tableau de bord : chrono avec anneau de progression, compteur de vitesse, cadran du vent, poussée du kite.
+    - En bas, ces 3 instruments et le FPS sont remplacés par deux graphiques des 30 dernières secondes : tension et poussée du kite, vitesse et vent.
+  - **Dépendances** : `requirements.txt` ne contient plus que Streamlit (matplotlib ne sert plus qu'au PDF, en local).
+- **Vérification** (Chrome sans écran, 1440 × 900) :
+  - plus d'onglets Streamlit ;
+  - compteur de visiteurs affiché ;
+  - bac à sable à deux caps ;
+  - bouton Passer le tutoriel ;
+  - traversée débutant complète (indice 145,993 t·s) ;
+  - page Classements (nombre de joueurs, podium expliqué, carte des routes) ;
+  - pirate qui canonne le vapeur ;
+  - maniabilité du kite avec trois gréements.
   - Aucune erreur JavaScript.

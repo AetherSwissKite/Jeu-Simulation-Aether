@@ -36,7 +36,7 @@
       var(--bg);
   }
   /* Visibilité selon la vue et le mode */
-  body:not(.view-home) .only-home, body:not(.view-sandbox) .only-sandbox, body:not(.view-race) .only-race,
+  body:not(.view-home) .only-home, body:not(.view-sandbox) .only-sandbox, body:not(.view-race) .only-race, body:not(.view-board) .only-board,
   body:not(.mode-beginner) .only-beginner, body:not(.mode-expert) .only-expert { display: none !important; }
 
   .app { position: relative; max-width: none; margin: 0 auto; padding: 4px 4px 8px; display: flex; flex-direction: column; gap: 10px; }
@@ -59,6 +59,7 @@
   .seg button { border: 0; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; padding: 6px 11px; border-radius: 999px; transition: background .2s, color .2s; white-space: nowrap; }
   .seg button.on { background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px rgba(31, 58, 104, .35); }
   .seg.small button { padding: 4px 9px; font-size: 9.5px; }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
   .btn { border: 1px solid var(--line2); background: #fff; border-radius: 9px; padding: 6px 11px; font-size: 12px; font-weight: 500; transition: background .15s, border-color .15s; display: inline-flex; align-items: center; gap: 6px; }
   .btn:hover { background: var(--accent-soft); border-color: rgba(31, 58, 104, .5); }
   .btn.primary { background: linear-gradient(135deg, #5a7cb3, var(--accent)); border-color: transparent; color: #fff; font-weight: 600; }
@@ -72,7 +73,7 @@
   .world { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background: #cfdde8; }
   .world > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .hero-slot .world { aspect-ratio: 2.9 / 1; min-height: 300px; }
-  .race-slot .world { height: var(--race-h, 56vw); min-height: 420px; }   /* hauteur ajustée à l'écran par fitRace() */
+  .race-slot .world { height: var(--race-h, 45vw); min-height: 360px; }   /* hauteur ajustée à l'écran par fitRace() */
   .glass { background: rgba(255, 255, 255, .74); border: 1px solid rgba(255, 255, 255, .9); border-radius: 11px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 4px 16px rgba(25, 40, 75, .1); }
   .hero-text { position: absolute; left: 22px; bottom: 20px; max-width: min(560px, 60%); padding: 16px 18px; }
   .hero-text h1 { margin: 0 0 6px; font-family: var(--head); font-size: clamp(24px, 3vw, 38px); font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
@@ -119,12 +120,23 @@
   .kitebox { position: absolute; right: 14px; bottom: 16px; width: 232px; padding: 8px 10px; z-index: 3; }
   .kitebox .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; font-size: 11.5px; }
   .kitebox .bar { position: relative; height: 8px; border-radius: 4px; background: #eceff5; overflow: hidden; flex: 1; }
+  .kitebox .trimbar { height: 12px; cursor: ew-resize; touch-action: none; }
   .kitebox .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
   .kitebtn { width: 100%; margin-top: 6px; justify-content: center; }
   .kitebox .rig { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 5px; font-size: 11px; }
   .kitebox .rig .seg { padding: 2px; }
   .kitebox .rig .seg button { padding: 3px 6px; font-size: 9px; letter-spacing: .02em; text-transform: none; }
   .dash { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 6px; padding: 6px; }
+  .inst.chart { grid-column: span 2; flex-direction: column; align-items: stretch; gap: 2px; }
+  .inst.chart canvas { width: 100%; height: 36px; }
+  .inst.chart .tx { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+  .inst.chart em { font-family: var(--mono); font-size: 10px; overflow: visible; }
+  .inst.chart em i { font-style: normal; font-weight: 700; }
+  .hud-tl { display: grid; grid-template-columns: repeat(2, minmax(150px, auto)); max-width: none; }
+  .hud-tl .hudinst { padding: 5px 10px 5px 6px; }
+  .hud-tl .hudinst canvas { width: 46px; height: 46px; }
+  .hud-tl .hudinst b { font-size: 17px; }
+  .hud-tl .hudinst:first-child b { font-size: 22px; }
   .inst { display: flex; align-items: center; gap: 6px; padding: 5px 6px; border-radius: 10px; min-width: 0; border: 1px solid rgba(255, 255, 255, .8); }
   .inst canvas { width: 46px; height: 46px; flex: none; display: block; }
   .inst .tx { min-width: 0; }
@@ -158,6 +170,15 @@
   .card canvas { width: 100%; height: 86px; display: block; border-radius: 10px; }
   .card .row { display: flex; gap: 6px; flex-wrap: wrap; }
   .boards { padding: 12px 14px; }
+  .board-count { margin: -4px 0 8px; font-weight: 600; color: var(--accent) !important; }
+  .routes { padding: 12px 14px; }
+  .routes-map { width: 100%; height: 360px; display: block; border-radius: 10px; background: #eef3f8; }
+  .routes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
+  .routes-grid figure { margin: 0; background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 6px; }
+  .routes-grid canvas { width: 100%; height: 120px; display: block; }
+  .routes-grid figcaption { font-size: 11px; margin-top: 4px; line-height: 1.35; }
+  .routes-grid figcaption span { font-family: var(--mono); color: var(--muted); font-size: 10px; }
+  .visits { font-family: var(--mono); font-size: 10px; color: var(--muted); text-align: right; margin: 0 4px; }
   .board-tabs { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; margin-bottom: 10px; }
   .board-scroll { max-height: 300px; overflow: auto; }
   table.board th.sorted, table.board td.sorted { color: var(--accent); font-weight: 700; }
@@ -332,6 +353,7 @@
       <button data-view="sandbox" data-i="nav_sandbox"></button>
       <button data-view="beginner" data-i="nav_beginner"></button>
       <button data-view="expert" data-i="nav_expert"></button>
+      <button data-view="board" data-i="nav_board"></button>
     </div>
     <div class="seg small" id="langSeg"><button data-lang="fr">FR</button><button data-lang="en">EN</button><button data-lang="de">DE</button><button data-lang="it">IT</button></div>
     <span class="player" id="playerChip" hidden></span>
@@ -372,6 +394,7 @@
       </div>
     </div>
     <div class="panel boards" id="homeBoard"></div>
+    <p class="visits" id="visitCount"></p>
   </section>
 
   <!-- ===================== BAC À SABLE ===================== -->
@@ -464,6 +487,20 @@
     </section>
   </section>
 
+  <!-- ===================== CLASSEMENTS ===================== -->
+  <section class="only-board" id="viewBoard" style="display:flex;flex-direction:column;gap:10px">
+    <div class="panel boards" id="pageBoard"></div>
+    <div class="panel routes">
+      <p class="eyebrow" data-i="routes_title"></p>
+      <p class="board-src" data-i="routes_note" style="margin:0 0 8px"></p>
+      <p class="board-src" id="routesEmpty" data-i="no_routes" hidden></p>
+      <canvas class="routes-map" id="routesMap"></canvas>
+      <div class="legend-grad" style="background:linear-gradient(90deg,#6271b7,#39a0c8,#4cbf7f,#e1c54a,#e08a3c,#d33d3d)"></div>
+      <div class="row" style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted)"><span id="routesVmin"></span><span id="routesVmax"></span></div>
+      <div class="routes-grid" id="routesGrid"></div>
+    </div>
+  </section>
+
   <!-- ===================== TRAVERSÉE ===================== -->
   <section class="only-race" id="viewRace" style="display:flex;flex-direction:column;gap:8px">
     <div class="race-slot" id="raceSlot"></div>
@@ -481,12 +518,7 @@
         <button class="btn big" data-go="expert" data-i="play_expert"></button>
       </div>
     </div>
-    <div class="hud-tl only-race">
-      <div class="glass chip big"><small data-i="d_time"></small><b id="hTime">0:00.00</b></div>
-      <div class="glass chip big"><small data-i="d_speed"></small><b id="hSpeed">0<i>kn</i></b></div>
-      <div class="glass chip"><small data-i="d_wind"></small><b id="hWind">–</b></div>
-      <div class="glass chip"><small data-i="d_kite"></small><b id="hKite">–</b></div>
-    </div>
+    <div class="hud-tl only-race" id="hudTl"></div>
     <div class="glass progress-top only-race"><div class="row"><span data-i="start_name"></span><span id="hProg">0 %</span><span data-i="finish_name"></span></div><div class="track"><div class="fill" id="hProgFill"></div></div></div>
     <div class="hud-tr only-race">
       <div class="tools">
@@ -504,7 +536,7 @@
       <div class="rig only-expert"><span data-i="rig_area"></span><div class="seg small"><button data-rig="area" data-v="10">10 m²</button><button data-rig="area" data-v="25">25 m²</button><button data-rig="area" data-v="100">100 m²</button></div></div>
       <div class="rig only-expert"><span data-i="rig_line"></span><div class="seg small"><button data-rig="line" data-v="25">25 m</button><button data-rig="line" data-v="100">100 m</button><button data-rig="line" data-v="300">300 m</button></div></div>
       <div class="row"><span data-i="kb_tension"></span><div class="bar"><i id="kbTension"></i></div></div>
-      <div class="row only-expert"><span data-i="kb_trim"></span><div class="bar"><i id="kbTrim" style="background:linear-gradient(90deg,#bfeee0,#3d5f94)"></i></div></div>
+      <div class="row only-expert"><span data-i="kb_trim"></span><div class="bar trimbar" id="kbTrimBar" title="↑ / ↓"><i id="kbTrim" style="background:linear-gradient(90deg,#bfeee0,#3d5f94)"></i></div><b id="kbTrimVal" style="font-family:var(--mono);font-size:11px;min-width:34px;text-align:right">–</b></div>
       <div class="row"><span data-i="kb_zone"></span><b id="kbZone" style="font-family:var(--mono)">–</b></div>
       <button class="btn kitebtn" id="kiteBtn"></button>
     </div>
@@ -538,7 +570,7 @@
     <div class="modal" id="ovHelp" style="width:min(720px,100%)" hidden>
       <p class="eyebrow" id="helpEyebrow"></p>
       <div id="helpBody"></div>
-      <div class="row" style="justify-content:flex-end"><div class="pager" id="helpPager"></div><button class="btn" id="helpBack" data-i="back"></button><button class="btn primary" id="helpOk"></button></div>
+      <div class="row" style="justify-content:flex-end"><button class="btn ghost" id="helpSkip" data-i="help_skip" style="margin-right:auto"></button><div class="pager" id="helpPager"></div><button class="btn" id="helpBack" data-i="back"></button><button class="btn primary" id="helpOk"></button></div>
     </div>
 
     <div class="modal" id="ovPause" style="width:min(380px,100%);text-align:center" hidden>

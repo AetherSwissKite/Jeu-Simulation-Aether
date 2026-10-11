@@ -167,7 +167,7 @@ def page_physics(pdf):
         ("Masse effective ressentie", "80 t", "190 t", "barge à gravier chargée, inertie"),
         ("Pilotage du kite", "automatique (8)", "manuel (flèches)", "fenêtre de vol, choquer / border"),
         ("Kite · lignes", "150 m² · 200 m", "10/25/100 m² · 25/100/300 m", "petit = vif, grand = puissant"),
-        ("Tension max avant casse", "140 kN", "≈ 1,6 kN/m²", "pénalités : +4 s / +3 s / +2 s"),
+        ("Tension max avant casse", "95 kN", "≈ 1,15 kN/m²", "pénalités : +4 s / +3 s / +2 s"),
         ("Taux de lacet max", "17 °/s", "9,5 °/s", "la barre n'agit qu'avec de la vitesse"),
         ("Moteur · résistance", "500 kW · 80 kN", "idem", "R = 4,2 kN/(m/s)² · u²"),
         ("Carburant · CO$_2$", "0,215 kg/kWh", "3,17 kg/kg", "CO$_2$ évité = poussée utile du kite"),

@@ -5,8 +5,8 @@ const BARGE = { CD: 4.2, FE: 80, PMAX: 500, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, 
 // Les deux modes partagent la même physique ; seules la masse effective (inertie ressentie), l'agilité
 // et la compression du temps changent pour adapter les sensations au public.
 const MODES = {
-  beginner: { TN: 60, M: 80, RMAX: 17, TAUR: 0.45, TMAX: 140, camD: 58, camH: 19 },
-  expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 160, camD: 62, camH: 20 }
+  beginner: { TN: 60, M: 80, RMAX: 17, TAUR: 0.45, TMAX: 95, camD: 58, camH: 19 },
+  expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 115, camD: 62, camH: 20 }
 };
 const INTRO_DUR = 4.2, FINISH_DUR = 3.8;
 const GHOST_COLS = ["#1e9e5a", "#46c37b", "#8fdcaa"];   // traces du top 3 en vert, du plus foncé (1er) au plus clair

@@ -29,6 +29,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 17 | Scores perdus, classement en direct, taille de la scène stable | 10-11 20:49:25 | 10-11 20:52:43 | 3 min 18 s |
 | 18 | Vent plus fort et plus de risées : environ 2× plus vite au kite | 10-11 23:25:14 | 10-11 23:40:38 | 15 min 24 s |
 | 19 | Retour en arrière, vent juste assez fort pour +20 % au kite | 10-11 23:43:23 | 10-11 23:58:01 | 14 min 38 s |
+| 20 | Retour à la version d'avant les changements de vent | 10-12 00:03:19 | 10-12 00:03:39 | 0 min 20 s |
 
 ---
 
@@ -365,4 +366,13 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - étapes intermédiaires : +60 % de vent seul = +11 % de vitesse ; avec les risées = +18 %.
   - Kite expert : en vol 97 % du temps (100 m² sur 100 ou 300 m) et 83 % (25 m², 100 m).
   - Aucune erreur JavaScript.
+
+## 20. Retour à la version d'avant les changements de vent
+- **Heure du prompt** : 2026-10-12 00:03:19 · **Heure du résultat** : 2026-10-12 00:03:39 · **Temps de calcul** : 0 min 20 s
+- **Demande** : revenir à la version d'avant la demande d'augmentation du vent (« c'était mieux avant »).
+- **Modifications** :
+  - Tout le code (jeu, services Python, outils, PDF) est remis exactement dans l'état du commit `6a538cb` (prompt 17). Les prompts 18 et 19 sont donc annulés.
+  - On retrouve le vent de 12 à 18 nœuds, les 46 risées d'origine, le kite et les tensions d'origine (95 kN en débutant, environ 1,15 kN par m² en expert) et la maniabilité du kite expert du prompt 14.
+  - Le journal garde la trace des prompts 18 et 19.
+- **Vérification** : aucun écart entre le code et le commit `6a538cb` en dehors de ce journal ; cette version avait été testée au prompt 17.
 

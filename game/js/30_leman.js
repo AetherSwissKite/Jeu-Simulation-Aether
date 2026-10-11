@@ -139,7 +139,7 @@ const LANDMARKS = GEO.landmarks.map(l => ({ type: l.type, x: l.x * SCALE, y: l.y
 // τ = temps de course / durée nominale du mode : le même scénario se déroule quel que soit le mode.
 // Les vents du Léman : Vaudaire (sud-est) au départ, Vent (sud-ouest) au milieu, coup de Joran (nord-ouest), Bise (nord-est) vers Genève.
 // vent portant presque tout le parcours, un bout de vent de travers devant Lausanne, et le coup de Joran au milieu
-const WIND_KEYS = [[0, 120, 25], [0.18, 115, 25], [0.25, 195, 20], [0.38, 200, 20], [0.44, 110, 23], [0.49, 320, 22], [0.6, 330, 20], [0.67, 45, 26], [1, 45, 28]];
+const WIND_KEYS = [[0, 120, 15], [0.18, 115, 15], [0.25, 195, 12], [0.38, 200, 12], [0.44, 110, 14], [0.49, 320, 22], [0.6, 330, 20], [0.67, 45, 16], [1, 45, 18]];
 const WIND_NAMES = [[0, "w_vaudaire"], [0.25, "w_vent"], [0.46, "w_joran"], [0.65, "w_bise"]];
 function baseWind(f) {
   let i = 1;
@@ -154,12 +154,11 @@ const stormBurst = tau => 0.55 + 0.45 * Math.pow(Math.abs(Math.sin(tau * 61)), 3
 const GUSTS = [], CALMS = [];
 {
   const r = rng(2024);
-  // 80 risées (+8 à +15 nd), assez longues pour être croisées que l'on soit en avance ou en retard sur l'allure nominale
-  for (let i = 0; i < 80; i++) {
-    const f0 = 0.03 + (i / 80) * 0.94 + (r() - 0.5) * 0.02;
-    const cp = coursePoint(f0 * COURSE_LEN), lat = (r() - 0.5) * 220;
+  for (let i = 0; i < 46; i++) {
+    const f0 = 0.03 + (i / 46) * 0.94 + (r() - 0.5) * 0.02;
+    const cp = coursePoint(f0 * COURSE_LEN), lat = (r() - 0.5) * 240;
     const bw = baseWind(f0), to = rad(bw.from + 180);
-    GUSTS.push({ x0: cp.x + cp.nx * lat, y0: cp.y + cp.ny * lat, r: 32 + r() * 46, boost: 8 + r() * 7, t0: f0 * (0.75 + r() * 0.2) - 0.05, dur: 0.18 + r() * 0.1, vx: Math.sin(to) * 380, vy: Math.cos(to) * 380 });
+    GUSTS.push({ x0: cp.x + cp.nx * lat, y0: cp.y + cp.ny * lat, r: 30 + r() * 46, boost: 6 + r() * 7, t0: f0 - 0.06 - r() * 0.03, dur: 0.15 + r() * 0.06, vx: Math.sin(to) * 480, vy: Math.cos(to) * 480 });
   }
   for (const [f, lat, rr] of [[0.31, -110, 85], [0.37, 120, 70], [0.41, -40, 60], [0.82, 50, 55]]) {
     const cp = coursePoint(f * COURSE_LEN);

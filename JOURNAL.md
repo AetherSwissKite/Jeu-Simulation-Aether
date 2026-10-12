@@ -33,6 +33,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 21 | Retrait des temps de TJL en mode débutant | 10-12 00:06:47 | 10-12 00:07:23 | 0 min 36 s |
 | 22 | Remise à zéro de tout l'historique de course | 10-12 00:09:24 | 10-12 00:09:50 | 0 min 26 s |
 | 23 | Nouveau mode « Traversée SP80 » | 10-12 20:46:07 | 10-12 21:34:13 | 48 min 06 s |
+| 24 | Vent propre au SP80 (50–80 nd tout le parcours), lac plat | 10-12 21:40:11 | 10-12 21:50:31 | 10 min 20 s |
 
 ---
 
@@ -446,4 +447,28 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Le pilote automatique de test devait « tenir » l'aile du bon côté : il n'a pas validé la difficulté réelle pour un humain, et le réglage de vitesse et de durée mériterait un essai en main.
   - Le vent arrière du parcours oblige à empanner en zigzag : c'est fidèle au vrai SP80, mais exigeant.
   - Le classement en ligne reste stocké sur le disque éphémère de Streamlit Cloud.
+
+## 24. Vent propre au SP80 : 50 à 80 nœuds tout le long du parcours, lac plat
+- **Heure du prompt** : 2026-10-12 21:40:11 · **Heure du résultat** : 2026-10-12 21:50:31 · **Temps de calcul** : 10 min 20 s
+- **Demande** : modifier le vent uniquement pour la traversée SP80, pour aller entre 50 et 80 nœuds tout le long du parcours, en gardant le lac assez plat.
+- **Modifications** :
+  - **Profil de vent par mode** (`WIND_PROFILE`, choisi au début de chaque traversée) : les modes barge gardent exactement leur vent ; le SP80 a le sien (`WIND_KEYS_SP80`).
+  - **Vent du SP80** : 25 nœuds de travers, à environ 110° de la route du côté bâbord, qui tourne avec les virages du parcours. Le SP80 navigue donc toujours à son meilleur angle, sans avoir à zigzaguer. Risées et tempête conservées.
+  - **Pétoles** : beaucoup plus faibles en SP80 (−25 % de vent au lieu de −78 %).
+  - **Lac plat en SP80** : vagues limitées à quelques centimètres et pas de moutons, quel que soit le vent.
+  - **Annonces de vent** (Vaudaire, Joran…) désactivées en SP80, car elles ne correspondent plus à ce vent.
+  - **Compression du temps** recalée (vitesse nominale 52 nœuds) pour garder une traversée d'environ 1 min 30 malgré la vitesse plus élevée.
+- **Mesures** (pilote de test, traversée SP80 complète) :
+  - Réglages successifs :
+
+    | Vent | Temps entre 50 et 80 nœuds | Vitesse moyenne |
+    |---|---|---|
+    | 14 nœuds à 105° | 11 % | 32 nœuds |
+    | 18 nœuds | 29 % | 43 nœuds |
+    | 22 nœuds à 110° | 52 % | 50 nœuds |
+    | 25 nœuds à 110° | 87 % | 60 nœuds |
+
+  - Avec 25 nœuds : 10 % sous 50 nœuds (départ et chocs) et 3 % au-dessus de 80 nœuds (pointe à 84 dans une rafale).
+  - Traversée en 79,8 s.
+  - **Non-régression** : vent de départ des modes débutant et expert toujours de 15 nœuds du 120°, celui du SP80 de 25 nœuds du 189°. Aucune erreur JavaScript.
 

@@ -118,9 +118,10 @@ function drawRanges(ctx, cam, L) {
 
 // ---------------- Lac ----------------
 function seaState(windKn, flowBearing) {
-  const A = 0.03 + Math.pow(windKn / 14, 2) * 0.32;
+  // SP80 : lac gardé presque plat (vagues et moutons limités) quel que soit le vent
+  const A = WIND_PROFILE.flat ? Math.min(0.06, 0.02 + windKn * 0.002) : 0.03 + Math.pow(windKn / 14, 2) * 0.32;
   const k = 2 * Math.PI / (6 + windKn * 0.8);
-  return { A, k, om: Math.sqrt(9.81 * k) * 0.8, dx: Math.sin(rad(flowBearing)), dy: Math.cos(rad(flowBearing)), foam: smooth((windKn - 18) / 12) };
+  return { A, k, om: Math.sqrt(9.81 * k) * 0.8, dx: Math.sin(rad(flowBearing)), dy: Math.cos(rad(flowBearing)), foam: WIND_PROFILE.flat ? 0 : smooth((windKn - 18) / 12) };
 }
 function waveY(x, y, sea, t) {
   const p1 = sea.k * (x * sea.dx + y * sea.dy) - sea.om * t;

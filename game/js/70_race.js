@@ -8,9 +8,9 @@ const BARGE = { CD: 4.2, FE: 80, PMAX: 500, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, 
 const MODES = {
   beginner: { TN: 60, M: 80, RMAX: 17, TAUR: 0.45, TMAX: 95, camD: 58, camH: 19 },
   expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 115, camD: 62, camH: 20 },
-  // SP80 : ~1 min 30 pour une VMG moyenne de ~20 nd le long du parcours (zigzags au largue compris) ;
+  // SP80 : ~1 min 30 à ~55 nd de moyenne (vent de travers propre au SP80, voir WIND_KEYS_SP80) ;
   // masse effective faible = accélérations violentes
-  sp80: { TN: 90, VNOM: 20, M: 4, RMAX: 22, TAUR: 0.22, TMAX: 260, camD: 30, camH: 8.5, boat: "sp80", half: 4.5 }
+  sp80: { TN: 90, VNOM: 52, M: 4, RMAX: 22, TAUR: 0.22, TMAX: 260, camD: 30, camH: 8.5, boat: "sp80", half: 4.5 }
 };
 const RACE_MODES = Object.keys(MODES);
 const manualKite = () => RACE.mode === "expert" || RACE.mode === "sp80";   // kite piloté aux flèches
@@ -29,6 +29,7 @@ const VK = () => COURSE_LEN / (cfg().TN * (cfg().VNOM || 9.5));        // m de j
 const FTIME = () => VK() * 1000 / (SCALE * KN);                         // secondes réelles par seconde de jeu
 
 function resetRace() {
+  setWindProfile(RACE.mode);   // vent propre au SP80, inchangé pour les autres modes
   Object.assign(RACE, { t: 0, tau: 0.02, pen: 0, coll: 0, fuel: 0, saved: 0, track: [], trackT: 0, throttle: 0, rudder: 0, mouseHelm: false,
     introT: 0, finishT: 0, cool: {}, dolphins: [], wake: [], smoke: [], shake: 0, flash: 0, result: null, maxKn: 0 });
   RACE.windShown = new Set();
@@ -117,7 +118,7 @@ function bargeDynamics(dt, w, B, C) {
 }
 // annonces : vents du Léman, tempête, dauphins
 function raceAnnounces(w) {
-  for (const [f0, key] of WIND_NAMES) if (RACE.f >= f0 && !RACE.windShown.has(key)) { RACE.windShown.add(key); toast(T(key), "", null); }
+  if (RACE.mode !== "sp80") for (const [f0, key] of WIND_NAMES) if (RACE.f >= f0 && !RACE.windShown.has(key)) { RACE.windShown.add(key); toast(T(key), "", null); }
   if (RACE.f > 0.42 && RACE.f < 0.47 && KS.deployed) toast(T(manualKite() ? "storm_warn_expert" : "storm_warn"), "warn", "stormw", 8);
   if (RACE.f >= 0.48 && !RACE.windShown.has("sharks")) { RACE.windShown.add("sharks"); toast(T("sharks_toast"), "warn", null); }
   for (const fs of DOLPHIN_SPOTS) if (RACE.f >= fs && !RACE.windShown.has("d" + fs)) { RACE.windShown.add("d" + fs); spawnDolphins(); toast(T("dolphins"), "good", null); }

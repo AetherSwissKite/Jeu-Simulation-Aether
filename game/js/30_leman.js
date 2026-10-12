@@ -140,11 +140,19 @@ const LANDMARKS = GEO.landmarks.map(l => ({ type: l.type, x: l.x * SCALE, y: l.y
 // Les vents du Léman : Vaudaire (sud-est) au départ, Vent (sud-ouest) au milieu, coup de Joran (nord-ouest), Bise (nord-est) vers Genève.
 // vent portant presque tout le parcours, un bout de vent de travers devant Lausanne, et le coup de Joran au milieu
 const WIND_KEYS = [[0, 120, 15], [0.18, 115, 15], [0.25, 195, 12], [0.38, 200, 12], [0.44, 110, 14], [0.49, 320, 22], [0.6, 330, 20], [0.67, 45, 16], [1, 45, 18]];
+// Profil propre au SP80 : vent de travers régulier (~110° de la route, du côté bâbord) qui tourne avec le parcours,
+// pour tenir 50 à 80 nœuds de bout en bout ; pétoles très atténuées et lac lissé. Les modes barge gardent WIND_KEYS.
+const WIND_KEYS_SP80 = [[0, 189, 25], [0.18, 171, 25], [0.38, 156, 25], [0.5, 142, 25], [0.67, 123, 25], [0.8, 105, 25], [1, 92, 25]];
+const WIND_PROFILE = { keys: WIND_KEYS, calm: 0.78, flat: false };
+function setWindProfile(mode) {
+  Object.assign(WIND_PROFILE, mode === "sp80" ? { keys: WIND_KEYS_SP80, calm: 0.25, flat: true } : { keys: WIND_KEYS, calm: 0.78, flat: false });
+}
 const WIND_NAMES = [[0, "w_vaudaire"], [0.25, "w_vent"], [0.46, "w_joran"], [0.65, "w_bise"]];
 function baseWind(f) {
   let i = 1;
-  while (i < WIND_KEYS.length - 1 && WIND_KEYS[i][0] < f) i++;
-  const [f0, d0, k0] = WIND_KEYS[i - 1], [f1, d1, k1] = WIND_KEYS[i];
+  const K = WIND_PROFILE.keys;
+  while (i < K.length - 1 && K[i][0] < f) i++;
+  const [f0, d0, k0] = K[i - 1], [f1, d1, k1] = K[i];
   const t = smooth((f - f0) / (f1 - f0));
   return { from: norm360(d0 + norm180(d1 - d0) * t), kn: lerp(k0, k1, t) };
 }
@@ -182,7 +190,7 @@ function windAt(x, y, tau, cpOpt) {
   }
   for (const c of CALMS) {
     const d2 = ((x - c.x) ** 2 + (y - c.y) ** 2) / (c.r * c.r);
-    if (d2 < 6) kn *= 1 - 0.78 * Math.exp(-d2);
+    if (d2 < 6) kn *= 1 - WIND_PROFILE.calm * Math.exp(-d2);
   }
   kn *= 1 + 0.06 * Math.sin(tau * 40 + x * 0.01);
   return { from: norm360(from), kn: Math.max(0.5, kn), storm: st, gust: gustK, f };

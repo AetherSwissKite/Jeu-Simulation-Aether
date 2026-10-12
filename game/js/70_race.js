@@ -1,13 +1,19 @@
 // ================================================================
-//  TRAVERSÉES DU LÉMAN (débutant / expert) : physique de la barge, commandes, caméras, course
+//  TRAVERSÉES DU LÉMAN (débutant / expert / SP80) : physique de la barge, commandes, caméras, course
+//  Le SP80 a son propre régime physique (72_sp80.js) ; tout le reste (météo, kite, course) est partagé.
 // ================================================================
 const BARGE = { CD: 4.2, FE: 80, PMAX: 500, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, AF: 70, CX: 0.9 };
 // Les deux modes partagent la même physique ; seules la masse effective (inertie ressentie), l'agilité
 // et la compression du temps changent pour adapter les sensations au public.
 const MODES = {
   beginner: { TN: 60, M: 80, RMAX: 17, TAUR: 0.45, TMAX: 95, camD: 58, camH: 19 },
-  expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 115, camD: 62, camH: 20 }
+  expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 115, camD: 62, camH: 20 },
+  // SP80 : ~1 min 30 pour une VMG moyenne de ~20 nd le long du parcours (zigzags au largue compris) ;
+  // masse effective faible = accélérations violentes
+  sp80: { TN: 90, VNOM: 20, M: 4, RMAX: 22, TAUR: 0.22, TMAX: 260, camD: 30, camH: 8.5, boat: "sp80", half: 4.5 }
 };
+const RACE_MODES = Object.keys(MODES);
+const manualKite = () => RACE.mode === "expert" || RACE.mode === "sp80";   // kite piloté aux flèches
 const INTRO_DUR = 4.2, FINISH_DUR = 3.8;
 const GHOST_COLS = ["#1e9e5a", "#46c37b", "#8fdcaa"];   // traces du top 3 en vert, du plus foncé (1er) au plus clair
 const KEYS = new Set();
@@ -16,15 +22,15 @@ const RACE = {
   boat: { x: START.x, y: START.y, hdg: START.bearing, u: 0, r: 0, heelR: 0, heelV: 0, pitchR: 0, heave: 0 },
   throttle: 0, rudder: 0, mouseHelm: false, view: "third", showWindow: true, showGhosts: false,
   cam: { x: 0, y: 0, z: 0, yaw: 0, pitch: 0 }, introT: 0, finishT: 0, cool: {}, dolphins: [], wake: [], wakeT: 0, smoke: [],
-  windShown: new Set(), wind: { kn: 0, from: 0, storm: 0, gust: 0, f: 0 }, f: 0, shake: 0, flash: 0, ghosts: { beginner: [], expert: [] }, result: null
+  windShown: new Set(), wind: { kn: 0, from: 0, storm: 0, gust: 0, f: 0 }, f: 0, shake: 0, flash: 0, ghosts: { beginner: [], expert: [], sp80: [] }, result: null, maxKn: 0
 };
 const cfg = () => MODES[RACE.mode] || MODES.beginner;
-const VK = () => COURSE_LEN / (cfg().TN * 9.5);                         // m de jeu par seconde et par nœud
+const VK = () => COURSE_LEN / (cfg().TN * (cfg().VNOM || 9.5));        // m de jeu par seconde et par nœud (vitesse nominale du mode)
 const FTIME = () => VK() * 1000 / (SCALE * KN);                         // secondes réelles par seconde de jeu
 
 function resetRace() {
   Object.assign(RACE, { t: 0, tau: 0.02, pen: 0, coll: 0, fuel: 0, saved: 0, track: [], trackT: 0, throttle: 0, rudder: 0, mouseHelm: false,
-    introT: 0, finishT: 0, cool: {}, dolphins: [], wake: [], smoke: [], shake: 0, flash: 0, result: null });
+    introT: 0, finishT: 0, cool: {}, dolphins: [], wake: [], smoke: [], shake: 0, flash: 0, result: null, maxKn: 0 });
   RACE.windShown = new Set();
   Object.assign(RACE.boat, { x: START.x, y: START.y, hdg: START.bearing, u: 0, r: 0, heelR: 0, heelV: 0, pitchR: 0, heave: 0 });
   kiteReset();
@@ -48,9 +54,10 @@ function stepRace(dt) {
   const w = windAt(B.x, B.y, RACE.tau, cp);
   RACE.wind = w;
   // commandes
-  const kb = KEYS;
-  const up = kb.has("z") || kb.has("w") || (RACE.mode === "beginner" && kb.has("ArrowUp"));
-  const down = kb.has("s") || (RACE.mode === "beginner" && kb.has("ArrowDown"));
+  const kb = KEYS, sail = C.boat === "sp80";   // SP80 : 100 % à la voile, Z/S sans effet
+  const up = !sail && (kb.has("z") || kb.has("w") || (RACE.mode === "beginner" && kb.has("ArrowUp")));
+  const down = !sail && (kb.has("s") || (RACE.mode === "beginner" && kb.has("ArrowDown")));
+  if (sail) RACE.throttle = 0;
   const left = kb.has("q") || kb.has("a") || (RACE.mode === "beginner" && kb.has("ArrowLeft"));
   const right = kb.has("d") || (RACE.mode === "beginner" && kb.has("ArrowRight"));
   if (up || down) RACE.throttle = clamp(RACE.throttle + ((up ? 1 : 0) - (down ? 1 : 0)) * 0.75 * dt, -0.4, 1);
@@ -58,14 +65,25 @@ function stepRace(dt) {
   else if (!RACE.mouseHelm) RACE.rudder -= RACE.rudder * damp(3.5, dt);
   // kite
   const rig = kiteRig();
-  const altReal = 40 + rig.L * Math.sin(rad(clamp(KS.el || 30, 5, 85)));
+  const altReal = (sail ? 6 : 40) + rig.L * Math.sin(rad(clamp(KS.el || 30, 5, 85)));
   const air = kiteAir(w.kn, w.from, B.hdg, B.u, altReal);
-  if (RACE.mode === "expert") {
+  if (manualKite()) {
     const steer = (kb.has("ArrowRight") ? 1 : 0) - (kb.has("ArrowLeft") ? 1 : 0);
     const trim = (kb.has("ArrowDown") ? 1 : 0) - (kb.has("ArrowUp") ? 1 : 0);   // ↓ border (puissance) · ↑ choquer
     kiteStepManual(dt, air, steer, trim, rig);
   } else kiteStepAuto(dt, air, C.TMAX);
   RACE.air = air;
+  if (sail) sp80Dynamics(dt, w, B, C); else bargeDynamics(dt, w, B, C);
+  RACE.maxKn = Math.max(RACE.maxKn, B.u / KN);
+  collisions(dt);
+  raceAnnounces(w);
+  // trace de la route (pour les classements et la page des résultats)
+  RACE.trackT += dt;
+  if (RACE.trackT >= 0.5) { RACE.trackT = 0; RACE.track.push([Math.round(B.x * 10) / 10, Math.round(B.y * 10) / 10, Math.round(B.u / KN * 100) / 100]); }
+  if (cp.s >= COURSE_LEN - 4 && cp.d < 120 * 120) finishRace();
+}
+// Régime « barge » (débutant / expert) : moteur, carène lourde, gîte, carburant
+function bargeDynamics(dt, w, B, C) {
   // forces longitudinales (kN) et accélération (masse effective en tonnes → m/s²)
   const deck = kiteAir(w.kn, w.from, B.hdg, B.u, 10);
   const windDrag = 0.5 * RHO * BARGE.AF * BARGE.CX * deck.Wa * deck.Wa * Math.cos(rad(deck.awa)) / 1000;
@@ -96,24 +114,22 @@ function stepRace(dt) {
   const ft = FTIME() * dt;
   RACE.fuel += Math.max(0, RACE.throttle) * BARGE.PMAX * ft / 3600 * BARGE.SFOC;   // moteur à 0 % = aucun CO₂
   RACE.saved += Math.max(0, KS.fwd) * Math.max(0, B.u) / BARGE.ETA * ft / 3600 * BARGE.SFOC * BARGE.CO2F;
-  collisions(dt);
-  // annonces : vents du Léman, tempête, dauphins
+}
+// annonces : vents du Léman, tempête, dauphins
+function raceAnnounces(w) {
   for (const [f0, key] of WIND_NAMES) if (RACE.f >= f0 && !RACE.windShown.has(key)) { RACE.windShown.add(key); toast(T(key), "", null); }
-  if (RACE.f > 0.42 && RACE.f < 0.47 && KS.deployed) toast(T(RACE.mode === "expert" ? "storm_warn_expert" : "storm_warn"), "warn", "stormw", 8);
+  if (RACE.f > 0.42 && RACE.f < 0.47 && KS.deployed) toast(T(manualKite() ? "storm_warn_expert" : "storm_warn"), "warn", "stormw", 8);
   if (RACE.f >= 0.48 && !RACE.windShown.has("sharks")) { RACE.windShown.add("sharks"); toast(T("sharks_toast"), "warn", null); }
   for (const fs of DOLPHIN_SPOTS) if (RACE.f >= fs && !RACE.windShown.has("d" + fs)) { RACE.windShown.add("d" + fs); spawnDolphins(); toast(T("dolphins"), "good", null); }
   if (w.gust > 0.5 && KS.state === "flying") toast(T("gust_caught"), "good", "gust", 6);
-  // trace de la route (pour les classements et la page des résultats)
-  RACE.trackT += dt;
-  if (RACE.trackT >= 0.5) { RACE.trackT = 0; RACE.track.push([Math.round(B.x * 10) / 10, Math.round(B.y * 10) / 10, Math.round(B.u / KN * 100) / 100]); }
-  if (cp.s >= COURSE_LEN - 4 && cp.d < 120 * 120) finishRace();
 }
 function collisions(dt) {
   const B = RACE.boat;
   for (const k in RACE.cool) RACE.cool[k] -= dt;
-  const pts = [-15, 0, 15].map(ly => bargeToWorld(B, 0, ly, 0));
+  const hl = cfg().half || 15;   // demi-longueur de la coque (barge 40 m, SP80 ~10 m)
+  const pts = [-hl, 0, hl].map(ly => bargeToWorld(B, 0, ly, 0));
   // rives
-  const bow = bargeToWorld(B, 0, 20, 0);
+  const bow = bargeToWorld(B, 0, hl * 1.33, 0);
   if (!inLake(bow[0], bow[1]) || !inLake(B.x, B.y)) {
     const n = nearestShore(B.x, B.y);
     const dx = B.x - n.x, dy = B.y - n.y, back = inLake(B.x, B.y) ? 1 : -1, L = Math.hypot(dx, dy) || 1;
@@ -159,7 +175,7 @@ function finishRace() {
   RACE.result = { id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, mode: RACE.mode, name: PLAYER.name, team: PLAYER.team,
     time: Math.round(RACE.t * 1000) / 1000, pen: Math.round(RACE.pen * 1000) / 1000, total: Math.round(total * 1000) / 1000,
     co2: Math.round(RACE.fuel * BARGE.CO2F * 10) / 10, saved: Math.round(RACE.saved * 10) / 10, coll: RACE.coll, track: RACE.track,
-    rig: RACE.mode === "expert" ? `${RIG.area} m² · ${RIG.line} m` : null };
+    rig: RACE.mode === "expert" ? `${RIG.area} m² · ${RIG.line} m` : null, maxKn: Math.round(RACE.maxKn * 10) / 10 };
   submitScore(RACE.result);
   toast(T("finish_toast", { t: fmtTime(total) }), "good", null);
 }
@@ -196,11 +212,12 @@ function computeCamera(dt, w, h) {
     return makeCam(w, h, x, y, z, yaw, pitch, 0, half);
   }
   if (RACE.view === "cabin" && RACE.state !== "intro") {
+    if (cfg().boat === "sp80") return sp80PilotCam(w, h, dt);   // vue pilote secouée, dans le cockpit
     const p = bargeToWorld(B, 0, -15.1, 4.8);
     half = 56;
     return makeCam(w, h, p[0], p[1], p[2], B.hdg, -2 + deg(B.pitchR), B.heelR, half);
   }
-  const rig = kiteRig(), follow = RACE.mode === "expert" && RACE.state === "run" && KS.dep > 0.15 && KS.state !== "crashed" ? 1 : 0;
+  const rig = kiteRig(), follow = manualKite() && RACE.state === "run" && KS.dep > 0.15 && KS.state !== "crashed" ? 1 : 0;
   FRAME.wt = lerp(FRAME.wt, follow, damp(1.4, dt));
   FRAME.off = lerp(FRAME.off, follow * clamp(norm180(KS.azRel || 0) * 0.45, -38, 38), damp(1.1, dt));
   FRAME.extra = lerp(FRAME.extra, follow * rig.Lvis * 0.75, damp(1.3, dt));
@@ -220,7 +237,7 @@ function computeCamera(dt, w, h) {
     return makeCam(w, h, x, y, z, yaw, pitch, 0, half);
   }
   // hauteur angulaire du kite vue de la caméra (lissée pour ne pas suivre chaque huit)
-  const A = bargeToWorld(B, ...BARGE_ANCHOR), azW = rad(B.hdg + (KS.azRel || 0)), elW = rad(KS.el || 30);
+  const A = bargeToWorld(B, ...(cfg().boat === "sp80" ? SP80_ANCHOR : BARGE_ANCHOR)), azW = rad(B.hdg + (KS.azRel || 0)), elW = rad(KS.el || 30);
   const Lk = rig.Lvis * KS.dep, kx = A[0] + Lk * Math.cos(elW) * Math.sin(azW), ky = A[1] + Lk * Math.cos(elW) * Math.cos(azW), kz = A[2] + Lk * Math.sin(elW);
   FRAME.elK = lerp(FRAME.elK, deg(Math.atan2(kz - z, Math.hypot(kx - x, ky - y))), damp(2.5, dt));
   const elB = deg(Math.atan2(3 - z, Math.hypot(tx - x, ty - y)));
@@ -257,8 +274,8 @@ function renderWorld(dt) {
   drawQuay(ctx, cam, L, t);
   drawObstacles(ctx, cam, L, tau, t);
   drawWake(ctx, cam, dt);
-  const info = drawBarge(ctx, cam, B, L);
-  drawSmoke(ctx, cam, dt, info.exhaust);
+  const info = cfg().boat === "sp80" && RACE.mode !== "attract" ? drawSP80(ctx, cam, B, L, dt) : drawBarge(ctx, cam, B, L);
+  if (info.exhaust) drawSmoke(ctx, cam, dt, info.exhaust);
   drawRaceKite(ctx, cam, dt, info);
   if (storm > 0.02) {
     ctx.fillStyle = `rgba(60,70,92,${0.28 * storm})`; ctx.fillRect(-w * 0.3, -h * 0.3, w * 1.6, h * 1.6);
@@ -267,7 +284,7 @@ function renderWorld(dt) {
     drawRainLayer(ctx, w, h, t, storm, -10, QUALITY.rain);
   }
   ctx.restore();
-  if (RACE.view === "cabin" && RACE.mode !== "attract" && RACE.state !== "intro" && RACE.state !== "finish" && RACE.state !== "end") drawCabin(ctx, w, h, storm, t);
+  if (RACE.view === "cabin" && RACE.mode !== "attract" && RACE.state !== "intro" && RACE.state !== "finish" && RACE.state !== "end") (cfg().boat === "sp80" ? drawSP80Cockpit : drawCabin)(ctx, w, h, storm, t);
 }
 function drawGhosts(ctx, cam) {
   const ghosts = RACE.ghosts[RACE.mode] || [];
@@ -337,7 +354,7 @@ function drawWake(ctx, cam, dt) {
   RACE.wakeT += dt;
   if (RACE.wakeT > 0.07 && B.u > 0.3) {
     RACE.wakeT = 0;
-    const s = bargeToWorld({ ...B, heelR: 0, pitchR: 0, heave: 0 }, 0, -20, 0);
+    const s = bargeToWorld({ ...B, heelR: 0, pitchR: 0, heave: 0 }, 0, -(cfg().half || 15) * 1.33, 0);
     RACE.wake.push({ x: s[0], y: s[1], hdg: B.hdg, age: 0, v: B.u });
   }
   for (const p of RACE.wake) p.age += dt;
@@ -346,7 +363,7 @@ function drawWake(ctx, cam, dt) {
     ctx.beginPath();
     let first = true;
     for (let i = RACE.wake.length - 1; i >= 0; i--) {
-      const p = RACE.wake[i], spread = 4 + p.age * 9 * (p.v / 4.4), hr = rad(p.hdg);
+      const p = RACE.wake[i], spread = 4 + p.age * 9 * Math.min(p.v / 4.4, 1.6), hr = rad(p.hdg);
       const q = cam.p(p.x + Math.cos(hr) * spread * side, p.y - Math.sin(hr) * spread * side, 0.1);
       if (Math.abs(q[3]) > 100) { first = true; continue; }
       first ? ctx.moveTo(q[0], q[1]) : ctx.lineTo(q[0], q[1]); first = false;
@@ -362,8 +379,8 @@ function drawWake(ctx, cam, dt) {
     ctx.beginPath(); ctx.ellipse(q[0], q[1], (4 + p.age * 6) * s, (1 + p.age) * s * 0.4, 0, 0, Math.PI * 2); ctx.fill();
   }
   // vague d'étrave
-  const bw = cam.p(...bargeToWorld(B, 0, 19.5, 0)), s = cam.k * 57.3 / Math.max(bw[2], 1);
-  if (Math.abs(bw[3]) < 100 && B.u > 0.5) { ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.beginPath(); ctx.ellipse(bw[0], bw[1], (3 + B.u * 1.2) * s, 0.7 * s, 0, 0, Math.PI * 2); ctx.fill(); }
+  const bw = cam.p(...bargeToWorld(B, 0, (cfg().half || 15) * 1.3, 0)), s = cam.k * 57.3 / Math.max(bw[2], 1);
+  if (Math.abs(bw[3]) < 100 && B.u > 0.5 && cfg().boat !== "sp80") { ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.beginPath(); ctx.ellipse(bw[0], bw[1], (3 + B.u * 1.2) * s, 0.7 * s, 0, 0, Math.PI * 2); ctx.fill(); }
 }
 function drawSmoke(ctx, cam, dt, ex) {
   const intensity = Math.max(0.15, RACE.throttle) * 14;
@@ -399,7 +416,7 @@ function drawRaceKite(ctx, cam, dt, info) {
   const tension = clamp(KS.T / rig.tmax, 0, 1.4);
   ctx.strokeStyle = tension > 0.85 ? `rgba(208,74,108,${0.6 + 0.4 * Math.sin(performance.now() / 50)})` : "rgba(40,50,70,.65)";
   ctx.lineWidth = 1 + tension * 1.2;
-  ctx.beginPath(); ctx.moveTo(info.anchorScreen[0], info.anchorScreen[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
+  if (Math.abs(info.anchorScreen[3]) < 100) { ctx.beginPath(); ctx.moveTo(info.anchorScreen[0], info.anchorScreen[1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); }   // point d'attache derrière la caméra (vue pilote) : pas de ligne
   const prev = RACE.lastKitePx;
   let target = 0;
   if (prev) { const vx = p[0] - prev[0], vy = p[1] - prev[1]; if (Math.hypot(vx, vy) > 0.3) target = clamp(Math.atan2(vx, -vy), -1.1, 1.1); }
@@ -407,7 +424,8 @@ function drawRaceKite(ctx, cam, dt, info) {
   RACE.lastKitePx = [p[0], p[1]];
   const span = clamp(cam.k * 57.3 * 24 * Math.sqrt(rig.area / KITE.area) / Math.max(p[2], 1), 16, 260) * (0.4 + 0.6 * KS.dep);   // taille ∝ √surface
   if (KS.state === "crashed") { ctx.fillStyle = "rgba(255,255,255,.85)"; for (let i = 0; i < 7; i++) { ctx.beginPath(); ctx.arc(p[0] + Math.sin(i * 2.3 + performance.now() / 160) * span * 0.2, p[1] - Math.abs(Math.cos(i + performance.now() / 200)) * span * 0.15, 2.4, 0, Math.PI * 2); ctx.fill(); } return; }
-  drawParagliderFront(ctx, p[0], p[1], span, RACE.kiteRoll, RACE.mode === "expert" ? KS.trim : 1);
+  if (cfg().boat === "sp80") drawSP80Kite(ctx, p[0], p[1], span, RACE.kiteRoll, KS.trim);   // kite SP80 (logo Richard Mille)
+  else drawParagliderFront(ctx, p[0], p[1], span, RACE.kiteRoll, RACE.mode === "expert" ? KS.trim : 1);
 }
 function trailPt(cam, A, [az, el]) {
   const L = kiteRig().Lvis, p = cam.p(A[0] + L * Math.cos(rad(el)) * Math.sin(rad(az)), A[1] + L * Math.cos(rad(el)) * Math.cos(rad(az)), A[2] + L * Math.sin(rad(el)));
@@ -489,7 +507,7 @@ function toggleGhosts() {
   if (RACE.showGhosts && !(RACE.ghosts[RACE.mode] || []).length) toast(T("no_ghosts"), "", "ng", 5);
 }
 function toggleWindowView() { RACE.showWindow = !RACE.showWindow; $("tWin").classList.toggle("on", RACE.showWindow); }
-function toggleCamView() { RACE.view = RACE.view === "third" ? "cabin" : "third"; $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : "view_cabin"); }
+function toggleCamView() { RACE.view = RACE.view === "third" ? "cabin" : "third"; $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" ? "view_pilot" : "view_cabin"); }
 
 // ---------------- Boucle de la traversée ----------------
 function frameRace(dt) {
@@ -503,7 +521,7 @@ function frameRace(dt) {
     if (RACE.introT >= INTRO_DUR) {
       RACE.state = "run"; RACE.throttle = 0.3;
       setTimeout(() => { if ($("bigCount").textContent === T("go")) $("bigCount").hidden = true; }, 700);
-      toast(T(RACE.mode === "expert" ? "start_tip_expert" : "start_tip"), "", null);
+      toast(T(RACE.mode === "sp80" ? "start_tip_sp80" : RACE.mode === "expert" ? "start_tip_expert" : "start_tip"), "", null);
       $("spacePop").hidden = false; RACE.popT = 0;
     }
   } else if (RACE.state === "run") {

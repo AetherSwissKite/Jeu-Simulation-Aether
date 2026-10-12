@@ -2,7 +2,8 @@
 //  KITE : dessin en forme de parapente + physique de traction (pilote automatique et pilotage manuel)
 // ================================================================
 // --- Dessin vu de derrière (traversées). Origine = boîtier de pilotage ; l'aile est au-dessus.
-function drawParagliderFront(ctx, x, y, span, roll, power = 1) {
+// opts : couleurs de la voile et logo (kite EPFL blanc par défaut, kite SP80 noir « RICHARD MILLE »)
+function drawParagliderFront(ctx, x, y, span, roll, power = 1, opts = {}) {
   const s = span, Ra = s * (0.56 + 0.12 * (1 - power)), hc = s * 0.66, N = 16;
   const top = [], bot = [], mid = [];
   for (let i = 0; i <= N; i++) {
@@ -31,7 +32,7 @@ function drawParagliderFront(ctx, x, y, span, roll, power = 1) {
   ctx.stroke();
   // voile
   const g = ctx.createLinearGradient(0, -hc - s * 0.1, 0, -hc + s * 0.4);
-  g.addColorStop(0, "#ffffff"); g.addColorStop(1, "#e3e7ef");
+  g.addColorStop(0, opts.top || "#ffffff"); g.addColorStop(1, opts.bot || "#e3e7ef");
   ctx.shadowColor = "rgba(40,40,80,.25)"; ctx.shadowBlur = Math.min(10, s * 0.06);
   ctx.fillStyle = g;
   ctx.beginPath();
@@ -59,9 +60,10 @@ function drawParagliderFront(ctx, x, y, span, roll, power = 1) {
   for (const i of [0, N]) { ctx.beginPath(); ctx.arc(mid[i][0], mid[i][1], Math.max(1, s * 0.018), 0, Math.PI * 2); ctx.fill(); }
   // logo
   if (s > 14) {
-    ctx.font = `800 ${Math.max(6, s * 0.1)}px "Inter Tight", Arial, sans-serif`;
-    ctx.fillStyle = "#FF0000"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText("EPFL", 0, mid[N / 2][1]);
+    const logo = opts.logo || "EPFL";
+    ctx.font = `800 ${Math.max(6, s * (opts.logoSize || 0.1))}px "Inter Tight", Arial, sans-serif`;
+    ctx.fillStyle = opts.logoCol || "#FF0000"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(logo, 0, mid[N / 2][1]);
   }
   // boîtier de pilotage
   ctx.fillStyle = "#3a4258"; ctx.fillRect(-s * 0.035, -s * 0.03, s * 0.07, s * 0.05);
@@ -112,6 +114,7 @@ const RIG_AREAS = [10, 25, 100], RIG_LINES = [25, 100, 300];
 const RIG = (() => { let r = {}; try { r = JSON.parse(store.get("aether.rig") || "{}") || {}; } catch { /* valeur illisible */ } return { area: RIG_AREAS.includes(r.area) ? r.area : 25, line: RIG_LINES.includes(r.line) ? r.line : 100 }; })();
 // surface, longueur réelle, longueur affichée (échelle du décor), tension de rupture et agilité du gréement courant
 function kiteRig() {
+  if (RACE.mode === "sp80") return SP80_RIG;   // kite de 25 m², gréement fixe (72_sp80.js)
   if (RACE.mode !== "expert") return { area: KITE.area, L: KITE.LREAL, Lvis: KITE.LVIS, tmax: cfg().TMAX, agil: 1 };
   return {
     area: RIG.area, L: RIG.line, Lvis: 18 + RIG.line * 0.27,
@@ -143,7 +146,7 @@ function kiteAir(windKn, windFrom, heading, uMs, altReal) {
 function toggleKiteDeploy() {
   if (KS.damaged > 0) { toast(T("kite_damaged_wait"), "bad", "dmg", 2); return; }
   KS.deployed = !KS.deployed;
-  if (KS.deployed && RACE.mode === "expert") Object.assign(KS, { phi: 0, theta: 80, psi: 90, crashed: 0, overload: 0 });
+  if (KS.deployed && manualKite()) Object.assign(KS, { phi: 0, theta: 80, psi: 90, crashed: 0, overload: 0 });
   toast(T(KS.deployed ? "kite_out" : "kite_in"), KS.deployed ? "good" : "", "kt" + KS.deployed, 0);
 }
 // Pilote automatique (débutant) : le kite fait des 8 dans la meilleure direction de traction
@@ -189,13 +192,16 @@ function kiteStepManual(dt, air, steer, trimDir, rig) {
     return;
   }
   KS.state = "flying";
-  const wf = Math.max(0, Math.cos(rad(KS.theta)) * Math.cos(rad(KS.phi)));
+  // rig.edge < 1 : aile très rapide qui garde de la puissance près des bords de la fenêtre (SP80) ;
+  // sa vitesse de déplacement suit, elle, la vraie position dans la fenêtre (elle ralentit au bord et ne s'y écrase pas)
+  const wfPos = Math.max(0, Math.cos(rad(KS.theta)) * Math.cos(rad(KS.phi)));
+  const wf = rig.edge ? Math.max(0, Math.cos(rad(KS.theta)) * Math.cos(rad(KS.phi * rig.edge))) : wfPos;
   const LD = KITE.LD0 * (0.5 + 0.5 * KS.trim);
-  const vt = air.Wa * wf * LD + 0.12 * air.Wa;                // vitesse de l'aile en travers du vent (m/s)
+  const vt = air.Wa * wfPos * LD + 0.12 * air.Wa;             // vitesse de l'aile en travers du vent (m/s)
   // vitesse angulaire dans la fenêtre (°/s, rythme de jeu), volontairement compressée pour rester maniable :
   // jamais figée au bord (≈ 20°/s minimum), jamais incontrôlable au centre (75°/s au plus) ; lignes courtes = plus vive
   const lineF = clamp(Math.sqrt(KITE.LREAL / rig.L), 0.75, 1.5);
-  const om = Math.min(75, (18 + 30 * Math.sqrt(clamp(vt / 22, 0, 1.6))) * lineF);
+  const om = Math.min(rig.omMax || 75, (18 + 30 * Math.sqrt(clamp(vt / 22, 0, 1.6))) * lineF);
   KS.psi = norm180(KS.psi + steer * (80 + 50 * clamp(vt / 25, 0, 1)) * rig.agil * dt);
   KS.theta += om * Math.cos(rad(KS.psi)) * dt;
   KS.phi += om * Math.sin(rad(KS.psi)) * dt / Math.max(Math.cos(rad(KS.theta)), 0.3);
@@ -204,7 +210,7 @@ function kiteStepManual(dt, air, steer, trimDir, rig) {
   if (KS.theta > 88) KS.theta = 88;
   KS.wf = wf;
   KS.Va = air.Wa * wf * Math.sqrt(1 + LD * LD);
-  KS.T = 0.5 * RHO * rig.area * KITE.CL * (0.1 + 0.9 * KS.trim) * KS.Va * KS.Va / 1000;
+  KS.T = 0.5 * RHO * rig.area * KITE.CL * (rig.power || 1) * (0.1 + 0.9 * KS.trim) * KS.Va * KS.Va / 1000;
   KS.azRel = air.down + KS.phi; KS.el = KS.theta;
   const Th = KS.T * Math.cos(rad(KS.theta));
   KS.fwd = Th * Math.cos(rad(KS.azRel)); KS.lat = Th * Math.sin(rad(KS.azRel));

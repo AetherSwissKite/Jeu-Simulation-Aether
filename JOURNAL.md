@@ -32,6 +32,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 20 | Retour à la version d'avant les changements de vent | 10-12 00:03:19 | 10-12 00:03:39 | 0 min 20 s |
 | 21 | Retrait des temps de TJL en mode débutant | 10-12 00:06:47 | 10-12 00:07:23 | 0 min 36 s |
 | 22 | Remise à zéro de tout l'historique de course | 10-12 00:09:24 | 10-12 00:09:50 | 0 min 26 s |
+| 23 | Nouveau mode « Traversée SP80 » | 10-12 20:46:07 | 10-12 21:34:13 | 48 min 06 s |
 
 ---
 
@@ -394,4 +395,55 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - **Serveur** : version des données passée de 2 à 3. Au démarrage, la base en ligne efface toutes les courses (débutant et expert, tous les joueurs). Le compteur de visiteurs est conservé.
   - **Navigateur** : les clés de stockage local (classement hors ligne, traces, scores en attente d'envoi) passent en v3, pour qu'aucun ancien score en attente ne soit renvoyé après la remise à zéro.
 - **Vérification** : test sur une base de copie en version 2 contenant deux courses : elles sont effacées au démarrage, le visiteur est gardé, et une nouvelle course est conservée aux redémarrages suivants.
+
+## 23. Nouveau mode « Traversée SP80 »
+- **Heure du prompt** : 2026-10-12 20:46:07 · **Heure du résultat** : 2026-10-12 21:34:13 · **Temps de calcul** : 48 min 06 s
+- **Demande** : ajouter la « Traversée SP80 » sans toucher aux autres modes. Le SP80 est le trimaran de vitesse du projet sp80.ch (objectif 80 nœuds) avec son kite de 25 m². Même parcours, même météo, même carte, environ 1 min 30. Commandes : flèches pour le kite, Q/D pour le cap, Z/S désactivés (100 % voile). Vue 3ᵉ personne et vue pilote secouée. Physique réaliste mais jouable. Classement séparé au temps réel, intégré à la page Classements avec ses standards. Tutoriel dédié avec « Passer le tutoriel ». Toutes les langues. 30 à 60 images/s. Aucune perte de données.
+- **Recherche** :
+  - Le site sp80.ch était inaccessible (certificat expiré). J'ai utilisé la presse spécialisée : yacht.de, IEEE Spectrum, EPFL Actu, Mensgear, WatchPro.
+  - Le SP80 est un trimaran d'environ 10 × 7,5 m pour environ 1 t, conçu par des ingénieurs et étudiants de l'EPFL.
+  - Forme : coque centrale en goutte en carbone, deux cockpits en tandem sous verrière, bras courts en forme d'aile vers deux petits flotteurs, foil central ventilé, petit safran avant, bôme pivotante noire (« power module ») où s'attache le kite.
+  - Livrée noire avec un bandeau rouge et la marque Richard Mille en blanc.
+  - Kites de 12 à 40 m² (25 m² aux essais), lignes de 40 à 90 m. Navigation à 100–140° du vent. Coque qui déjauge vers 25 nœuds. Record du bateau : 58,3 nœuds ; record du monde visé : 65,45 nœuds.
+- **Modifications** :
+  - **Nouveau module `game/js/72_sp80.js`** (régime séparé, pas une adaptation du code de la barge) :
+    - **Maquette 3D fidèle** : coque en goutte noire, bandeau rouge, verrières en tandem, bras et flotteurs, safran, bôme du power module orientée vers le kite, marquages « RICHARD MILLE » et « SP80 », gerbe d'eau du foil.
+    - **Kite de 25 m²** noir au logo Richard Mille, sur 70 m de lignes.
+    - **Physique** : pas de moteur ; traction du kite contre une traînée ∝ V², plus forte sur coque jusqu'au décollage du foil (~25 nœuds). Le foil encaisse l'effort latéral (dérive et gîte presque nulles en vol). Masse effective faible, donc accélérations violentes. Barre de plus en plus sensible avec la vitesse (×1,8) et coûteuse en vitesse.
+    - **Kite du SP80** : aile très rapide qui garde de la puissance près du bord de la fenêtre et ralentit au bord sans s'y écraser. Coefficient de portance élevé (aile de course), vitesse dans la fenêtre plafonnée à 50°/s pour rester pilotable.
+    - **Vue pilote** : dans le cockpit avant, secousses (lacet, tangage, roulis, hauteur) qui croissent avec le carré de la vitesse, l'état du lac et les chocs. Champ de vision élargi à haute vitesse. Habillage du cockpit (arceaux de verrière, nez noir au bandeau rouge, gouttes).
+  - **Course partagée** :
+    - La boucle de course appelle soit le régime barge, soit le régime SP80. La vitesse nominale par mode (20 nœuds pour le SP80) fixe la compression du temps.
+    - La météo, les risées, la tempête, les vapeurs CGN, le pirate et les requins restent calés sur l'avancement : même scénario pour tous.
+    - Collisions et sillage adaptés à la taille du bateau.
+  - **Interface** :
+    - Onglet « Traversée SP80 » entre Expert et Classements, et carte d'accueil illustrée.
+    - En SP80 : levier des gaz masqué, réglage de puissance du kite visible, sélecteurs de gréement masqués.
+    - HUD : compteur jusqu'à 90 nœuds avec repère du record (65,45). Tableau de bord : VMG et angle au vent, état du foil, vitesse max à la place du moteur, de la part du kite et du CO₂.
+    - Le bouton 🏆 est réduit à son icône pour garder la barre du haut sur une ligne.
+  - **Tutoriel** SP80 en 3 pages (objectif et règles, commandes, lecture de l'écran) avec « Passer le tutoriel ».
+  - **Classements** :
+    - Mode `sp80` ajouté côté serveur (temps accepté à partir de 30 s), aux fantômes et aux routes.
+    - Classement SP80 au temps réel, sans indice CO₂ : podium, temps au millième, nombre de joueurs, jour / semaine / historique, joueurs / équipes, traces du top 3 en vert, routes.
+    - Écran d'arrivée avec la vitesse max.
+    - **Aucune migration** : la version des données est inchangée, les courses des modes barge restent intactes.
+  - **Textes** : FR, EN, DE et IT (338 textes par langue), hypothèses du modèle et schéma PDF mis à jour.
+- **Vérification** (Chrome sans écran, 1440 × 900) :
+  - **SP80** :
+    - Z sans effet (gaz à 0) et levier des gaz masqué.
+    - Tutoriel affiché et passé.
+    - Traversée complète en 110,8 s (+7 s de pénalités), pointe à 63,5 nœuds, 60 images/s minimum.
+    - Lors d'un essai précédent, le bateau a atteint 72,3 nœuds.
+    - Vue pilote capturée à 52–57 nœuds en pleine tempête.
+    - Page Classements onglet SP80 : colonnes Tentative / Temps, podium au temps, tri CO₂ masqué.
+  - **Non-régression** :
+    - Traversée débutant complète en 72,7 s, comme avant.
+    - Expert : sélecteurs de gréement, gaz et puissance visibles.
+    - Bac à sable, menu en allemand et barre du haut sur une ligne en 1366 et 1440 px.
+    - Test de la base : courses des anciens modes conservées après la mise à jour, course SP80 acceptée, temps trop court refusé.
+    - Aucune erreur JavaScript.
+- **Reste fragile** :
+  - Le pilote automatique de test devait « tenir » l'aile du bon côté : il n'a pas validé la difficulté réelle pour un humain, et le réglage de vitesse et de durée mériterait un essai en main.
+  - Le vent arrière du parcours oblige à empanner en zigzag : c'est fidèle au vrai SP80, mais exigeant.
+  - Le classement en ligne reste stocké sur le disque éphémère de Streamlit Cloud.
 

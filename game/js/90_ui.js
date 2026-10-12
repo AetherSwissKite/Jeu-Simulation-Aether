@@ -34,7 +34,7 @@ function fitModals() {
 function goView(v) {
   if ((RACE.state === "run" || RACE.state === "pause" || RACE.state === "intro") && VIEW !== v) toast(T("race_abandoned"), "warn", null);
   VIEW = v;
-  const race = v === "beginner" || v === "expert";
+  const race = v === "beginner" || v === "expert" || v === "sp80";
   document.body.className = `view-${race ? "race" : v}${race ? " mode-" + v : ""}`;
   document.querySelectorAll("#navSeg button").forEach(b => b.classList.toggle("on", b.dataset.view === v));
   hideOverlay(); KEYS.clear(); $("bigCount").hidden = true;
@@ -46,7 +46,7 @@ function goView(v) {
   } else if (race) {
     $("raceSlot").appendChild(world);
     RACE.mode = v; resetRace(); RACE.state = "name";
-    $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : "view_cabin");
+    $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" ? "view_pilot" : "view_cabin");
     openNameForm();
   } else if (v === "board") {
     $("heroSlot").appendChild(world);
@@ -146,7 +146,7 @@ let boardReturn = null;
 function openBoard() {
   if (RACE.state === "run") { RACE.state = "pause"; KEYS.clear(); }
   boardReturn = overlay;
-  BOARD.mode = VIEW === "expert" ? "expert" : BOARD.mode;
+  BOARD.mode = RACE_MODES.includes(VIEW) ? VIEW : BOARD.mode;
   showOverlay("ovBoard");
   renderBoards();
 }
@@ -167,6 +167,14 @@ function helpPages(mode) {
   if (mode === "sandbox") return [
     `<h2>${T("hs_title")}</h2><p>${T("hs_text")}</p><div class="help-grid">${keyRow(["↑", "↓"], T("k_sb_speed"))}${keyRow(["←", "→"], T("k_sb_heading"))}${keyRow([T("key_space")], T("k_sb_kite"))}${keyRow(["🖱"], T("k_sb_knobs"))}</div>`,
     `<h2>${T("read_title")}</h2>${read(["rs_hud", "rs_mission", "rs_compass", "rs_gauges", "rs_bars", "rs_curves"])}`
+  ];
+  if (mode === "sp80") return [
+    `<h2>${T("hp_title")}</h2><p>${T("hp_text")}</p>${rules(["hp_r1", "hp_r2", "hp_r3"])}`,
+    `<h2>${T("ctrl_title")}</h2><div class="help-grid">
+      ${keyRow(["Q", "D"], T("k_helm_sp80"))}${keyRow(["←", "→"], T("k_kite_steer"))}${keyRow(["↑", "↓"], T("k_kite_trim"))}
+      ${keyRow([T("key_space"), "E"], T("k_kite_toggle"))}${keyRow(["V"], T("k_view_sp80"))}${keyRow(["F"], T("k_window"))}${keyRow(["T"], T("k_ghost"))}${common.join("")}
+    </div><p class="note">${T("ctrl_sp80_note")}</p>`,
+    `<h2>${T("read_title")}</h2>${read(["rr_hud", "rr_progress", "rr_minimap", "rr_wind", "rr_kitebox", "rr_sp80_dash"])}<p>${T("rr_sp80")}</p>`
   ];
   const isE = mode === "expert";
   return [
@@ -206,7 +214,7 @@ function closeHelp() {
 langListeners.push(() => {
   if (overlay === "ovHelp") setHelpPage(helpPage);
   if (overlay === "ovName") { $("nameEyebrow").textContent = T("name_eyebrow", { mode: T("nav_" + RACE.mode) }); fillTeams(PLAYER.team); }
-  $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : "view_cabin");
+  $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" ? "view_pilot" : "view_cabin");
   renderBoards(); drawCards();
 });
 
@@ -229,7 +237,7 @@ function initKeyboard() {
     if (overlay === "ovEnd" && k === "Escape") { e.preventDefault(); goView("home"); return; }
     if ((RACE.state === "run" || RACE.state === "pause") && (lk === "p" || k === "Escape")) { e.preventDefault(); togglePause(); return; }
     if (overlay) return;
-    if (VIEW === "beginner" || VIEW === "expert") {
+    if (VIEW === "beginner" || VIEW === "expert" || VIEW === "sp80") {
       if (lk === "v") { toggleCamView(); return; }
       if (lk === "f") { toggleWindowView(); return; }
       if (lk === "t") { toggleGhosts(); return; }
@@ -276,6 +284,19 @@ function drawCards() {
       ctx.beginPath(); COURSE.forEach(([x, y], i) => i ? ctx.lineTo(ox + x * sc, oy - y * sc) : ctx.moveTo(ox + x * sc, oy - y * sc)); ctx.stroke(); ctx.setLineDash([]);
       for (const gst of GUSTS.slice(0, 24)) { ctx.fillStyle = windColor(16 + gst.boost); ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.arc(ox + gst.x0 * sc, oy - gst.y0 * sc, 3, 0, Math.PI * 2); ctx.fill(); }
       ctx.globalAlpha = 1; ctx.font = "13px sans-serif"; ctx.fillText("🏁", ox + FINISH.x * sc - 6, oy - FINISH.y * sc + 4);
+    } else if (kind === "sp80") {
+      // SP80 de profil, lancé sur l'eau, tracté par son kite noir
+      const sky = ctx.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, "#22324f"); sky.addColorStop(0.62, "#7d9cc2"); sky.addColorStop(0.63, "#3e6f8f"); sky.addColorStop(1, "#1f4762");
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
+      const bx = w * 0.34, by = h * 0.7, L = w * 0.42;
+      ctx.fillStyle = "rgba(255,255,255,.7)"; for (let i = 0; i < 12; i++) { ctx.beginPath(); ctx.arc(bx - L * 0.55 - i * 7, by - Math.sin(i / 11 * Math.PI) * h * 0.12, 2 + i * 0.6, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = "#16171c"; ctx.beginPath(); ctx.moveTo(bx - L / 2, by); ctx.quadraticCurveTo(bx - L * 0.1, by - h * 0.13, bx + L / 2, by - h * 0.02); ctx.lineTo(bx + L / 2, by + 2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#c8102e"; ctx.fillRect(bx - L * 0.12, by - h * 0.085, L * 0.18, h * 0.06);
+      ctx.fillStyle = "#46597a"; ctx.beginPath(); ctx.ellipse(bx + L * 0.12, by - h * 0.1, L * 0.14, h * 0.035, -0.05, Math.PI, 0); ctx.fill();
+      ctx.strokeStyle = "#0d0e12"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(bx - L * 0.15, by - h * 0.1); ctx.lineTo(bx - L * 0.02, by - h * 0.2); ctx.stroke();
+      ctx.strokeStyle = "rgba(255,255,255,.6)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(bx - L * 0.02, by - h * 0.2); ctx.lineTo(w * 0.8, h * 0.24); ctx.stroke();
+      drawSP80Kite(ctx, w * 0.8, h * 0.24, h * 0.42, 0.35, 1);
+      ctx.fillStyle = "#fff"; ctx.font = `800 ${Math.round(h * 0.12)}px "Inter Tight", Arial, sans-serif`; ctx.fillText("80 kn", 10, h * 0.2);
     } else {
       ctx.fillStyle = "#f2f4f9"; ctx.fillRect(0, 0, w, h);
       const cx = w / 2, cy = h - 6, R = Math.min(w / 2 - 8, h - 12);

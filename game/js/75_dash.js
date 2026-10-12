@@ -8,11 +8,11 @@ const DASH_CELLS = [
   { id: "wind", tone: "mint", label: "d_wind", hud: true },
   { id: "thrust", tone: "rose", label: "d_kite", hud: true },
   { id: "engine", tone: "peach", label: "d_engine", no: "sp80" },
-  { id: "vmg", tone: "peach", label: "d_vmg", only: "sp80" },
+  { id: "vmg", tone: "peach", label: "d_vmg", only: "foiler" },
   { id: "kite", tone: "rose", label: "kb_tension" },
-  { id: "share", tone: "lilac", label: "d_share", no: "sp80" },
-  { id: "foil", tone: "lilac", label: "d_foil", only: "sp80" },
-  { id: "co2", tone: "sand", label: "d_co2", no: "sp80" },
+  { id: "share", tone: "lilac", label: "d_share", no: ["sp80", "ssb"] },
+  { id: "foil", tone: "lilac", label: "d_foil", only: "foiler" },
+  { id: "co2", tone: "sand", label: "d_co2", no: ["sp80", "ssb"] },
   { id: "vmax", tone: "sand", label: "d_vmax", only: "sp80" },
   { id: "heel", tone: "sky", label: "d_heel" },
   { id: "pen", tone: "peach", label: "d_pen" },
@@ -23,7 +23,7 @@ const DASH = { cv: {}, hist: [] };
 function initDash() {
   const cell = c => c.chart
     ? `<div class="inst chart t-${c.tone}"><div class="tx"><small data-i="${c.label}"></small><em id="s_${c.id}"></em></div><canvas id="g_${c.id}"></canvas></div>`
-    : `<div class="inst t-${c.tone}${c.hud ? " glass hudinst" : ""}${c.only ? " only-" + c.only : ""}${c.no ? " no-" + c.no : ""}"><canvas id="g_${c.id}"></canvas><div class="tx"><small data-i="${c.label}"></small><b id="v_${c.id}">–</b><em id="s_${c.id}"></em></div></div>`;
+    : `<div class="inst t-${c.tone}${c.hud ? " glass hudinst" : ""}${c.only ? " only-" + c.only : ""}${c.no ? [].concat(c.no).map(m => " no-" + m).join("") : ""}"><canvas id="g_${c.id}"></canvas><div class="tx"><small data-i="${c.label}"></small><b id="v_${c.id}">–</b><em id="s_${c.id}"></em></div></div>`;
   $("hudTl").innerHTML = DASH_CELLS.filter(c => c.hud).map(cell).join("");
   $("databar").innerHTML = DASH_CELLS.filter(c => !c.hud).map(cell).join("");
   for (const c of DASH_CELLS) DASH.cv[c.id] = setupCanvas($("g_" + c.id));
@@ -153,17 +153,19 @@ function updateDash() {
   // en haut à gauche
   gArc(DASH.cv.time, f, [[0, "#a8e6d3"], [1, "#3d5f94"]], { text: `${fmt0(f * 100)}` });
   set("time", fmtClock(RACE.t), `${RACE.pen ? `+${fmt1(RACE.pen)} s · ` : ""}${fmt1((1 - f) * COURSE_LEN / SCALE)} km`);
-  const sp = RACE.mode === "sp80", vScale = sp ? 90 : 12;
+  const sp = RACE.mode === "sp80", isSsb = RACE.mode === "ssb", vScale = sp ? 90 : isSsb ? 30 : 12;
   // SP80 : cadran jusqu'à 90 nd, repère au record du monde à la voile (65,45 nd)
-  gArc(DASH.cv.speed, kn / vScale, SPEED_STOPS, { needle: true, zones: sp ? [[65.45 / 90, 1, "#c8102e"]] : [[8.5 / 12, 1, "#3d5f94"]] });
-  set("speed", `${fmt1(kn)} ${T("u_kn")}`, sp ? `${fmt0(kn * 1.852)} km/h` : `⚙ ${fmt0(Math.max(0, RACE.Fe || 0))} kN`);
+  gArc(DASH.cv.speed, kn / vScale, SPEED_STOPS, { needle: true, zones: sp ? [[65.45 / 90, 1, "#c8102e"]] : isSsb ? [[12 / 30, 1, "#d23b2f"]] : [[8.5 / 12, 1, "#3d5f94"]] });   // SSB : repère au décollage des foils (~12 nd)
+  set("speed", `${fmt1(kn)} ${T("u_kn")}`, sp || isSsb ? `${fmt0(kn * 1.852)} km/h` : `⚙ ${fmt0(Math.max(0, RACE.Fe || 0))} kN`);
   gWind(DASH.cv.wind, norm180(wd.from - B.hdg), wd.kn);
   set("wind", `${fmt0(wd.kn)} ${T("u_kn")} ${cardinal(wd.from)}`, wd.gust > 0.3 ? `💨 ${T("d_gust")}` : wd.storm > 0.3 ? `⛈ ${T("d_storm")}` : "");
   gArc(DASH.cv.thrust, Math.max(0, KS.fwd) / Math.max(rig.tmax * 0.8, 1), [[0, "#c9d6ec"], [1, "#5fc9a8"]], { needle: true });
   set("thrust", `${fmt0(KS.fwd)} kN`, T("d_thrust"));
   // tableau du bas
-  gKnob(DASH.cv.engine, (RACE.throttle + 0.4) / 1.4, THR_STOPS);
-  set("engine", `${fmt0(RACE.throttle * 100)} %`, `${fmt0(Math.max(0, RACE.throttle) * BARGE.PMAX)} kW`);
+  const ssb = RACE.mode === "ssb", si = RACE.ssbInfo || { kw: 0, h: 0, fly: 0 }, broken = ssb && RACE.ssb && RACE.ssb.broken;
+  gKnob(DASH.cv.engine, ssb ? RACE.throttle : (RACE.throttle + 0.4) / 1.4, THR_STOPS);
+  if (ssb) set("engine", broken ? T("ssb_motor_short") : `${fmt0(RACE.throttle * 100)} %`, broken ? "⚠" : `${fmt0(si.kw)} kW ☀+H₂`);
+  else set("engine", `${fmt0(RACE.throttle * 100)} %`, `${fmt0(Math.max(0, RACE.throttle) * BARGE.PMAX)} kW`);
   gArc(DASH.cv.kite, KS.T / (rig.tmax * 1.2), TENS_STOPS, { needle: true, zones: [[0.7, 0.83, "#f2c14e"], [0.83, 1, "#f07d9c"]] });
   set("kite", `${fmt0(KS.T)} kN`, `max ${fmt0(rig.tmax)}`);
   const share = KS.fwd > 0 ? KS.fwd / (KS.fwd + Math.max(1, RACE.Fe || 0)) : 0;
@@ -177,6 +179,13 @@ function updateDash() {
   set("heel", `${fmt1(Math.abs(heel))}°`, heel > 0.3 ? "↘" : heel < -0.3 ? "↙" : "");
   gPen(DASH.cv.pen, RACE.pen, RACE.coll);
   set("pen", `+${fmt1(RACE.pen)} s`, `💥 ${RACE.coll}`);
+  if (ssb) {
+    const c = coursePoint(clamp(RACE.f, 0, 1) * COURSE_LEN), vmg = kn * Math.cos(rad(B.hdg - c.bearing));
+    gArc(DASH.cv.vmg, Math.max(0, vmg) / 30, SPEED_STOPS, { needle: true });
+    set("vmg", `${fmt1(vmg)} ${T("u_kn")}`, `${fmt0(Math.abs(norm180(wd.from - B.hdg)))}° ${T("d_twa")}`);
+    gDonut(DASH.cv.foil, si.fly, "#d23b2f", `${fmt0(si.h * 100)}`);
+    set("foil", T(si.fly > 0.5 ? "foil_on" : "foil_off"), `${fmt0(si.h * 100)} cm · ${T("foil_note_ssb")}`);
+  }
   if (sp) {
     const c = coursePoint(clamp(RACE.f, 0, 1) * COURSE_LEN), vmg = kn * Math.cos(rad(B.hdg - c.bearing));
     gArc(DASH.cv.vmg, Math.max(0, vmg) / 60, SPEED_STOPS, { needle: true });

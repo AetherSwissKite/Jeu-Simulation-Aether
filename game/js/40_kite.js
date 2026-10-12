@@ -115,6 +115,7 @@ const RIG = (() => { let r = {}; try { r = JSON.parse(store.get("aether.rig") ||
 // surface, longueur réelle, longueur affichée (échelle du décor), tension de rupture et agilité du gréement courant
 function kiteRig() {
   if (RACE.mode === "sp80") return SP80_RIG;   // kite de 25 m², gréement fixe (72_sp80.js)
+  if (RACE.mode === "ssb") return SSB_RIG;     // kite de secours de 25 m² sur 200 m (74_ssb.js)
   if (RACE.mode !== "expert") return { area: KITE.area, L: KITE.LREAL, Lvis: KITE.LVIS, tmax: cfg().TMAX, agil: 1 };
   return {
     area: RIG.area, L: RIG.line, Lvis: 18 + RIG.line * 0.27,

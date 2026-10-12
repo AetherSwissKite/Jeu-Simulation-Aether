@@ -41,7 +41,7 @@ function init() {
   requestAnimationFrame(() => drawCards());
   new ResizeObserver(() => drawCards()).observe($("viewHome"));
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { curveDirty = true; drawCards(); });
-  const refit = () => { if (VIEW === "beginner" || VIEW === "expert" || VIEW === "sp80") fitRace(); else fitModals(); };
+  const refit = () => { if (RACE_MODES.includes(VIEW)) fitRace(); else fitModals(); };
   window.addEventListener("resize", refit);
   try { window.parent.addEventListener("resize", refit); } catch { /* parent inaccessible */ }
   // la page Streamlit autour du jeu se met en place en plusieurs temps : on revérifie la taille chaque seconde
@@ -51,7 +51,7 @@ function init() {
   // accès pour les tests automatisés uniquement (adresse contenant aetherdebug=1)
   try {
     const q = (window.parent && window.parent.location.search) || location.search;
-    if (/aetherdebug=1/.test(q)) window.__AE = { RACE, KS, kiteRig, inLake, PIRATE, cgnState, CGN_LINES, PIRATE_PREY, PERF, QUALITY, BOARD, coursePoint, courseProject, COURSE_LEN, toggleKiteDeploy, goView, setLang };
+    if (/aetherdebug=1/.test(q)) window.__AE = { RACE, KS, kiteRig, inLake, SSB_RADE_F, PIRATE, cgnState, CGN_LINES, PIRATE_PREY, PERF, QUALITY, BOARD, coursePoint, courseProject, COURSE_LEN, toggleKiteDeploy, goView, setLang };
   } catch { /* parent d'une autre origine */ }
 }
 init();

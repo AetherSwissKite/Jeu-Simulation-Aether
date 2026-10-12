@@ -15,6 +15,7 @@ STRINGS = {
   Traction = ½·ρ·S·C_L·Va², où Va combine le vent apparent et la vitesse propre de l'aile en travers du vent (d'où l'intérêt des 8). Fenêtre de vol : puissance ∝ cos(élévation)·cos(écart au centre).
 - **Pilotage expert** : les lignes arrière font virer l'aile, les lignes avant règlent l'incidence (choquer/border). Un petit kite vire vite mais tire peu ; des lignes longues montent chercher plus de vent mais l'aile traverse la fenêtre plus lentement. Au-delà d'environ 1,15 kN par m² de kite, la ligne casse.
 - **SP80** : trimaran de 10 m (~1 t) sans moteur, kite de 25 m² sur 70 m de lignes. Traînée ∝ V², plus forte sur coque jusqu'au décollage du foil (~25 nd) ; l'aile garde de la puissance près du bord de la fenêtre, d'où des vitesses de 2 à 5 fois le vent au largue (100–140° du vent). Classement au temps réel.
+- **SSB (Lobst'Air)** : foiler électrique solaire + hydrogène (~70 kW), décollage sur foils vers 12 nd, ~25 nd en vol ; panne moteur à l'entrée de la tempête, fin de traversée au kite de 25 m² sur 200 m de lignes (fenêtre large, réponse plus lente). Classement au temps réel.
 - **Météo** : même scénario pour tous (Vaudaire, Vent, coup de Joran, Bise ; risées et pétole), qui se déroule selon le temps de course normalisé.
 - **Bac à sable** : puissance ∝ V³, gazole par traversée ∝ V² ; répartition du gain = moyenne des deux ordres (ralentir puis kite, kite puis ralentir).
 """,
@@ -31,6 +32,7 @@ STRINGS = {
   Pull = ½·ρ·S·C_L·Va², where Va combines the apparent wind and the wing's own crosswind speed (hence figure-eights). Wind window: power ∝ cos(elevation)·cos(offset from centre).
 - **Expert flying**: back lines turn the wing, front lines set the angle of attack (depower/power). A small kite turns fast but pulls little; long lines reach stronger wind but the wing crosses the window more slowly. Above about 1.15 kN per m² of kite the line snaps.
 - **SP80**: 10 m trimaran (~1 t) with no engine, 25 m² kite on 70 m lines. Drag ∝ V², higher on the hull until the foil takes off (~25 kn); the wing keeps power near the window edge, giving 2 to 5 times the wind speed on a reach (100–140° to the wind). Ranked by real time.
+- **SSB (Lobst'Air)**: solar + hydrogen electric foiler (~70 kW), foil take-off near 12 kn, ~25 kn flying; motor failure entering the storm, finish under a 25 m² kite on 200 m lines (wide window, slower response). Ranked by real time.
 - **Weather**: the same scenario for everyone (Vaudaire, Vent, Joran squall, Bise; gusts and calm patches), driven by normalised race time.
 - **Sandbox**: power ∝ V³, diesel per crossing ∝ V²; share of the gain = average of both orders (slow down then kite, kite then slow down).
 """,
@@ -47,6 +49,7 @@ STRINGS = {
   Zug = ½·ρ·S·C_L·Va², wobei Va den scheinbaren Wind und die Eigengeschwindigkeit des Schirms quer zum Wind kombiniert (daher die Achten). Windfenster: Leistung ∝ cos(Höhe)·cos(Abweichung von der Mitte).
 - **Profi-Steuerung**: die hinteren Leinen lenken den Schirm, die vorderen stellen den Anstellwinkel ein (fieren/dichtholen). Ein kleiner Kite dreht schnell, zieht aber wenig; lange Leinen erreichen stärkeren Wind, doch der Schirm quert das Fenster langsamer. Ab etwa 1,15 kN pro m² Kite reisst die Leine.
 - **SP80**: 10-m-Trimaran (~1 t) ohne Motor, 25-m²-Kite an 70 m Leinen. Widerstand ∝ V², auf dem Rumpf höher bis zum Abheben des Foils (~25 kn); der Schirm behält Leistung am Fensterrand, daher 2- bis 5-fache Windgeschwindigkeit raumschots (100–140° zum Wind). Wertung nach echter Zeit.
+- **SSB (Lobst'Air)**: solar- und wasserstoffelektrischer Foiler (~70 kW), Abheben auf den Foils bei ~12 kn, ~25 kn im Flug; Motorschaden beim Eintritt in den Sturm, Ziel am 25-m²-Kite an 200 m Leinen (breites Fenster, trägere Reaktion). Wertung nach echter Zeit.
 - **Wetter**: dasselbe Szenario für alle (Vaudaire, Vent, Joran-Bö, Bise; Böen und Flautenfelder), gesteuert durch die normierte Fahrzeit.
 - **Sandkasten**: Leistung ∝ V³, Diesel pro Überfahrt ∝ V²; Anteile am Gewinn = Mittel beider Reihenfolgen (erst langsamer, dann Kite und umgekehrt).
 """,
@@ -63,6 +66,7 @@ STRINGS = {
   Trazione = ½·ρ·S·C_L·Va², dove Va combina il vento apparente e la velocità propria dell'ala trasversale al vento (da qui l'interesse degli 8). Finestra di volo: potenza ∝ cos(elevazione)·cos(scarto dal centro).
 - **Pilotaggio esperto**: i cavi posteriori fanno virare l'ala, quelli anteriori regolano l'incidenza (lascare/cazzare). Un kite piccolo vira in fretta ma tira poco; cavi lunghi raggiungono vento più forte ma l'ala attraversa la finestra più lentamente. Oltre circa 1,15 kN per m² di kite il cavo si rompe.
 - **SP80**: trimarano di 10 m (~1 t) senza motore, kite di 25 m² su cavi di 70 m. Resistenza ∝ V², maggiore sullo scafo fino al decollo del foil (~25 nd); l'ala mantiene potenza vicino al bordo della finestra, da cui velocità da 2 a 5 volte il vento al lasco (100–140° dal vento). Classifica al tempo reale.
+- **SSB (Lobst'Air)**: foiler elettrico solare + idrogeno (~70 kW), decollo sui foil verso 12 nd, ~25 nd in volo; guasto al motore all'ingresso della tempesta, arrivo col kite di 25 m² su cavi di 200 m (finestra ampia, risposta più lenta). Classifica al tempo reale.
 - **Meteo**: stesso scenario per tutti (Vaudaire, Vent, colpo di Joran, Bise; raffiche e bonacce), che si svolge secondo il tempo di gara normalizzato.
 - **Sandbox**: potenza ∝ V³, gasolio per traversata ∝ V²; ripartizione del guadagno = media dei due ordini (prima rallentare poi kite, e viceversa).
 """,

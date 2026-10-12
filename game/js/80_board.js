@@ -80,7 +80,7 @@ function showVisits() { const el = $("visitCount"); if (el && Number.isFinite(BO
 // page Classements : routes des meilleures tentatives (mode, période et critère du classement choisis)
 function renderRoutes() {
   const all = (BOARD.routes && BOARD.routes[BOARD.mode]) || [];
-  const f = BOARD.mode === "sp80" ? METRICS.time : (METRICS[BOARD.sort] || METRICS.score);
+  const f = BOARD.mode === "sp80" || BOARD.mode === "ssb" ? METRICS.time : (METRICS[BOARD.sort] || METRICS.score);
   const list = all.map(e => ({ ...e, ...cleanRun({ ...e, mode: BOARD.mode }), track: e.track })).filter(e => e.track && e.track.length > 1 && inPeriod(e.ts, BOARD.period)).sort((a, b) => f(a) - f(b)).slice(0, 8);
   $("routesEmpty").hidden = list.length > 0;
   const big = $("routesMap"), grid = $("routesGrid");
@@ -149,18 +149,18 @@ const boardHosts = [];
 function mountBoard(container, opts = {}) { boardHosts.push({ container, opts }); renderBoard(container, opts); }
 function renderBoards() { boardHosts.forEach(b => { if (b.container.isConnected && !b.container.closest("[hidden]")) renderBoard(b.container, b.opts); }); }
 function renderBoard(container, opts) {
-  const mode = opts.mode || BOARD.mode, isP = BOARD.group === "players", timeOnly = mode === "sp80", sort = timeOnly ? "time" : BOARD.sort, podK = timeOnly ? "time" : "score";
+  const mode = opts.mode || BOARD.mode, isP = BOARD.group === "players", timeOnly = mode === "sp80" || mode === "ssb", sort = timeOnly ? "time" : BOARD.sort, podK = timeOnly ? "time" : "score";
   container.innerHTML = `
     <p class="eyebrow">${T("boards")} <b>· ${T(BOARD.remote ? "src_remote" : "src_local")}</b></p>
     <div class="board-tabs">
-      <div class="seg small" data-k="mode"><button data-v="beginner">${T("nav_beginner")}</button><button data-v="expert">${T("nav_expert")}</button><button data-v="sp80">${T("nav_sp80")}</button></div>
+      <div class="seg small" data-k="mode"><button data-v="beginner">${T("nav_beginner")}</button><button data-v="expert">${T("nav_expert")}</button><button data-v="sp80">${T("nav_sp80")}</button><button data-v="ssb">${T("nav_ssb")}</button></div>
       <div class="seg small" data-k="sort"${timeOnly ? ' style="display:none"' : ""}><button data-v="score">${T("s_score")}</button><button data-v="co2">${T("s_co2")}</button><button data-v="time">${T("s_time")}</button></div>
       <div class="seg small" data-k="period"><button data-v="day">${T("p_day")}</button><button data-v="week">${T("p_week")}</button><button data-v="all">${T("p_all")}</button></div>
       <div class="seg small" data-k="group"><button data-v="players">${T("g_players")}</button><button data-v="teams">${T("g_teams")}</button></div>
     </div>
     <p class="board-src board-count"></p>
     <div class="board-body">
-      <div><div class="podium"></div><p class="board-src" style="margin:4px 0 0;text-align:center">${T(timeOnly ? "podium_rule_sp80" : "podium_rule")}</p></div>
+      <div><div class="podium"></div><p class="board-src" style="margin:4px 0 0;text-align:center">${T(mode === "ssb" ? "podium_rule_ssb" : timeOnly ? "podium_rule_sp80" : "podium_rule")}</p></div>
       <div class="board-scroll"><table class="board"><thead></thead><tbody></tbody></table><p class="board-src" style="margin:6px 0 0"></p></div>
       <div><canvas class="dist"></canvas><p class="board-src" style="margin:4px 0 0">${T("dist_note")} · ${T("s_" + sort)}</p></div>
     </div>`;
@@ -240,15 +240,16 @@ function showEnd() {
   RACE.state = "end";
   const r = RACE.result;
   if (!r) return;
-  const sp = r.mode === "sp80", pl = attempts(r.mode, "all", sp ? "time" : "score"), rank = pl.findIndex(e => e.id === r.id) + 1;
+  const sp = r.mode === "sp80" || r.mode === "ssb", pl = attempts(r.mode, "all", sp ? "time" : "score"), rank = pl.findIndex(e => e.id === r.id) + 1;
   $("endEyebrow").textContent = T("end_eyebrow", { mode: T("nav_" + r.mode) });
   $("endTitle").innerHTML = T(rank === 1 ? "end_title_1" : rank > 0 && rank <= 3 ? "end_title_podium" : "end_title");
   $("endScore").innerHTML = `${fmt3(r.total)}<small>s</small>`;
   const rows = sp ? [[T("e_time"), fmtTime(r.time)], [T("e_pen"), `+${fmt3(r.pen)} s · ${r.coll} ${T("e_coll")}`], [T("e_vmax"), `<b>${fmt1(r.maxKn || 0)} ${T("u_kn")}</b>`]]
     : [[T("e_score"), `<b>${fmtMetric("score", r.co2 / 1000 * r.total)}</b>`], [T("e_time"), fmtTime(r.time)], [T("e_pen"), `+${fmt3(r.pen)} s · ${r.coll} ${T("e_coll")}`], [T("e_co2"), `${fmt0(r.co2)} kg`], [T("e_saved"), `${fmt0(r.saved)} kg`]];
   if (r.rig) rows.push([T("e_rig"), r.rig]);
+  if (r.mode === "ssb") rows.push([T("e_cannon"), String(r.hits || 0)]);
   $("endBreak").innerHTML = rows.map(([a, b]) => `<span>${a}</span><span>${b}</span>`).join("");
-  $("endRank").textContent = rank > 0 ? T(sp ? "end_rank_sp80" : "end_rank", { r: rank, n: pl.length }) : "";
+  $("endRank").textContent = rank > 0 ? T(r.mode === "ssb" ? "end_rank_ssb" : sp ? "end_rank_sp80" : "end_rank", { r: rank, n: pl.length }) : "";
   showOverlay("ovEnd");
   requestAnimationFrame(() => { const rg = drawRouteMap($("endMap"), r.track); if (rg) { $("endVmin").textContent = `${fmt1(rg[0])} ${T("u_kn")}`; $("endVmax").textContent = `${fmt1(rg[1])} ${T("u_kn")}`; } });
   BOARD.mode = r.mode;

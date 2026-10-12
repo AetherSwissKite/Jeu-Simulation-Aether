@@ -81,22 +81,40 @@ const PIRATE_FACES = (() => {
 // et lui tire des bordées : fumée sur son flanc, boulets et gerbes d'eau autour du vapeur.
 const PIRATE = { x: 0, y: 0, hdg: 0, heelR: 0, pitchR: 0, heave: 0, init: false, last: 0, cd: 2, side: 1, fx: [] };
 const PIRATE_PREY = 2;   // indice dans CGN_LINES
+// Traversée SSB : après la panne moteur, le pirate chasse le Lobst'Air jusqu'à la rade de Genève.
+// Tirs à cadence fixe et points d'impact prédéfinis autour du bateau : même scénario pour tous ; les boulets
+// frôlent et mouillent, un coup au but coûte +2 s mais ne coule jamais le bateau.
+const SSB_SHOTS = [[-14, 8], [12, -10], [-9, -16], [16, 12], [6, -20], [-18, -4], [10, 18], [-6, 22], [20, -2], [-12, 14]];
 function updatePirate(tau, t) {
   const P = PIRATE, dt = clamp(t - P.last, 0, 0.1); P.last = t;
-  const prey = cgnState(CGN_LINES[PIRATE_PREY], tau), h = rad(prey.hdg);
+  const chase = RACE.mode === "ssb" && RACE.state === "run" && RACE.ssb && RACE.ssb.chase;
+  const B = RACE.boat, boatV = B.u / KN * VK();
+  const prey = chase ? { x: B.x, y: B.y, hdg: B.hdg } : cgnState(CGN_LINES[PIRATE_PREY], tau), h = rad(prey.hdg);
   // poste de tir : un peu en arrière du vapeur, sur son flanc, à ~55 m
   const side = P.side, tx = prey.x - Math.sin(h) * 35 + Math.cos(h) * 55 * side, ty = prey.y - Math.cos(h) * 35 - Math.sin(h) * 55 * side;
   if (!P.init || Math.hypot(tx - P.x, ty - P.y) > 450) Object.assign(P, { x: tx, y: ty, hdg: prey.hdg, init: true });
   const dx = tx - P.x, dy = ty - P.y, d = Math.hypot(dx, dy);
   const want = d > 6 ? deg(Math.atan2(dx, dy)) : prey.hdg;
-  P.hdg = norm360(P.hdg + clamp(norm180(want - P.hdg), -25 * dt, 25 * dt));
-  const v = clamp(d * 0.35, 0, 9);
+  const turn = chase ? 45 : 25;
+  P.hdg = norm360(P.hdg + clamp(norm180(want - P.hdg), -turn * dt, turn * dt));
+  let v = clamp(d * (chase ? 0.6 : 0.35), 0, chase ? Math.max(12, boatV * 1.4) : 9);   // en chasse, il suit le rythme du Lobst'Air
+  if (chase && Math.hypot(B.x - P.x, B.y - P.y) < 45) v = Math.min(v, boatV * 0.5);       // il garde ses distances : il tire, il n'aborde pas
   P.x += Math.sin(rad(P.hdg)) * v * dt; P.y += Math.cos(rad(P.hdg)) * v * dt;
   P.heelR = Math.sin(t * 0.9) * 0.1; P.pitchR = Math.sin(t * 1.3) * 0.05; P.heave = Math.sin(t * 1.1) * 0.5;
   // bordée toutes les ~3,5 s quand le vapeur est à portée
   P.cd -= dt;
   const toPrey = Math.hypot(prey.x - P.x, prey.y - P.y);
-  if (P.cd <= 0 && toPrey < 140) {
+  if (chase && P.cd <= 0 && toPrey < 160) {
+    P.cd = 3.0; P.shot = (P.shot || 0) + 1;
+    const bear = deg(Math.atan2(prey.x - P.x, prey.y - P.y)), rel = norm180(bear - P.hdg), fs = rel > 0 ? 1 : -1;
+    const lead = 1.1 * boatV, [ox, oy] = SSB_SHOTS[P.shot % SSB_SHOTS.length], c = Math.cos(h), sn = Math.sin(h);
+    const tx = B.x + sn * lead + c * ox + sn * oy, ty = B.y + c * lead - sn * ox + c * oy;   // décalage dans le repère du bateau
+    for (let k = 0; k < 3; k++) {
+      const lp = bargeToWorld(P, fs * 4.2, -4 + k * 4, 2.2);
+      P.fx.push({ kind: "smoke", x: lp[0], y: lp[1], z: lp[2], vx: Math.sin(rad(bear)) * 6, vy: Math.cos(rad(bear)) * 6, age: -k * 0.12, life: 2.6 });
+      P.fx.push({ kind: "ball", x0: lp[0], y0: lp[1], x1: tx + (k - 1) * 4, y1: ty + (k - 1) * 3, age: -k * 0.12, life: 1.1, ssb: true });
+    }
+  } else if (!chase && P.cd <= 0 && toPrey < 140) {
     P.cd = 3.2 + Math.random() * 1.2;
     const bear = deg(Math.atan2(prey.x - P.x, prey.y - P.y)), rel = norm180(bear - P.hdg), fs = rel > 0 ? 1 : -1;
     for (let k = 0; k < 4; k++) {
@@ -108,7 +126,14 @@ function updatePirate(tau, t) {
   for (const f of P.fx) {
     f.age += dt;
     if (f.kind === "smoke" && f.age > 0) { f.x += f.vx * dt; f.y += f.vy * dt; f.z += 2.5 * dt; f.vx *= 0.97; f.vy *= 0.97; }
-    if (f.kind === "ball" && f.age >= f.life && !f.splashed) { f.splashed = true; P.fx.push({ kind: "splash", x: f.x1, y: f.y1, age: 0, life: 1.2 }); }
+    if (f.kind === "ball" && f.age >= f.life && !f.splashed) {
+      f.splashed = true; P.fx.push({ kind: "splash", x: f.x1, y: f.y1, age: 0, life: 1.2 });
+      if (f.ssb && RACE.state === "run" && RACE.ssb) {
+        const dd = Math.hypot(f.x1 - B.x, f.y1 - B.y);
+        if (dd < 6 && !(RACE.cool.cannon > 0)) { RACE.cool.cannon = 1.5; RACE.pen += 2; RACE.shake = 0.9; RACE.ssb.wet = 1; RACE.ssb.hits++; toast(T("ssb_hit") + " +2 s", "bad", null); }
+        else if (dd < 25) RACE.ssb.wet = Math.max(RACE.ssb.wet, 0.7);   // le boulet frôle : gerbe d'eau sur le bateau
+      }
+    }
   }
   P.fx = P.fx.filter(f => f.age < f.life + (f.kind === "ball" ? 0.05 : 0));
   return P;

@@ -38,7 +38,8 @@
   /* Visibilité selon la vue et le mode */
   body:not(.view-home) .only-home, body:not(.view-sandbox) .only-sandbox, body:not(.view-race) .only-race, body:not(.view-board) .only-board,
   body:not(.mode-beginner) .only-beginner, body:not(.mode-expert) .only-expert, body:not(.mode-sp80) .only-sp80,
-  body:not(.mode-expert):not(.mode-sp80) .only-manual, body.mode-sp80 .no-sp80 { display: none !important; }
+  body:not(.mode-expert):not(.mode-sp80):not(.mode-ssb) .only-manual, body.mode-sp80 .no-sp80, body.mode-ssb .no-ssb,
+  body:not(.mode-ssb) .only-ssb, body:not(.mode-sp80):not(.mode-ssb) .only-foiler { display: none !important; }
 
   .app { position: relative; max-width: none; margin: 0 auto; padding: 4px 4px 8px; display: flex; flex-direction: column; gap: 10px; }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 1px 2px rgba(25, 45, 85, .04), 0 8px 24px rgba(25, 45, 85, .05); }
@@ -160,11 +161,11 @@
   @keyframes tin { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 
   /* ---------- Accueil ---------- */
-  .home-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 2fr); gap: 10px; }
+  .home-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }   /* vision au-dessus des 5 cartes de mode */
   .vision { padding: 14px 16px; }
   .vision p { margin: 0 0 8px; line-height: 1.55; color: #4a4f6c; font-size: 12.5px; }
   .vision ul { margin: 4px 0 0; padding-left: 18px; color: #4a4f6c; line-height: 1.55; font-size: 12.5px; }
-  .cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
   .card { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
   .card h3 { margin: 0; font-family: var(--head); font-size: 17px; font-weight: 700; }
   .card .tag { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
@@ -357,6 +358,7 @@
       <button data-view="beginner" data-i="nav_beginner"></button>
       <button data-view="expert" data-i="nav_expert"></button>
       <button data-view="sp80" data-i="nav_sp80"></button>
+      <button data-view="ssb" data-i="nav_ssb"></button>
       <button data-view="board" data-i="nav_board"></button>
     </div>
     <div class="seg small" id="langSeg"><button data-lang="fr">FR</button><button data-lang="en">EN</button><button data-lang="de">DE</button><button data-lang="it">IT</button></div>
@@ -401,6 +403,13 @@
           <canvas data-card="sp80"></canvas>
           <p data-i="card_sp80_desc"></p>
           <div class="row"><button class="btn primary" data-go="sp80" data-i="play"></button><button class="btn" data-tuto="sp80" data-i="tutorial"></button></div>
+        </div>
+        <div class="panel card">
+          <span class="tag" data-i="card_ssb_tag"></span>
+          <h3 data-i="nav_ssb"></h3>
+          <canvas data-card="ssb"></canvas>
+          <p data-i="card_ssb_desc"></p>
+          <div class="row"><button class="btn primary" data-go="ssb" data-i="play"></button><button class="btn" data-tuto="ssb" data-i="tutorial"></button></div>
         </div>
       </div>
     </div>

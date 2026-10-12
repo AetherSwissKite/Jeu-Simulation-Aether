@@ -34,7 +34,7 @@ function fitModals() {
 function goView(v) {
   if ((RACE.state === "run" || RACE.state === "pause" || RACE.state === "intro") && VIEW !== v) toast(T("race_abandoned"), "warn", null);
   VIEW = v;
-  const race = v === "beginner" || v === "expert" || v === "sp80";
+  const race = RACE_MODES.includes(v);
   document.body.className = `view-${race ? "race" : v}${race ? " mode-" + v : ""}`;
   document.querySelectorAll("#navSeg button").forEach(b => b.classList.toggle("on", b.dataset.view === v));
   hideOverlay(); KEYS.clear(); $("bigCount").hidden = true;
@@ -46,7 +46,7 @@ function goView(v) {
   } else if (race) {
     $("raceSlot").appendChild(world);
     RACE.mode = v; resetRace(); RACE.state = "name";
-    $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" ? "view_pilot" : "view_cabin");
+    $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin");
     openNameForm();
   } else if (v === "board") {
     $("heroSlot").appendChild(world);
@@ -168,6 +168,14 @@ function helpPages(mode) {
     `<h2>${T("hs_title")}</h2><p>${T("hs_text")}</p><div class="help-grid">${keyRow(["↑", "↓"], T("k_sb_speed"))}${keyRow(["←", "→"], T("k_sb_heading"))}${keyRow([T("key_space")], T("k_sb_kite"))}${keyRow(["🖱"], T("k_sb_knobs"))}</div>`,
     `<h2>${T("read_title")}</h2>${read(["rs_hud", "rs_mission", "rs_compass", "rs_gauges", "rs_bars", "rs_curves"])}`
   ];
+  if (mode === "ssb") return [
+    `<h2>${T("hx_title")}</h2><p>${T("hx_text")}</p>${rules(["hx_r1", "hx_r2", "hx_r3"])}`,
+    `<h2>${T("ctrl_title")}</h2><div class="help-grid">
+      ${keyRow(["Z", "S"], T("k_power_ssb"))}${keyRow(["Q", "D"], T("k_helm"))}${keyRow(["←", "→"], T("k_kite_steer"))}${keyRow(["↑", "↓"], T("k_kite_trim"))}
+      ${keyRow([T("key_space"), "E"], T("k_kite_toggle"))}${keyRow(["V"], T("k_view_ssb"))}${keyRow(["F"], T("k_window"))}${keyRow(["T"], T("k_ghost"))}${common.join("")}
+    </div><p class="note">${T("ctrl_ssb_note")}</p>`,
+    `<h2>${T("read_title")}</h2>${read(["rr_hud", "rr_progress", "rr_minimap", "rr_wind", "rr_kitebox", "rr_ssb_dash"])}<p>${T("rr_ssb")}</p>`
+  ];
   if (mode === "sp80") return [
     `<h2>${T("hp_title")}</h2><p>${T("hp_text")}</p>${rules(["hp_r1", "hp_r2", "hp_r3"])}`,
     `<h2>${T("ctrl_title")}</h2><div class="help-grid">
@@ -214,7 +222,7 @@ function closeHelp() {
 langListeners.push(() => {
   if (overlay === "ovHelp") setHelpPage(helpPage);
   if (overlay === "ovName") { $("nameEyebrow").textContent = T("name_eyebrow", { mode: T("nav_" + RACE.mode) }); fillTeams(PLAYER.team); }
-  $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" ? "view_pilot" : "view_cabin");
+  $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin");
   renderBoards(); drawCards();
 });
 
@@ -237,7 +245,7 @@ function initKeyboard() {
     if (overlay === "ovEnd" && k === "Escape") { e.preventDefault(); goView("home"); return; }
     if ((RACE.state === "run" || RACE.state === "pause") && (lk === "p" || k === "Escape")) { e.preventDefault(); togglePause(); return; }
     if (overlay) return;
-    if (VIEW === "beginner" || VIEW === "expert" || VIEW === "sp80") {
+    if (RACE_MODES.includes(VIEW)) {
       if (lk === "v") { toggleCamView(); return; }
       if (lk === "f") { toggleWindowView(); return; }
       if (lk === "t") { toggleGhosts(); return; }
@@ -284,6 +292,20 @@ function drawCards() {
       ctx.beginPath(); COURSE.forEach(([x, y], i) => i ? ctx.lineTo(ox + x * sc, oy - y * sc) : ctx.moveTo(ox + x * sc, oy - y * sc)); ctx.stroke(); ctx.setLineDash([]);
       for (const gst of GUSTS.slice(0, 24)) { ctx.fillStyle = windColor(16 + gst.boost); ctx.globalAlpha = 0.55; ctx.beginPath(); ctx.arc(ox + gst.x0 * sc, oy - gst.y0 * sc, 3, 0, Math.PI * 2); ctx.fill(); }
       ctx.globalAlpha = 1; ctx.font = "13px sans-serif"; ctx.fillText("🏁", ox + FINISH.x * sc - 6, oy - FINISH.y * sc + 4);
+    } else if (kind === "ssb") {
+      // Lobst'Air en vol sur ses foils au-dessus du Léman
+      const sky = ctx.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, "#9ec3e4"); sky.addColorStop(0.62, "#e9eef4"); sky.addColorStop(0.63, "#5f95b4"); sky.addColorStop(1, "#356e8e");
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
+      const bx = w * 0.45, wl = h * 0.72, L = w * 0.5, lift = h * 0.14;
+      ctx.strokeStyle = "#2a2f3b"; ctx.lineWidth = 2.5;
+      for (const fx of [0.32, -0.36]) { ctx.beginPath(); ctx.moveTo(bx + L * fx, wl - lift); ctx.lineTo(bx + L * fx, wl + 2); ctx.stroke(); }
+      ctx.fillStyle = "rgba(255,255,255,.75)"; for (let i = 0; i < 8; i++) { ctx.beginPath(); ctx.arc(bx - L * 0.36 - i * 7, wl - Math.sin(i / 7 * Math.PI) * 6, 1.5 + i * 0.5, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = "#f1f3f6"; ctx.beginPath(); ctx.moveTo(bx - L / 2, wl - lift); ctx.lineTo(bx + L * 0.42, wl - lift); ctx.quadraticCurveTo(bx + L / 2, wl - lift - 4, bx + L / 2, wl - lift - 12); ctx.lineTo(bx - L / 2, wl - lift - 16); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#d23b2f"; ctx.fillRect(bx - L / 2, wl - lift - 13, L * 0.95, 3);
+      ctx.fillStyle = "#1f3550"; ctx.fillRect(bx - L * 0.45, wl - lift - 19, L * 0.55, 4);
+      ctx.fillStyle = "#5b7392"; ctx.beginPath(); ctx.moveTo(bx + L * 0.1, wl - lift - 16); ctx.lineTo(bx + L * 0.2, wl - lift - 26); ctx.lineTo(bx + L * 0.24, wl - lift - 16); ctx.fill();
+      ctx.fillStyle = "#d23b2f"; ctx.font = `800 ${Math.round(h * 0.1)}px "Inter Tight", Arial, sans-serif`; ctx.fillText("LOBST'AIR", 10, h * 0.18);
+      ctx.fillStyle = "#1f3a68"; ctx.font = `700 ${Math.round(h * 0.075)}px "Inter Tight", Arial, sans-serif`; ctx.fillText("☀ + H₂ · 25 kn", 10, h * 0.3);
     } else if (kind === "sp80") {
       // SP80 de profil, lancé sur l'eau, tracté par son kite noir
       const sky = ctx.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, "#22324f"); sky.addColorStop(0.62, "#7d9cc2"); sky.addColorStop(0.63, "#3e6f8f"); sky.addColorStop(1, "#1f4762");

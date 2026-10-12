@@ -34,6 +34,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 22 | Remise à zéro de tout l'historique de course | 10-12 00:09:24 | 10-12 00:09:50 | 0 min 26 s |
 | 23 | Nouveau mode « Traversée SP80 » | 10-12 20:46:07 | 10-12 21:34:13 | 48 min 06 s |
 | 24 | Vent propre au SP80 (50–80 nd tout le parcours), lac plat | 10-12 21:40:11 | 10-12 21:50:31 | 10 min 20 s |
+| 25 | Nouveau mode « Traversée SSB » (Lobst'Air) | 10-12 21:54:16 | 10-12 22:24:26 | 30 min 10 s |
 
 ---
 
@@ -471,4 +472,58 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Avec 25 nœuds : 10 % sous 50 nœuds (départ et chocs) et 3 % au-dessus de 80 nœuds (pointe à 84 dans une rafale).
   - Traversée en 79,8 s.
   - **Non-régression** : vent de départ des modes débutant et expert toujours de 15 nœuds du 120°, celui du SP80 de 25 nœuds du 189°. Aucune erreur JavaScript.
+
+## 25. Nouveau mode « Traversée SSB » avec le Lobst'Air
+- **Heure du prompt** : 2026-10-12 21:54:16 · **Heure du résultat** : 2026-10-12 22:24:26 · **Temps de calcul** : 30 min 10 s
+- **Demande** : ajouter la « Traversée SSB » avec le Lobst'Air de l'équipe EPFL Swiss Solar Boat (et non le Dahu). Même parcours, même météo et même carte, environ 2–3 min, environ 25 nœuds au moteur. Vol sur foils (décollage, vol, retombées). Kite EPFL de 25 m² sur 200 m de lignes à l'avant. Flèches pour le kite, Q/D pour le cap. Vue 3ᵉ personne et vue pilote vivante. Panne moteur à l'entrée de la tempête avec fumée et message « appuie sur Espace ». Le pirate poursuit et canonne le bateau jusqu'à la rade de Genève puis abandonne. Classement SSB au temps, tutoriel dédié, 4 langues, aucune régression ni perte de données.
+- **Recherche** :
+  - swisssolarboat.ch : le Lobst'Air a volé au-dessus des vagues après plus de trois ans de développement et a remporté le Monaco Energy Boat Challenge.
+  - EPFL MAKE et ingenieur.de : le « Renewable Energy Foiler » (REF), successeur du Dahu, est un bateau à foils rétractables pour trois personnes, hybride solaire et hydrogène (pile à combustible de 60 kW, batterie haute tension), annoncé à 35 nœuds en pointe.
+  - Presse sur Monaco 2026 : vainqueur au classement général, prix du design et prix de l'éco-design.
+  - **Aucune source consultée ne décrit les couleurs ni les dimensions** : la maquette est une interprétation sobre (coque blanche, liston rouge, pont couvert de panneaux solaires, cockpit à trois places).
+- **Modifications** :
+  - **Nouveau module `game/js/74_ssb.js`** (régime séparé, pas une adaptation du code de la barge ou du SP80) :
+    - **Maquette** : coque blanche effilée, liston rouge, pont en panneaux solaires quadrillés, cockpit en creux à trois sièges en tandem, pare-brise, nom « LOBST'AIR ». Les jambes de foil se voient quand la coque vole ; gerbe d'eau à l'arrière.
+    - **Physique** :
+      - moteur électrique solaire et hydrogène d'environ 70 kW, réglé par Z/S (puissance, sans marche arrière) ;
+      - traînée de carène qui chute en vol ; décollage vers 12 nœuds, hauteur de vol d'environ 0,7 m (ressort amorti perturbé par les vagues et les risées) ; retombée en dessous du seuil ;
+      - environ 25 nœuds au moteur seul ;
+      - en vol, cap plus sensible et inclinaison dans les virages ; dans l'eau, le bateau tape dans les vagues.
+    - **Kite EPFL de 25 m² sur 200 m de lignes**, attaché à l'étrave : fenêtre large (aile en altitude, vent plus fort), réponse plus lente et lissée (vitesse dans la fenêtre plafonnée à 38°/s).
+    - **Vue pilote** : la caméra monte avec la hauteur de vol. Les secousses sont fortes dans l'eau et réduites d'environ 75 % une fois en vol stable. Pare-brise, nez blanc au liston rouge, écran de bord (kW et hauteur de vol, puis « moteur en panne »), embruns.
+    - **Scénario** :
+      - aucune invitation à sortir le kite au départ ;
+      - panne à l'entrée de la tempête (47 % du parcours) : moteur coupé, gaz bloqués à 0, fumée légère du capot, message près du bateau « le moteur est en panne… appuie sur Espace » (affiché jusqu'à la sortie du kite) ;
+      - le pirate prend alors le Lobst'Air en chasse, garde ses distances (pas d'abordage) et tire une bordée toutes les 3 s : fumée sur le flanc, boulets, gerbes autour du bateau ;
+      - les points d'impact suivent une séquence fixe autour du bateau, la même pour tous. Les boulets frôlent et mouillent le pare-brise ; un coup au but coûte +2 s, sans jamais couler le bateau ;
+      - à l'entrée de la rade de Genève (vers les Eaux-Vives, 94 % du parcours), le pirate abandonne et on termine sereinement au pied du Jet d'eau.
+  - **Course partagée** : régime barge, SP80 ou SSB. Vitesse nominale de 24 nœuds (la vitesse moyenne réelle) : risées, tempête, vapeurs CGN, pirate et requins restent calés sur l'avancement. Pas de vague d'étrave de barge pour les foilers.
+  - **Interface** :
+    - Onglet « Traversée SSB » entre SP80 et Classements, et carte d'accueil illustrée (le Lobst'Air en vol). Les 5 cartes de mode tiennent sur une ligne sous la vision du jeu.
+    - En SSB : levier des gaz visible jusqu'à la panne, réglage de puissance du kite visible.
+    - HUD : compteur jusqu'à 30 nœuds avec repère au décollage des foils.
+    - Tableau de bord : moteur électrique (kW ou « En panne »), VMG, hauteur de vol.
+  - **Tutoriel SSB** en 3 pages avec « Passer le tutoriel ».
+  - **Classements** : mode `ssb` côté serveur (temps accepté à partir de 40 s), fantômes et routes. Classement SSB au temps réel avec les mêmes standards. Écran d'arrivée avec vitesse max et boulets reçus.
+  - **Aucune migration** : les données existantes restent intactes.
+  - **Textes** : FR, EN, DE et IT (365 textes par langue), hypothèses du modèle et schéma PDF mis à jour.
+- **Vérification** (Chrome sans écran, 1440 × 900) :
+  - **SSB** :
+    - Tutoriel et bouton « Passer ».
+    - Pas d'invitation au kite au départ.
+    - Décollage sur foils au bout de 3 s à 17,5 nœuds, vol à 25–26 nœuds, à 48–72 cm au-dessus de l'eau.
+    - Panne à 47 % du parcours avec le message affiché ; kite envoyé, jusqu'à 38,9 nœuds sous kite.
+    - Le pirate suit à 108 m en moyenne (de 11 à 191 m) sans abordage, tire autour du bateau, et abandonne à l'entrée de la rade.
+    - Arrivée en 140,7 s (environ 2 min 21), 60 images/s.
+    - Page Classements onglet SSB : colonnes Tentative / Temps, podium au temps, routes.
+  - **Non-régression** :
+    - Débutant : invitation au kite toujours présente, vent de 15 nœuds, traversée complète en 72,7 s comme avant.
+    - SP80 : vent de 25 nœuds, gaz masqué.
+    - Expert : gréement et gaz visibles.
+    - Test de la base : courses débutant, expert et SP80 conservées après la mise à jour ; course SSB acceptée, temps trop court refusé.
+    - Aucune erreur du jeu. Les seules erreurs de console viennent de la télémétrie de Streamlit, sans accès réseau dans le navigateur de test.
+- **Reste fragile** :
+  - Apparence du Lobst'Air interprétée, faute de photos ou de description de la livrée.
+  - Le kite a été tenu par le pilote de test : la difficulté réelle de la fin de course au kite, surtout vent arrière après la tempête, reste à valider en main.
+  - Le pirate ne tire que s'il est à moins de 160 m : un joueur très rapide le distance (ce qui est voulu).
 

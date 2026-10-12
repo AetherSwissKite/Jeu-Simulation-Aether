@@ -120,13 +120,13 @@ def page_archi(pdf):
         ("10_sandbox_model", "modèle du bac à sable"), ("15/20_sandbox", "potards, vue de côté, missions"),
         ("30_leman", "géographie, parcours, météo, CGN"), ("40_kite", "aile parapente, kite auto / manuel"),
         ("50_barge", "barge 40 m, modèles à facettes"), ("60_render", "ciel, relief, eau, villes, vent"),
-        ("70_race", "barge, caméras, course, HUD"), ("72_sp80", "trimaran SP80 : foil, vue pilote"), ("80_board", "classements, podium, fin"),
+        ("70_race", "barge, caméras, course, HUD"), ("72_sp80", "trimaran SP80 : foil, vue pilote"), ("74_ssb", "Lobst'Air : foils, panne, pirate"), ("80_board", "classements, podium, fin"),
         ("90_ui", "vues, tutoriels, clavier"), ("99_main", "boucle 60 i/s, LOD, démarrage"),
     ]
     ax.add_patch(FancyBboxPatch((64, 9), 32, 47, boxstyle="round,pad=0.25,rounding_size=1.2", fc=PASTEL["peach"], ec=EDGE["peach"], lw=1.1))
     ax.text(65.2, 54.4, "game/index.html + game/js/", fontsize=9.6, fontweight="bold", color=INK, va="top")
     for i, (m, d) in enumerate(mods):
-        y = 50.6 - i * 3.2
+        y = 50.6 - i * 3.0
         ax.text(65.4, y, m, fontsize=7.9, color=ACCENT, fontweight="bold", va="top", family="monospace")
         ax.text(76.4, y, d, fontsize=7.9, color=INK, va="top")
     arrow(ax, (18, 44), (18, 42.2))
@@ -171,13 +171,14 @@ def page_physics(pdf):
         ("Taux de lacet max", "17 °/s", "9,5 °/s", "la barre n'agit qu'avec de la vitesse"),
         ("Moteur · résistance", "500 kW · 80 kN", "idem", "R = 4,2 kN/(m/s)² · u²"),
         ("Carburant · CO$_2$", "0,215 kg/kWh", "3,17 kg/kg", "CO$_2$ évité = poussée utile du kite"),
-        ("Mode SP80 (1 t, kite 25 m²)", "≈ 90 s", "jusqu'à ~75 nd", "sans moteur, foil vers 25 nd, classé au temps"),
+        ("Mode SP80 (1 t, kite 25 m²)", "≈ 90 s", "50 à 80 nd", "sans moteur, foil vers 25 nd, classé au temps"),
+        ("Mode SSB (Lobst'Air)", "≈ 2 min 30", "~25 nd + kite", "foils vers 12 nd, panne en tempête, pirate"),
     ]
-    tx, ty, cw = 4, 37.5, [24, 15, 23, 30]
+    tx, ty, cw = 4, 38, [24, 15, 23, 30]
     for r, row in enumerate(rows):
         x = tx
         for c, cell in enumerate(row):
-            ax.text(x + 0.6, ty - r * 2.5, cell, fontsize=7.9, color=INK if r else MUTED, fontweight="bold" if r == 0 else "normal", va="top")
+            ax.text(x + 0.6, ty - r * 2.35, cell, fontsize=7.9, color=INK if r else MUTED, fontweight="bold" if r == 0 else "normal", va="top")
             x += cw[c]
         if r == 0:
             ax.plot([tx, tx + sum(cw)], [ty - 2.3, ty - 2.3], color="#d8dde8", lw=0.8)

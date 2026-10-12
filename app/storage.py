@@ -125,7 +125,17 @@ def list_runs(limit=6000):
     """Résumé des courses (sans tracé) pour les classements du jeu."""
     with _conn() as c:
         rows = c.execute("SELECT id, mode, name, team, total_s, co2_kg, ts, max_kn FROM runs ORDER BY ts DESC LIMIT ?", (limit,)).fetchall()
-    return [{"id": r["id"], "mode": r["mode"], "name": r["name"], "team": r["team"], "total": r["total_s"], "co2": r["co2_kg"], "ts": r["ts"], "vmax": r["max_kn"]} for r in rows]
+        # filet de sécurité : une course sans vitesse max enregistrée la reprend de sa trace (et on la mémorise)
+        missing = {r["id"] for r in rows if r["max_kn"] is None}
+        fixed = {}
+        for rid in missing:
+            track = c.execute("SELECT track FROM runs WHERE id = ?", (rid,)).fetchone()[0]
+            speeds = [q[2] for q in json.loads(track or "[]") if isinstance(q, list) and len(q) >= 3]
+            if speeds:
+                fixed[rid] = max(speeds)
+                c.execute("UPDATE runs SET max_kn = ? WHERE id = ?", (fixed[rid], rid))
+    return [{"id": r["id"], "mode": r["mode"], "name": r["name"], "team": r["team"], "total": r["total_s"], "co2": r["co2_kg"], "ts": r["ts"],
+             "vmax": r["max_kn"] if r["max_kn"] is not None else fixed.get(r["id"])} for r in rows]
 
 
 def score(total_s, co2_kg):

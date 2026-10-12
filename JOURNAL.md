@@ -36,6 +36,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 24 | Vent propre au SP80 (50–80 nd tout le parcours), lac plat | 10-12 21:40:11 | 10-12 21:50:31 | 10 min 20 s |
 | 25 | Nouveau mode « Traversée SSB » (Lobst'Air) | 10-12 21:54:16 | 10-12 22:24:26 | 30 min 10 s |
 | 26 | Classement SP80 à la vitesse de pointe | 10-12 22:28:32 | 10-12 22:31:36 | 3 min 04 s |
+| 27 | Vitesse max non enregistrée en ligne : rechargement des modules | 10-12 22:35:35 | 10-12 22:39:47 | 4 min 12 s |
 
 ---
 
@@ -547,4 +548,16 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Une nouvelle course à 78,4 nœuds passe en tête au classement vitesse.
   - Dans le navigateur, onglet SP80 : au temps, « Lent » est premier (80 s) ; en vitesse max, « Fusée » est premier (78,4 nœuds) avec le podium et la règle adaptés.
   - Débutant et SSB inchangés. Aucune erreur JavaScript.
+
+## 27. Vitesse max non enregistrée en ligne : rechargement des modules Python
+- **Heure du prompt** : 2026-10-12 22:35:35 · **Heure du résultat** : 2026-10-12 22:39:47 · **Temps de calcul** : 4 min 12 s
+- **Demande** : la vitesse max ne s'enregistre pas.
+- **Diagnostic** :
+  - En local, tout fonctionnait : pointe de 69,8 nœuds enregistrée dans le résultat, le classement et la base.
+  - Le problème venait de la mise en ligne. Après un push, Streamlit Cloud relit le jeu (HTML et JS) à chaque passage, donc le nouveau classement s'affichait. En revanche, le module Python de stockage déjà chargé en mémoire restait l'ancien, sans la colonne `max_kn`. La vitesse envoyée par le jeu était donc ignorée et le classement affichait « — ».
+  - Reproduit en local : serveur démarré avec l'ancien stockage, fichier mis à jour sans redémarrage, puis course SP80. Résultat : « — » dans le tableau et pas de colonne en base.
+- **Modifications** :
+  - `Test.py` recharge automatiquement `app/i18n.py`, `app/storage.py` et `app/game.py` dès que leur fichier a changé. Une mise en ligne prend donc effet tout de suite, sans redémarrage manuel de l'application.
+  - **Filet de sécurité** côté serveur : une course sans vitesse max enregistrée la reprend de sa trace à la lecture du classement, et cette valeur est mémorisée.
+- **Vérification** : même scénario (ancien stockage en mémoire, fichier mis à jour sans redémarrage, course SP80 à 69,8 nœuds). Avant : « — ». Après : 69,8 nœuds en base, dans l'écran de fin et dans le classement. Aucune erreur.
 

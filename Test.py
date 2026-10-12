@@ -3,11 +3,26 @@
 Une seule page : le jeu (accueil, bac à sable, traversées débutant/expert, classements), sans onglets Streamlit.
 Le jeu lui-même est dans game/ (HTML + modules JS), les services Python dans app/.
 """
+import importlib
+import os
+
 import streamlit as st
 
-from app import storage
-from app.game import game_page
-from app.i18n import LANGS
+import app.game
+import app.i18n
+import app.storage
+
+# Après une mise en ligne, Streamlit Cloud peut garder en mémoire l'ancienne version des modules Python
+# alors que le jeu (relu à chaque passage) est déjà à jour : on recharge un module dès que son fichier change.
+for _mod in (app.i18n, app.storage, app.game):
+    _mtime = os.path.getmtime(_mod.__file__)
+    if getattr(_mod, "_loaded_mtime", _mtime) != _mtime:
+        _mod = importlib.reload(_mod)
+    _mod._loaded_mtime = _mtime
+
+from app import storage  # noqa: E402
+from app.game import game_page  # noqa: E402
+from app.i18n import LANGS  # noqa: E402
 
 st.set_page_config(page_title="Æther Swiss Kite Simulator", page_icon="🪁", layout="wide")
 storage.init()

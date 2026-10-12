@@ -37,6 +37,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 25 | Nouveau mode « Traversée SSB » (Lobst'Air) | 10-12 21:54:16 | 10-12 22:24:26 | 30 min 10 s |
 | 26 | Classement SP80 à la vitesse de pointe | 10-12 22:28:32 | 10-12 22:31:36 | 3 min 04 s |
 | 27 | Vitesse max non enregistrée en ligne : rechargement des modules | 10-12 22:35:35 | 10-12 22:39:47 | 4 min 12 s |
+| 28 | Descriptif SSB qui garde la surprise | 10-12 22:44:18 | 10-12 22:44:47 | 0 min 29 s |
 
 ---
 
@@ -560,4 +561,12 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - `Test.py` recharge automatiquement `app/i18n.py`, `app/storage.py` et `app/game.py` dès que leur fichier a changé. Une mise en ligne prend donc effet tout de suite, sans redémarrage manuel de l'application.
   - **Filet de sécurité** côté serveur : une course sans vitesse max enregistrée la reprend de sa trace à la lecture du classement, et cette valeur est mémorisée.
 - **Vérification** : même scénario (ancien stockage en mémoire, fichier mis à jour sans redémarrage, course SP80 à 69,8 nœuds). Avant : « — ». Après : 69,8 nœuds en base, dans l'écran de fin et dans le classement. Aucune erreur.
+
+## 28. Descriptif SSB qui garde la surprise
+- **Heure du prompt** : 2026-10-12 22:44:18 · **Heure du résultat** : 2026-10-12 22:44:47 · **Temps de calcul** : 0 min 29 s
+- **Demande** : réécrire le descriptif de la carte SSB de l'accueil pour garder la surprise de la panne et du kite, tout en annonçant qu'il y a une surprise.
+- **Modifications** (FR, EN, DE et IT) :
+  - **Sous-titre** : « ≈ 2 min 30 – foiler solaire… et une surprise » (au lieu de « … puis kite de secours »).
+  - **Descriptif** : « Le Lobst'Air de l'équipe EPFL Swiss Solar Boat vole sur ses foils à ~25 nœuds au-dessus du Léman. Mais la traversée te réserve une surprise… Sauras-tu t'adapter jusqu'à Genève ? » La panne, le kite et le pirate ne sont plus mentionnés.
+  - Le tutoriel du mode SSB n'a pas été modifié : il explique toujours la panne et le kite.
 

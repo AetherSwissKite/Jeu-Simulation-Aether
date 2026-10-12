@@ -60,6 +60,14 @@ def init():
         if not row or row[0] != DATA_VERSION:
             c.execute("DELETE FROM runs")
             c.execute("INSERT OR REPLACE INTO meta VALUES ('data_version', ?)", (DATA_VERSION,))
+        # colonne ajoutée sans perte de données : vitesse max de pointe (classement SP80) ; les anciennes courses
+        # la reprennent de leur trace (échantillonnée toutes les 0,5 s)
+        cols = {r[1] for r in c.execute("PRAGMA table_info(runs)").fetchall()}
+        if "max_kn" not in cols:
+            c.execute("ALTER TABLE runs ADD COLUMN max_kn REAL")
+            for rid, track in c.execute("SELECT id, track FROM runs").fetchall():
+                speeds = [q[2] for q in json.loads(track or "[]") if isinstance(q, list) and len(q) >= 3]
+                c.execute("UPDATE runs SET max_kn = ? WHERE id = ?", (max(speeds) if speeds else None, rid))
         # nettoyages ponctuels demandés : exécutés une seule fois par base (les nouvelles courses ne sont pas touchées)
         for key, mode, name in CLEANUPS:
             if not c.execute("SELECT 1 FROM meta WHERE key = ?", (key,)).fetchone():
@@ -95,26 +103,29 @@ def add_run(entry):
         track = []
         for q in (entry.get("track") or [])[:4000]:
             if isinstance(q, (list, tuple)) and len(q) >= 3:
-                track.append([round(_num(q[0], -1e5, 1e5), 1), round(_num(q[1], -1e5, 1e5), 1), round(_num(q[2], -20, 60), 2)])
+                track.append([round(_num(q[0], -1e5, 1e5), 1), round(_num(q[1], -1e5, 1e5), 1), round(_num(q[2], -20, 120), 2)])
+        speeds = [q[2] for q in track]
+        max_kn = round(max(_num(entry.get("maxKn", 0) or 0, 0, 120), max(speeds) if speeds else 0), 2)
         row = (
             clean_text(entry.get("id"), 40) or f"run-{time.time_ns()}",
             entry["mode"], name, clean_text(entry.get("team"), 20),
             round(time_s, 3), round(pen_s, 3), round(time_s + pen_s, 3),
             round(_num(entry.get("co2", 0), 0, 1e6), 1), round(_num(entry.get("saved", 0), 0, 1e6), 1),
-            int(_num(entry.get("coll", 0), 0, 999)), int(time.time()), json.dumps(track, separators=(",", ":")),
+            int(_num(entry.get("coll", 0), 0, 999)), int(time.time()), json.dumps(track, separators=(",", ":")), max_kn,
         )
     except (KeyError, TypeError, ValueError):
         return False
     with _LOCK, _conn() as c:
-        cur = c.execute("INSERT OR IGNORE INTO runs VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", row)
+        cur = c.execute("INSERT OR IGNORE INTO runs (id, mode, name, team, time_s, pen_s, total_s, co2_kg, saved_kg, collisions, ts, track, max_kn) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", row)
         return cur.rowcount == 1
 
 
 def list_runs(limit=6000):
     """Résumé des courses (sans tracé) pour les classements du jeu."""
     with _conn() as c:
-        rows = c.execute("SELECT id, mode, name, team, total_s, co2_kg, ts FROM runs ORDER BY ts DESC LIMIT ?", (limit,)).fetchall()
-    return [{"id": r["id"], "mode": r["mode"], "name": r["name"], "team": r["team"], "total": r["total_s"], "co2": r["co2_kg"], "ts": r["ts"]} for r in rows]
+        rows = c.execute("SELECT id, mode, name, team, total_s, co2_kg, ts, max_kn FROM runs ORDER BY ts DESC LIMIT ?", (limit,)).fetchall()
+    return [{"id": r["id"], "mode": r["mode"], "name": r["name"], "team": r["team"], "total": r["total_s"], "co2": r["co2_kg"], "ts": r["ts"], "vmax": r["max_kn"]} for r in rows]
 
 
 def score(total_s, co2_kg):
@@ -150,13 +161,16 @@ def ghosts():
 
 def ranked_runs(mode, since_ts=0, sort="score", limit=None, with_track=False):
     """Toutes les tentatives (chaque course compte, datée), classées par indice CO₂ × temps, par CO₂ ou par temps."""
-    cols = "id, mode, name, team, time_s, pen_s, total_s, co2_kg, saved_kg, collisions, ts" + (", track" if with_track else "")
+    cols = "id, mode, name, team, time_s, pen_s, total_s, co2_kg, saved_kg, collisions, ts, max_kn" + (", track" if with_track else "")
     with _conn() as c:
         rows = [dict(r) for r in c.execute(f"SELECT {cols} FROM runs WHERE mode = ? AND ts >= ?", (mode, since_ts)).fetchall()]
     for d in rows:
         d["score"] = score(d["total_s"], d["co2_kg"])
         if with_track:
             d["track"] = json.loads(d["track"] or "[]")
+    if sort == "vmax":   # vitesse de pointe : la plus haute d'abord
+        rows.sort(key=lambda d: (-(d["max_kn"] or 0), d["total_s"]))
+        return rows[:limit] if limit else rows
     key = {"score": "score", "co2": "co2_kg", "time": "total_s"}.get(sort, "score")
     rows.sort(key=lambda d: (d[key] if d[key] is not None else 1e18, d["total_s"]))
     return rows[:limit] if limit else rows
@@ -180,6 +194,10 @@ def routes(limit=24):
     """Routes des meilleures tentatives de chaque mode (indice CO₂ × temps), pour la page Classements du jeu."""
     out = {}
     for m in MODES:
-        out[m] = [{"name": r["name"], "team": r["team"], "ts": r["ts"], "total": r["total_s"], "co2": r["co2_kg"], "track": r["track"]}
-                  for r in ranked_runs(m, sort="score", limit=limit, with_track=True)]
+        rows = ranked_runs(m, sort="score", limit=limit, with_track=True)
+        if m == "sp80":   # SP80 : aussi les meilleures vitesses de pointe (second classement)
+            seen = {r["id"] for r in rows}
+            rows += [r for r in ranked_runs(m, sort="vmax", limit=limit, with_track=True) if r["id"] not in seen]
+        out[m] = [{"id": r["id"], "name": r["name"], "team": r["team"], "ts": r["ts"], "total": r["total_s"], "co2": r["co2_kg"], "vmax": r["max_kn"], "track": r["track"]}
+                  for r in rows]
     return out

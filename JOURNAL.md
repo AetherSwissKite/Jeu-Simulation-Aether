@@ -35,6 +35,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 23 | Nouveau mode « Traversée SP80 » | 10-12 20:46:07 | 10-12 21:34:13 | 48 min 06 s |
 | 24 | Vent propre au SP80 (50–80 nd tout le parcours), lac plat | 10-12 21:40:11 | 10-12 21:50:31 | 10 min 20 s |
 | 25 | Nouveau mode « Traversée SSB » (Lobst'Air) | 10-12 21:54:16 | 10-12 22:24:26 | 30 min 10 s |
+| 26 | Classement SP80 à la vitesse de pointe | 10-12 22:28:32 | 10-12 22:31:36 | 3 min 04 s |
 
 ---
 
@@ -526,4 +527,24 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Apparence du Lobst'Air interprétée, faute de photos ou de description de la livrée.
   - Le kite a été tenu par le pilote de test : la difficulté réelle de la fin de course au kite, surtout vent arrière après la tempête, reste à valider en main.
   - Le pirate ne tire que s'il est à moins de 160 m : un joueur très rapide le distance (ce qui est voulu).
+
+## 26. Classement SP80 à la vitesse de pointe
+- **Heure du prompt** : 2026-10-12 22:28:32 · **Heure du résultat** : 2026-10-12 22:31:36 · **Temps de calcul** : 3 min 04 s
+- **Demande** : dans le mode SP80, ajouter un autre classement selon la vitesse max de pointe.
+- **Modifications** :
+  - **Base de données** :
+    - Nouvelle colonne `max_kn`, ajoutée sans perte (aucune course supprimée). Les courses déjà enregistrées reprennent leur vitesse max depuis leur trace, échantillonnée toutes les 0,5 s.
+    - Les nouvelles courses enregistrent la pointe exacte envoyée par le jeu, contrôlée par le serveur (0 à 120 nœuds, au moins la pointe de la trace).
+    - Les traces n'écrêtent plus les vitesses à 60 nœuds (limite relevée à 120) : avant, les pointes SP80 au-delà de 60 nœuds y étaient perdues.
+  - **Page Classements, onglet SP80** :
+    - Deux critères au choix, « Temps » ou « Vitesse max ». Le podium, le tableau (nouvelle colonne Vitesse max), l'histogramme, le classement des équipes et les routes suivent le critère choisi.
+    - Règle du podium affichée : vitesse de pointe, la plus haute gagne.
+    - Les autres modes ne changent pas.
+  - **Écran d'arrivée SP80** : il affiche aussi le rang en vitesse de pointe.
+  - **Textes** en FR, EN, DE et IT.
+- **Vérification** :
+  - Une base de l'ancienne version (4 courses, sans la colonne) est mise à jour au démarrage : courses conservées, vitesses max reprises des traces (52 à 60 nœuds).
+  - Une nouvelle course à 78,4 nœuds passe en tête au classement vitesse.
+  - Dans le navigateur, onglet SP80 : au temps, « Lent » est premier (80 s) ; en vitesse max, « Fusée » est premier (78,4 nœuds) avec le podium et la règle adaptés.
+  - Débutant et SSB inchangés. Aucune erreur JavaScript.
 

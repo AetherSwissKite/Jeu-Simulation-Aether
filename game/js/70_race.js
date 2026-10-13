@@ -179,7 +179,8 @@ function finishRace() {
   const total = RACE.t + RACE.pen;
   RACE.result = { id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, mode: RACE.mode, name: PLAYER.name, team: PLAYER.team,
     time: Math.round(RACE.t * 1000) / 1000, pen: Math.round(RACE.pen * 1000) / 1000, total: Math.round(total * 1000) / 1000,
-    co2: Math.round(RACE.fuel * BARGE.CO2F * 10) / 10, saved: Math.round(RACE.saved * 10) / 10, coll: RACE.coll, track: RACE.track,
+    // barges : au moins 1 kg de CO₂ (sinon une traversée au kite seul donnerait un indice CO₂ × temps de 0)
+    co2: cfg().boat ? Math.round(RACE.fuel * BARGE.CO2F * 10) / 10 : Math.max(1, Math.round(RACE.fuel * BARGE.CO2F * 10) / 10), saved: Math.round(RACE.saved * 10) / 10, coll: RACE.coll, track: RACE.track,
     rig: RACE.mode === "expert" ? `${RIG.area} m² · ${RIG.line} m` : null, maxKn: Math.round(RACE.maxKn * 10) / 10, hits: RACE.ssb ? RACE.ssb.hits : 0 };
   submitScore(RACE.result);
   toast(T("finish_toast", { t: fmtTime(total) }), "good", null);

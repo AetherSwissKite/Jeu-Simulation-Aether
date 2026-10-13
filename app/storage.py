@@ -7,6 +7,7 @@ pour rester sûres quand plusieurs joueurs terminent en même temps.
 Sur Streamlit Community Cloud, le disque est remis à zéro à chaque redéploiement : pour un historique
 permanent, il faudra brancher une base externe (voir JOURNAL.md).
 """
+import datetime
 import json
 import math
 import re
@@ -14,6 +15,7 @@ import sqlite3
 import threading
 import time
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 DB_PATH = Path(__file__).resolve().parent.parent / "aether_scores.db"
 MODES = ("beginner", "expert", "sp80", "ssb")   # sp80 et ssb : classement au temps réel (pas de CO₂)
@@ -48,6 +50,8 @@ CREATE INDEX IF NOT EXISTS connections_ts ON connections(ts);
 DATA_VERSION = "3"   # v2 : le CO₂ ne compte plus que le moteur ; v3 : remise à zéro demandée le 12.10.2026
 # (clé unique, mode, pseudo) : retire tout l'historique d'un joueur dans un mode, une seule fois
 CLEANUPS = [("cleanup_tjl_beginner_2026_10_12", "beginner", "TJL")]
+BARGE_MODES = ("beginner", "expert")
+MIN_CO2_KG = 1.0   # barges : au moins 1 kg de CO₂, pour que l'indice CO₂ × temps ne puisse pas valoir 0
 
 
 def _conn():
@@ -76,6 +80,13 @@ def init():
             c.execute("INSERT INTO connections (vid, ts) SELECT vid, ts FROM visits WHERE vid NOT IN (SELECT vid FROM connections)")
             c.execute("INSERT INTO meta VALUES ('connections_seeded', 'done')")
         # nettoyages ponctuels demandés : exécutés une seule fois par base (les nouvelles courses ne sont pas touchées)
+        # 13.10.2026 : retrait de la course de MXL (expert, 13/10/2026 17h24, 0 kg de CO₂), puis plancher de 1 kg
+        # appliqué aux courses de barge déjà enregistrées à 0 kg
+        if not c.execute("SELECT 1 FROM meta WHERE key = 'cleanup_co2_min_2026_10_13'").fetchone():
+            t0 = int(datetime.datetime(2026, 10, 13, 17, 24, tzinfo=ZoneInfo("Europe/Zurich")).timestamp())
+            c.execute("DELETE FROM runs WHERE mode = 'expert' AND lower(name) = 'mxl' AND co2_kg < 1 AND ts BETWEEN ? AND ?", (t0, t0 + 59))
+            c.execute("UPDATE runs SET co2_kg = ? WHERE mode IN ('beginner', 'expert') AND (co2_kg IS NULL OR co2_kg < ?)", (MIN_CO2_KG, MIN_CO2_KG))
+            c.execute("INSERT INTO meta VALUES ('cleanup_co2_min_2026_10_13', 'done')")
         for key, mode, name in CLEANUPS:
             if not c.execute("SELECT 1 FROM meta WHERE key = ?", (key,)).fetchone():
                 c.execute("DELETE FROM runs WHERE mode = ? AND lower(name) = ?", (mode, name.lower()))
@@ -117,7 +128,7 @@ def add_run(entry):
             clean_text(entry.get("id"), 40) or f"run-{time.time_ns()}",
             entry["mode"], name, clean_text(entry.get("team"), 20),
             round(time_s, 3), round(pen_s, 3), round(time_s + pen_s, 3),
-            round(_num(entry.get("co2", 0), 0, 1e6), 1), round(_num(entry.get("saved", 0), 0, 1e6), 1),
+            round(max(MIN_CO2_KG if entry["mode"] in BARGE_MODES else 0, _num(entry.get("co2", 0), 0, 1e6)), 1), round(_num(entry.get("saved", 0), 0, 1e6), 1),
             int(_num(entry.get("coll", 0), 0, 999)), int(time.time()), json.dumps(track, separators=(",", ":")), max_kn,
         )
     except (KeyError, TypeError, ValueError):

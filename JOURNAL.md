@@ -45,6 +45,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 33 | Traces du top 3 (T) vérifiées, curseur « X meilleures » sur les routes | 10-13 11:55:39 | 10-13 11:59:15 | 3 min 36 s |
 | 34 | Statistiques : parties lancées et terminées | 10-13 12:25:46 | 10-13 12:28:44 | 2 min 58 s |
 | 35 | Lien vers aetherswisskite.ch sur l'accueil | 10-13 12:28:51 | 10-13 12:29:52 | 1 min 01 s |
+| 36 | Minimum 1 kg de CO₂ (barges), retrait de la course de MXL | 10-13 19:45:37 | 10-13 19:46:31 | 0 min 54 s |
 
 ---
 
@@ -663,4 +664,15 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Dans « La vision du jeu », à droite du texte, une carte bleu marine cliquable : « Notre site · aetherswisskite.ch ↗ », avec une phrase de présentation du projet. Elle s'ouvre dans un nouvel onglet.
   - Sur petit écran, la carte passe sous le texte. Textes en FR, EN, DE et IT.
 - **Vérification** : lien vers https://www.aetherswisskite.ch/ avec ouverture dans un nouvel onglet ; affichage contrôlé sur capture. Aucune erreur JavaScript.
+
+## 36. Minimum de 1 kg de CO₂ pour les barges, retrait de la course de MXL
+- **Heure du prompt** : 2026-10-13 19:45:37 · **Heure du résultat** : 2026-10-13 19:46:31 · **Temps de calcul** : 0 min 54 s
+- **Demande** : en traversée expert, imposer au moins 1 kg de CO₂ émis, pour qu'un joueur ne puisse pas obtenir 0 kg et donc un indice de 0 t·s ; supprimer la course de « MXL – 13/10/2026 17h24 » à 0 kg.
+- **Modifications** :
+  - **Plancher de 1 kg de CO₂**, appliqué à la fin de course et vérifié par le serveur pour les deux modes barge. Le même trou existait en débutant (traversée au kite seul, moteur coupé). Le SP80 et le SSB, classés au temps, ne sont pas concernés.
+  - **Nettoyage unique au démarrage du serveur** :
+    - suppression de la course expert de MXL du 13/10/2026 entre 17h24:00 et 17h24:59 (heure de Zurich) à moins de 1 kg ; ses autres courses sont gardées ;
+    - les autres courses de barge déjà enregistrées à 0 kg passent à 1 kg (leur indice n'est plus 0).
+- **Vérification** (base de test) : la course de MXL de 17h24 est supprimée et celle de 16h10 conservée ; Ana (expert) et Ben (débutant) passent de 0 à 1 kg ; Sam (SP80) reste à 0 ; une nouvelle course expert envoyée à 0 kg est enregistrée à 1 kg.
+- **Limite** : si la course de MXL n'est pas trouvée à cette minute exacte (par exemple si Streamlit Cloud a déjà effacé le classement), rien n'est supprimé.
 

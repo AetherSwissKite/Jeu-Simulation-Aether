@@ -198,13 +198,16 @@ function renderBoard(container, opts) {
   const hr = head.insertRow(), sortCol = is80 ? { time: 2, vmax: 3 }[sort] : timeOnly ? 2 : { score: 2, co2: 3, time: 4 }[sort];
   const cols = isP ? (is80 ? ["#", T("col_attempt"), T("s_time"), T("s_vmax")] : timeOnly ? ["#", T("col_attempt"), T("s_time")] : ["#", T("col_attempt"), T("s_score"), T("s_co2"), T("s_time")]) : ["#", T("team"), `${T("avg")} · ${T("s_" + sort)}`, T("members"), T("best")];
   cols.forEach((c, i) => { const th = document.createElement("th"); th.textContent = c; if (i >= 2) th.className = "n"; if (isP && i === sortCol) th.classList.add("sorted"); hr.appendChild(th); });
-  const rows = isP ? list.slice(0, 12).map(e => ({ me: e.id === mine, cells: is80 ? [attemptLabel(e), fmtTime(e.total), fmtMetric("vmax", METRICS.vmax(e))] : timeOnly ? [attemptLabel(e), fmtTime(e.total)] : [attemptLabel(e), fmtMetric("score", e.score), fmtMetric("co2", e.co2 ?? NaN), fmtTime(e.total)] }))
-    : teams(mode, BOARD.period, sort).slice(0, 12).map(t => ({ me: PLAYER.team && t.team.toLowerCase() === PLAYER.team.toLowerCase(), cells: [t.team, fmtMetric(sort, t.avg), String(t.members), fmtMetric(sort, t.best)] }));
+  // toutes les tentatives (et toutes les équipes) : le tableau défile, l'en-tête reste visible
+  const rows = isP ? list.map(e => ({ me: e.id === mine, cells: is80 ? [attemptLabel(e), fmtTime(e.total), fmtMetric("vmax", METRICS.vmax(e))] : timeOnly ? [attemptLabel(e), fmtTime(e.total)] : [attemptLabel(e), fmtMetric("score", e.score), fmtMetric("co2", e.co2 ?? NaN), fmtTime(e.total)] }))
+    : teams(mode, BOARD.period, sort).map(t => ({ me: PLAYER.team && t.team.toLowerCase() === PLAYER.team.toLowerCase(), cells: [t.team, fmtMetric(sort, t.avg), String(t.members), fmtMetric(sort, t.best)] }));
   if (!rows.length) { const td = body.insertRow().insertCell(); td.colSpan = 5; td.style.color = "var(--muted)"; td.textContent = T(isP ? "no_scores" : "no_teams"); }
   rows.forEach((r, i) => {
     const tr = body.insertRow(); if (r.me) tr.className = "me";
     [String(i + 1), ...r.cells].forEach((c, j) => { const td = tr.insertCell(); td.textContent = c; if (j >= 2) td.className = "n"; if (isP && j === sortCol) td.classList.add("sorted"); });
   });
+  const meRow = body.querySelector("tr.me"), scroller = container.querySelector(".board-scroll");
+  if (meRow && scroller) scroller.scrollTop = Math.max(0, meRow.offsetTop - 60);   // ta tentative reste visible dans la liste
   container.querySelector("table + .board-src").textContent = isP ? T("runs_count", { n: list.length }) : T("team_rule");
   // répartition selon le critère choisi
   const f = sort === "vmax" ? (e => e.vmax ?? NaN) : METRICS[sort], vals = list.map(f).filter(Number.isFinite), me = list.find(e => e.id === mine);

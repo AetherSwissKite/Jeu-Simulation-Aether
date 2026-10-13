@@ -38,6 +38,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 26 | Classement SP80 à la vitesse de pointe | 10-12 22:28:32 | 10-12 22:31:36 | 3 min 04 s |
 | 27 | Vitesse max non enregistrée en ligne : rechargement des modules | 10-12 22:35:35 | 10-12 22:39:47 | 4 min 12 s |
 | 28 | Descriptif SSB qui garde la surprise | 10-12 22:44:18 | 10-12 22:44:47 | 0 min 29 s |
+| 29 | Classement : toutes les tentatives affichées | 10-13 08:36:21 | 10-13 08:37:36 | 1 min 15 s |
 
 ---
 
@@ -569,4 +570,14 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - **Sous-titre** : « ≈ 2 min 30 – foiler solaire… et une surprise » (au lieu de « … puis kite de secours »).
   - **Descriptif** : « Le Lobst'Air de l'équipe EPFL Swiss Solar Boat vole sur ses foils à ~25 nœuds au-dessus du Léman. Mais la traversée te réserve une surprise… Sauras-tu t'adapter jusqu'à Genève ? » La panne, le kite et le pirate ne sont plus mentionnés.
   - Le tutoriel du mode SSB n'a pas été modifié : il explique toujours la panne et le kite.
+
+## 29. Classement : toutes les tentatives affichées
+- **Heure du prompt** : 2026-10-13 08:36:21 · **Heure du résultat** : 2026-10-13 08:37:36 · **Temps de calcul** : 1 min 15 s
+- **Demande** : le classement de la traversée débutant n'affiche que 12 résultats alors qu'il annonce 28 tentatives.
+- **Cause** : le tableau était volontairement limité aux 12 premières lignes (joueurs comme équipes), alors que le compteur compte toutes les tentatives. Aucune donnée n'était perdue.
+- **Modifications** :
+  - Toutes les tentatives et toutes les équipes sont affichées, dans tous les modes et sur toutes les pages de classement (accueil, page Classements, fenêtre et écran de fin).
+  - Le tableau défile ; son en-tête reste visible.
+  - Ta propre tentative est amenée dans la zone visible.
+- **Vérification** : base de test avec 28 tentatives débutant (9 joueurs, 3 équipes). Compteur « 9 joueur(s) · 28 tentative(s) », 28 lignes affichées jusqu'à la 28ᵉ, 3 équipes. Aucune erreur.
 

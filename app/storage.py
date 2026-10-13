@@ -170,8 +170,13 @@ def best_runs(mode, since_ts=0, limit=None, with_track=False):
 
 
 def ghosts():
-    """Tracés des 3 meilleurs joueurs historiques de chaque mode (traces sur l'eau dans le jeu)."""
-    return {m: [{"name": r["name"], "total": r["total_s"], "track": r["track"]} for r in best_runs(m, limit=3, with_track=True)] for m in MODES}
+    """Tracés des 3 meilleures tentatives historiques de chaque mode (touche T dans le jeu), selon le même critère
+    que le podium : indice CO₂ × temps pour les barges, temps réel pour le SP80 et le SSB."""
+    out = {}
+    for m in MODES:
+        rows = [r for r in ranked_runs(m, sort="time" if m in ("sp80", "ssb") else "score", with_track=True) if len(r["track"]) > 1][:3]
+        out[m] = [{"name": r["name"], "total": r["total_s"], "track": r["track"]} for r in rows]
+    return out
 
 
 
@@ -223,7 +228,7 @@ def visits():
         return c.execute("SELECT COUNT(*) FROM visits").fetchone()[0]
 
 
-def routes(limit=24):
+def routes(limit=50):
     """Routes des meilleures tentatives de chaque mode (indice CO₂ × temps), pour la page Classements du jeu."""
     out = {}
     for m in MODES:

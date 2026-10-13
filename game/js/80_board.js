@@ -84,14 +84,20 @@ function showVisits() { const el = $("visitCount"); if (el && Number.isFinite(BO
 function renderRoutes() {
   const all = (BOARD.routes && BOARD.routes[BOARD.mode]) || [];
   const f = BOARD.mode === "sp80" ? METRICS[BOARD.sort80] : BOARD.mode === "ssb" ? METRICS.time : (METRICS[BOARD.sort] || METRICS.score);
-  const list = all.map(e => ({ ...e, ...cleanRun({ ...e, mode: BOARD.mode }), track: e.track })).filter(e => e.track && e.track.length > 1 && inPeriod(e.ts, BOARD.period)).sort((a, b) => f(a) - f(b)).slice(0, 8);
+  const list = all.map(e => ({ ...e, ...cleanRun({ ...e, mode: BOARD.mode }), track: e.track })).filter(e => e.track && e.track.length > 1 && inPeriod(e.ts, BOARD.period)).sort((a, b) => f(a) - f(b));
+  // curseur : afficher seulement les X meilleures performances
+  const nIn = $("routesN"); nIn.max = String(Math.max(1, list.length));
+  if (!BOARD.routesN) BOARD.routesN = 8;
+  const shown = list.slice(0, Math.min(BOARD.routesN, list.length || 1));
+  nIn.value = String(Math.min(BOARD.routesN, +nIn.max)); $("routesNVal").textContent = `${shown.length} / ${list.length}`;
+  nIn.oninput = () => { BOARD.routesN = +nIn.value; renderRoutes(); };
   $("routesEmpty").hidden = list.length > 0;
   const big = $("routesMap"), grid = $("routesGrid");
-  const vs = list.flatMap(e => e.track.map(q => q[2])), range = vs.length ? [Math.min(...vs), Math.max(...vs, Math.min(...vs) + 0.1)] : null;
-  grid.innerHTML = list.map((e, i) => `<figure><canvas></canvas><figcaption><b>${i + 1}.</b> ${cleanText(attemptLabel(e), 60)}<br><span>${fmtMetric("score", e.score)} · ${fmtMetric("co2", e.co2 ?? NaN)} · ${fmtTime(e.total)}</span></figcaption></figure>`).join("");
+  const vs = shown.flatMap(e => e.track.map(q => q[2])), range = vs.length ? [Math.min(...vs), Math.max(...vs, Math.min(...vs) + 0.1)] : null;
+  grid.innerHTML = shown.map((e, i) => `<figure><canvas></canvas><figcaption><b>${i + 1}.</b> ${cleanText(attemptLabel(e), 60)}<br><span>${BOARD.mode === "sp80" || BOARD.mode === "ssb" ? "" : `${fmtMetric("score", e.score)} · ${fmtMetric("co2", e.co2 ?? NaN)} · `}${fmtTime(e.total)} · ⚡ ${fmt1(e.vmax ?? Math.max(...e.track.map(q => q[2])))} ${T("u_kn")}</span></figcaption></figure>`).join("");
   requestAnimationFrame(() => {
-    drawRouteMap(big, list.map(e => e.track), range);
-    grid.querySelectorAll("canvas").forEach((cv, i) => drawRouteMap(cv, list[i].track, range));
+    drawRouteMap(big, shown.map(e => e.track), range);
+    grid.querySelectorAll("canvas").forEach((cv, i) => drawRouteMap(cv, shown[i].track, range));
     if (range) { $("routesVmin").textContent = `${fmt1(range[0])} ${T("u_kn")}`; $("routesVmax").textContent = `${fmt1(range[1])} ${T("u_kn")}`; }
   });
 }
@@ -352,7 +358,7 @@ function drawTraffic(cv, bins, peak) {
   if (!bins.length) { ctx.textAlign = "center"; ctx.fillText(T("tr_empty"), w / 2, h / 2); return; }
   const mx = Math.max(1, ...bins.map(b => b.n)), bw = (w - pl - 6) / bins.length;
   ctx.strokeStyle = "rgba(38,43,69,.08)";
-  for (const f of [0.5, 1]) { const y = h - pb - (h - pb - pt) * f; ctx.beginPath(); ctx.moveTo(pl, y); ctx.lineTo(w - 4, y); ctx.stroke(); ctx.textAlign = "right"; ctx.fillText(fmt0(mx * f), pl - 4, y + 3); }
+  for (const f of (mx >= 2 ? [0.5, 1] : [1])) { const y = h - pb - (h - pb - pt) * f; ctx.beginPath(); ctx.moveTo(pl, y); ctx.lineTo(w - 4, y); ctx.stroke(); ctx.textAlign = "right"; ctx.fillText(fmt0(mx * f), pl - 4, y + 3); }
   const every = Math.ceil(bins.length / Math.max(1, Math.floor((w - pl) / 42)));
   bins.forEach((b, i) => {
     const bh = (h - pb - pt) * b.n / mx, x = pl + i * bw;

@@ -181,6 +181,9 @@
   .boards { padding: 12px 14px; }
   .board-count { margin: -4px 0 8px; font-weight: 600; color: var(--accent) !important; }
   .routes { padding: 12px 14px; }
+  .routes-n { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 12px; color: var(--muted); }
+  .routes-n input { flex: 0 1 260px; accent-color: var(--accent); }
+  .routes-n b { font-family: var(--mono); color: var(--text); min-width: 2ch; }
   .traffic { padding: 12px 14px; }
   .tr-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 4px 0 10px; }
   .tr-kpis div { background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
@@ -526,6 +529,7 @@
     <div class="panel routes">
       <p class="eyebrow" data-i="routes_title"></p>
       <p class="board-src" data-i="routes_note" style="margin:0 0 8px"></p>
+      <div class="routes-n"><label for="routesN" data-i="routes_n_label"></label><input type="range" id="routesN" min="1" max="8" value="8"><b id="routesNVal">8</b></div>
       <p class="board-src" id="routesEmpty" data-i="no_routes" hidden></p>
       <canvas class="routes-map" id="routesMap"></canvas>
       <div class="legend-grad" style="background:linear-gradient(90deg,#6271b7,#39a0c8,#4cbf7f,#e1c54a,#e08a3c,#d33d3d)"></div>

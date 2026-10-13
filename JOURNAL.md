@@ -42,6 +42,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 30 | Explication du pilotage du kite dans la bulle « Espace » | 10-13 09:28:00 | 10-13 09:30:47 | 2 min 47 s |
 | 31 | Statistiques de fréquentation du site | 10-13 10:45:44 | 10-13 10:47:52 | 2 min 08 s |
 | 32 | Bouton « Recommencer » dans la pause | 10-13 11:48:00 | 10-13 11:49:54 | 1 min 54 s |
+| 33 | Traces du top 3 (T) vérifiées, curseur « X meilleures » sur les routes | 10-13 11:55:39 | 10-13 11:59:15 | 3 min 36 s |
 
 ---
 
@@ -622,4 +623,20 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Textes en FR, EN, DE et IT ; le texte de la pause mentionne la touche R.
   - Fonctionne dans toutes les traversées (débutant, expert, SP80, SSB).
 - **Vérification** : en débutant puis en SP80, pause au bout de 5 s, « Recommencer » : retour au compte à rebours, progression remise à zéro, pseudo conservé, puis la course repart. Même résultat avec la touche R. Aucune course enregistrée, aucune erreur JavaScript.
+
+## 33. Traces du top 3 (touche T) vérifiées et curseur « X meilleures » sur les routes
+- **Heure du prompt** : 2026-10-13 11:55:39 · **Heure du résultat** : 2026-10-13 11:59:15 · **Temps de calcul** : 3 min 36 s
+- **Demande** : vérifier que, dans chaque mode, la touche T affiche bien les 3 meilleures traces ; dans la page Classements (cartes et vitesses), ajouter un curseur pour n'afficher que les X meilleures performances.
+- **Vérification des traces** : avec 6 courses de test par mode, les 3 traces vertes sont bien chargées et dessinées dans les 4 traversées, sur l'eau et sur la mini-carte. Deux défauts trouvés :
+  - L'affichage des traces restait mémorisé d'une course à l'autre : si on les avait allumées dans une course, T les éteignait à la suivante.
+  - Pour les barges, les traces suivaient les meilleurs temps et non le podium (indice CO₂ × temps).
+- **Modifications** :
+  - Chaque course démarre traces masquées : T les affiche toujours. Un message confirme « Traces du top 3 affichées (3) — T pour masquer » ou « masquées ».
+  - Les traces sont les 3 meilleures tentatives selon le critère du podium : CO₂ × temps pour débutant et expert, temps pour SP80 et SSB.
+  - **Page Classements** : curseur « Afficher les meilleures » au-dessus de la carte des routes, de 1 au nombre de tentatives de la période, avec l'indication « X / total ». La grande carte et les petites cartes suivent le curseur ; il reste réglé quand on change de mode ou de période.
+  - Les légendes des petites cartes montrent la vitesse max (⚡). Pour SP80 et SSB, elles n'affichent plus l'indice CO₂.
+  - Le serveur envoie jusqu'à 50 routes par mode (au lieu de 24).
+  - Statistiques de fréquentation : l'axe n'affiche plus deux fois « 1 » quand le maximum vaut 1.
+  - Textes en FR, EN, DE et IT.
+- **Vérification** : dans les 4 traversées, traces masquées au départ puis affichées après T (3 traces, message affiché). Page Classements : 6 / 6 routes, puis 3 / 3 cartes avec le curseur à 3, curseur conservé en passant à SP80. Aucune erreur JavaScript.
 

@@ -33,6 +33,7 @@ const FTIME = () => VK() * 1000 / (SCALE * KN);                         // secon
 function resetRace() {
   setWindProfile(RACE.mode);   // vent propre au SP80, inchangé pour les autres modes
   RACE.ssb = null; RACE.ssbInfo = null; RACE.popSticky = false;
+  RACE.showGhosts = false; const tg = document.getElementById("tGhost"); if (tg) tg.classList.remove("on");   // chaque course part traces masquées : T les affiche
   Object.assign(RACE, { t: 0, tau: 0.02, pen: 0, coll: 0, fuel: 0, saved: 0, track: [], trackT: 0, throttle: 0, rudder: 0, mouseHelm: false,
     introT: 0, finishT: 0, cool: {}, dolphins: [], wake: [], smoke: [], shake: 0, flash: 0, result: null, maxKn: 0 });
   RACE.windShown = new Set();
@@ -509,7 +510,9 @@ function initRaceControls() {
 let MINI = null;
 function toggleGhosts() {
   RACE.showGhosts = !RACE.showGhosts; $("tGhost").classList.toggle("on", RACE.showGhosts);
-  if (RACE.showGhosts && !(RACE.ghosts[RACE.mode] || []).length) toast(T("no_ghosts"), "", "ng", 5);
+  const n = (RACE.ghosts[RACE.mode] || []).length;
+  if (RACE.showGhosts && !n) toast(T("no_ghosts"), "", "ng", 5);
+  else toast(T(RACE.showGhosts ? "ghosts_on" : "ghosts_off", { n }), "", "ng", 2.5);
 }
 function toggleWindowView() { RACE.showWindow = !RACE.showWindow; $("tWin").classList.toggle("on", RACE.showWindow); }
 function toggleCamView() { RACE.view = RACE.view === "third" ? "cabin" : "third"; $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin"); }

@@ -142,6 +142,7 @@ function restartRace() {
 }
 function startIntro() {
   resetRace();
+  hostSend({ type: "play", mode: RACE.mode });   // statistiques : une partie lancée (recommencer en compte une nouvelle)
   RACE.state = "intro"; RACE.introT = 0;
   hideOverlay();
 }

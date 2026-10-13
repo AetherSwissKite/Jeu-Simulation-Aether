@@ -43,6 +43,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 31 | Statistiques de fréquentation du site | 10-13 10:45:44 | 10-13 10:47:52 | 2 min 08 s |
 | 32 | Bouton « Recommencer » dans la pause | 10-13 11:48:00 | 10-13 11:49:54 | 1 min 54 s |
 | 33 | Traces du top 3 (T) vérifiées, curseur « X meilleures » sur les routes | 10-13 11:55:39 | 10-13 11:59:15 | 3 min 36 s |
+| 34 | Statistiques : parties lancées et terminées | 10-13 12:25:46 | 10-13 12:28:44 | 2 min 58 s |
 
 ---
 
@@ -639,4 +640,18 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Statistiques de fréquentation : l'axe n'affiche plus deux fois « 1 » quand le maximum vaut 1.
   - Textes en FR, EN, DE et IT.
 - **Vérification** : dans les 4 traversées, traces masquées au départ puis affichées après T (3 traces, message affiché). Page Classements : 6 / 6 routes, puis 3 / 3 cartes avec le curseur à 3, curseur conservé en passant à SP80. Aucune erreur JavaScript.
+
+## 34. Statistiques : parties lancées et terminées
+- **Heure du prompt** : 2026-10-13 12:25:46 · **Heure du résultat** : 2026-10-13 12:28:44 · **Temps de calcul** : 2 min 58 s
+- **Demande** : dans la section fréquentation, pouvoir afficher aussi le nombre de parties jouées, pas seulement les visiteurs.
+- **Modifications** :
+  - **Suivi des parties lancées** : nouvelle table `plays` (horodatage et mode), ajoutée sans perte. Chaque départ de traversée y est noté au début du compte à rebours, qu'elle soit terminée, abandonnée ou recommencée (« Recommencer » compte une nouvelle partie).
+  - Les **parties terminées** sont les courses enregistrées au classement.
+  - La section devient « Fréquentation et parties », avec un choix d'indicateur **Connexions / Parties lancées / Parties terminées**, combinable avec Aujourd'hui / Cette semaine / Historique :
+    - Parties lancées : nombre, parties terminées, taux d'achèvement, mode le plus joué ;
+    - Parties terminées : nombre, joueurs différents, mode le plus joué, pic ;
+    - pour les parties, barres empilées par mode (couleurs et légende), le pic étant encadré.
+  - Phrases de pic neutres (« Heure de pointe aujourd'hui : 12h », « Jour de pointe… », « Semaine de pointe… »). Textes en FR, EN, DE et IT.
+- **Vérification** : 4 parties lancées dans le navigateur (débutant terminé après un « Recommencer », SP80, SSB). En base : 2 débutant, 1 SP80, 1 SSB et 1 course terminée. Affiché : 4 lancées, 1 terminée, 25 % d'achèvement, « Traversée débutant · 2 », barre empilée par mode. Aucune erreur JavaScript.
+- **Limite** : le suivi des parties lancées commence avec cette version ; avant, seules les parties terminées sont connues.
 

@@ -51,6 +51,7 @@ window.addEventListener("message", ev => {
     }
     if (m.routes && typeof m.routes === "object") BOARD.routes = m.routes;
     if (Number.isFinite(m.visits)) { BOARD.visits = m.visits; showVisits(); }
+    if (Array.isArray(m.plays)) BOARD.plays = m.plays.filter(c => Array.isArray(c) && Number.isFinite(c[0]));
     if (Array.isArray(m.conns)) { BOARD.conns = m.conns.filter(c => Array.isArray(c) && Number.isFinite(c[0])); if (VIEW === "board") renderTraffic(); }
     if (m.lang && m.lang !== LANG) setLang(m.lang, true);
     renderBoards();
@@ -301,7 +302,14 @@ function drawRouteMap(cv, tracks, range) {
 
 // ---------------- Fréquentation du site (page Classements) ----------------
 // Chaque connexion = [horodatage, n° de visiteur anonyme]. Heures et jours dans le fuseau du navigateur.
-BOARD.trPeriod = "day"; BOARD.conns = BOARD.conns || [];
+BOARD.trPeriod = "day"; BOARD.trMetric = "conns"; BOARD.conns = BOARD.conns || []; BOARD.plays = BOARD.plays || [];
+const TR_MODE_COLS = { beginner: "#9fb4d6", expert: "#3d5f94", sp80: "#c8102e", ssb: "#e8a33d" };
+// événements comptés selon l'indicateur choisi : connexions, parties lancées ou parties terminées (enregistrées)
+function trafficEvents(metric) {
+  if (metric === "plays") return BOARD.plays.map(([ts, mode]) => ({ d: new Date(ts * 1000), mode }));
+  if (metric === "runs") return BOARD.runs.map(e => ({ d: new Date(e.ts * 1000), mode: e.mode, v: keyOf(e) }));
+  return BOARD.conns.map(([ts, v]) => ({ d: new Date(ts * 1000), v }));
+}
 function weekStart(d) { const m = new Date(d); m.setHours(0, 0, 0, 0); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; }
 function isoWeek(d) {   // numéro de semaine ISO 8601
   const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7;
@@ -309,19 +317,20 @@ function isoWeek(d) {   // numéro de semaine ISO 8601
   const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
   return [t.getUTCFullYear(), Math.ceil(((t - y0) / 864e5 + 1) / 7)];
 }
-function trafficBins(period) {
-  const now = new Date(), list = BOARD.conns.map(([ts, v]) => ({ d: new Date(ts * 1000), v }));
+function trafficBins(period, metric) {
+  const now = new Date(), list = trafficEvents(metric);
+  const add = (b, c) => { b.n++; if (c.mode) b.parts[c.mode] = (b.parts[c.mode] || 0) + 1; };
   if (period === "day") {
     const d0 = new Date(now); d0.setHours(0, 0, 0, 0);
-    const sel = list.filter(c => c.d >= d0), bins = Array.from({ length: 24 }, (_, h) => ({ label: `${h}h`, n: 0 }));
-    sel.forEach(c => bins[c.d.getHours()].n++);
+    const sel = list.filter(c => c.d >= d0), bins = Array.from({ length: 24 }, (_, h) => ({ label: `${h}h`, n: 0, parts: {} }));
+    sel.forEach(c => add(bins[c.d.getHours()], c));
     return { sel, bins, peakFmt: b => T("tr_peak_hour", { h: b.label }) };
   }
   if (period === "week") {
     const w0 = weekStart(now), sel = list.filter(c => c.d >= w0);
     const names = Array.from({ length: 7 }, (_, i) => { const d = new Date(w0); d.setDate(d.getDate() + i); return d.toLocaleDateString(LOCALES[LANG], { weekday: "short", day: "numeric" }); });
-    const bins = names.map(label => ({ label, n: 0 }));
-    sel.forEach(c => bins[(c.d.getDay() + 6) % 7].n++);
+    const bins = names.map(label => ({ label, n: 0, parts: {} }));
+    sel.forEach(c => add(bins[(c.d.getDay() + 6) % 7], c));
     return { sel, bins, peakFmt: b => T("tr_peak_day", { d: b.label }) };
   }
   // historique : une barre par semaine ISO, de la première connexion à aujourd'hui
@@ -330,20 +339,27 @@ function trafficBins(period) {
   const first = weekStart(new Date(Math.min(...sel.map(c => c.d)))), bins = [], idx = new Map();
   for (let w = new Date(first); w <= now; w.setDate(w.getDate() + 7)) {
     const [y, n] = isoWeek(w); idx.set(`${y}-${n}`, bins.length);
-    bins.push({ label: `S${n}`, full: `${T("tr_weekname")} ${n} (${w.toLocaleDateString(LOCALES[LANG], { day: "numeric", month: "short" })})`, n: 0 });
+    bins.push({ label: `S${n}`, full: `${T("tr_weekname")} ${n} (${w.toLocaleDateString(LOCALES[LANG], { day: "numeric", month: "short" })})`, n: 0, parts: {} });
   }
-  sel.forEach(c => { const [y, n] = isoWeek(c.d), i = idx.get(`${y}-${n}`); if (i !== undefined) bins[i].n++; });
+  sel.forEach(c => { const [y, n] = isoWeek(c.d), i = idx.get(`${y}-${n}`); if (i !== undefined) add(bins[i], c); });
   return { sel, bins, peakFmt: b => T("tr_peak_week", { w: b.full }) };
 }
 function renderTraffic() {
   const seg = $("trSeg"); if (!seg) return;
   seg.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.v === BOARD.trPeriod); b.onclick = () => { BOARD.trPeriod = b.dataset.v; renderTraffic(); }; });
-  const { sel, bins, peakFmt } = trafficBins(BOARD.trPeriod);
+  $("trMetric").querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.v === BOARD.trMetric); b.onclick = () => { BOARD.trMetric = b.dataset.v; renderTraffic(); }; });
+  const metric = BOARD.trMetric, { sel, bins, peakFmt } = trafficBins(BOARD.trPeriod, metric);
   const peak = bins.reduce((a, b) => (b.n > (a ? a.n : 0) ? b : a), null);
-  const uniq = new Set(sel.map(c => c.v)).size;
-  const kpi = (k, v) => `<div><small>${T(k)}</small><b>${v}</b></div>`;
-  $("trKpis").innerHTML = kpi("tr_conns", fmt0(sel.length)) + kpi("tr_unique", fmt0(uniq)) + kpi("tr_total", fmt0(BOARD.visits || 0))
-    + kpi("tr_peak", peak && peak.n ? `${peak.label} · ${fmt0(peak.n)}` : "—");
+  const kpi = (k, v) => `<div><small>${T(k)}</small><b>${v}</b></div>`, peakTxt = peak && peak.n ? `${peak.label} · ${fmt0(peak.n)}` : "—";
+  const byMode = {}; sel.forEach(c => { if (c.mode) byMode[c.mode] = (byMode[c.mode] || 0) + 1; });
+  const topMode = Object.entries(byMode).sort((a, b) => b[1] - a[1])[0];
+  const topTxt = topMode ? `${T("nav_" + topMode[0])} · ${fmt0(topMode[1])}` : "—";
+  if (metric === "conns") $("trKpis").innerHTML = kpi("tr_conns", fmt0(sel.length)) + kpi("tr_unique", fmt0(new Set(sel.map(c => c.v)).size)) + kpi("tr_total", fmt0(BOARD.visits || 0)) + kpi("tr_peak", peakTxt);
+  else if (metric === "plays") {
+    const done = trafficBins(BOARD.trPeriod, "runs").sel.length;
+    $("trKpis").innerHTML = kpi("tr_m_plays", fmt0(sel.length)) + kpi("tr_m_runs", fmt0(done)) + kpi("tr_rate", sel.length ? `${fmt0(Math.min(100, done / sel.length * 100))} %` : "—") + kpi("tr_top_mode", topTxt);
+  } else $("trKpis").innerHTML = kpi("tr_m_runs", fmt0(sel.length)) + kpi("tr_players", fmt0(new Set(sel.map(c => c.v)).size)) + kpi("tr_top_mode", topTxt) + kpi("tr_peak", peakTxt);
+  $("trLegend").innerHTML = metric === "conns" ? "" : RACE_MODES.map(m => `<span><i style="background:${TR_MODE_COLS[m]}"></i>${T("nav_" + m)}</span>`).join("");
   $("trNote").textContent = peak && peak.n ? peakFmt(peak) : T("tr_empty");
   requestAnimationFrame(() => drawTraffic($("trChart"), bins, peak));
 }
@@ -362,8 +378,12 @@ function drawTraffic(cv, bins, peak) {
   const every = Math.ceil(bins.length / Math.max(1, Math.floor((w - pl) / 42)));
   bins.forEach((b, i) => {
     const bh = (h - pb - pt) * b.n / mx, x = pl + i * bw;
-    ctx.fillStyle = b === peak && b.n ? "#1f3a68" : "#9fb4d6";
-    ctx.fillRect(x + Math.min(2, bw * 0.15), h - pb - bh, Math.max(1, bw - Math.min(4, bw * 0.3)), bh);
+    const bx = x + Math.min(2, bw * 0.15), bwid = Math.max(1, bw - Math.min(4, bw * 0.3));
+    if (b.parts && Object.keys(b.parts).length) {   // parties : barres empilées par mode
+      let y = h - pb;
+      for (const m of RACE_MODES) { const k = b.parts[m] || 0; if (!k) continue; const hh = (h - pb - pt) * k / mx; ctx.fillStyle = TR_MODE_COLS[m]; ctx.fillRect(bx, y - hh, bwid, hh); y -= hh; }
+      if (b === peak) { ctx.strokeStyle = "#262b45"; ctx.lineWidth = 1.5; ctx.strokeRect(bx, h - pb - bh, bwid, bh); }
+    } else { ctx.fillStyle = b === peak && b.n ? "#1f3a68" : "#9fb4d6"; ctx.fillRect(bx, h - pb - bh, bwid, bh); }
     if (b.n && bw > 14) { ctx.fillStyle = "#262b45"; ctx.textAlign = "center"; ctx.fillText(String(b.n), x + bw / 2, h - pb - bh - 3); }
     if (i % every === 0) { ctx.fillStyle = "#8a8fa8"; ctx.textAlign = "center"; ctx.fillText(b.label, x + bw / 2, h - 8); }
   });

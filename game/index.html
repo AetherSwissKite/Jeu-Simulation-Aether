@@ -190,6 +190,8 @@
   .tr-kpis small { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .tr-kpis b { font-family: var(--mono); font-size: 18px; }
   .tr-chart { width: 100%; height: 220px; display: block; }
+  .tr-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .tr-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
   .routes-map { width: 100%; height: 360px; display: block; border-radius: 10px; background: #eef3f8; }
   .routes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
   .routes-grid figure { margin: 0; background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 6px; }
@@ -538,9 +540,10 @@
     </div>
     <div class="panel traffic">
       <p class="eyebrow" data-i="tr_title"></p>
-      <div class="board-tabs"><div class="seg small" id="trSeg"><button data-v="day" data-i="tr_day"></button><button data-v="week" data-i="tr_week"></button><button data-v="all" data-i="tr_all"></button></div><p class="board-src" id="trNote" style="margin:0"></p></div>
+      <div class="board-tabs"><div class="seg small" id="trMetric"><button data-v="conns" data-i="tr_m_conns"></button><button data-v="plays" data-i="tr_m_plays"></button><button data-v="runs" data-i="tr_m_runs"></button></div><div class="seg small" id="trSeg"><button data-v="day" data-i="tr_day"></button><button data-v="week" data-i="tr_week"></button><button data-v="all" data-i="tr_all"></button></div><p class="board-src" id="trNote" style="margin:0"></p></div>
       <div class="tr-kpis" id="trKpis"></div>
       <canvas class="tr-chart" id="trChart"></canvas>
+      <div class="tr-legend" id="trLegend"></div>
     </div>
   </section>
 

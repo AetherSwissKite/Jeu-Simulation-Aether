@@ -48,6 +48,7 @@ export default function (component) {
       if (m.type === "score" && window.__aeSend) window.__aeSend("score", m.entry);
       if (m.type === "lang" && window.__aeSend) window.__aeSend("lang", m.lang);
       if (m.type === "visit" && window.__aeSend) window.__aeSend("visit", m.vid);
+      if (m.type === "play" && window.__aeSend) window.__aeSend("play", { mode: m.mode, t: Date.now() });
     };
     window.addEventListener("message", window.__aeListener);
   }
@@ -68,6 +69,10 @@ def _on_lang():
         st.query_params["lang"] = new
 
 
+def _on_play():
+    storage.add_play(((st.session_state.get("aether_bridge") or {}).get("play") or {}).get("mode"))
+
+
 def _on_visit():
     storage.add_visit((st.session_state.get("aether_bridge") or {}).get("visit"))
 
@@ -75,9 +80,9 @@ def _on_visit():
 @st.fragment(run_every=15)
 def _live_bridge():
     """Rafraîchi toutes les 15 s : chaque joueur voit arriver les scores des autres sans recharger la page."""
-    _bridge(data={"runs": storage.list_runs(), "ghosts": storage.ghosts(), "routes": storage.routes(), "visits": storage.visits(), "conns": storage.connections(),
+    _bridge(data={"runs": storage.list_runs(), "ghosts": storage.ghosts(), "routes": storage.routes(), "visits": storage.visits(), "conns": storage.connections(), "plays": storage.plays(),
                   "lang": st.session_state.get("lang", "fr")},
-            key="aether_bridge", on_score_change=_on_score, on_lang_change=_on_lang, on_visit_change=_on_visit)
+            key="aether_bridge", on_score_change=_on_score, on_lang_change=_on_lang, on_visit_change=_on_visit, on_play_change=_on_play)
 
 
 def game_page():

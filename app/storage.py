@@ -41,6 +41,7 @@ CREATE INDEX IF NOT EXISTS runs_ts ON runs(ts);
 CREATE TABLE IF NOT EXISTS visits (vid TEXT PRIMARY KEY, ts INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS connections (vid TEXT NOT NULL, ts INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS plays (ts INTEGER NOT NULL, mode TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS connections_ts ON connections(ts);
 """
 # à incrémenter quand le calcul des scores change : toutes les courses enregistrées sont alors effacées
@@ -213,6 +214,21 @@ def add_visit(vid):
         if last is None or now - last > SESSION_GAP:
             c.execute("INSERT INTO connections VALUES (?, ?)", (vid, now))
         return new
+
+
+def add_play(mode):
+    """Note le départ d'une partie (y compris celles abandonnées ou recommencées), pour les statistiques."""
+    if mode not in MODES:
+        return False
+    with _LOCK, _conn() as c:
+        c.execute("INSERT INTO plays VALUES (?, ?)", (int(time.time()), mode))
+    return True
+
+
+def plays(limit=50000):
+    """Parties lancées récentes [horodatage, mode]."""
+    with _conn() as c:
+        return [[r["ts"], r["mode"]] for r in c.execute("SELECT ts, mode FROM plays ORDER BY ts DESC LIMIT ?", (limit,)).fetchall()]
 
 
 def connections(limit=50000):

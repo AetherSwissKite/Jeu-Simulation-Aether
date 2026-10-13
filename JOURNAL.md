@@ -44,6 +44,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 32 | Bouton « Recommencer » dans la pause | 10-13 11:48:00 | 10-13 11:49:54 | 1 min 54 s |
 | 33 | Traces du top 3 (T) vérifiées, curseur « X meilleures » sur les routes | 10-13 11:55:39 | 10-13 11:59:15 | 3 min 36 s |
 | 34 | Statistiques : parties lancées et terminées | 10-13 12:25:46 | 10-13 12:28:44 | 2 min 58 s |
+| 35 | Lien vers aetherswisskite.ch sur l'accueil | 10-13 12:28:51 | 10-13 12:29:52 | 1 min 01 s |
 
 ---
 
@@ -654,4 +655,12 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Phrases de pic neutres (« Heure de pointe aujourd'hui : 12h », « Jour de pointe… », « Semaine de pointe… »). Textes en FR, EN, DE et IT.
 - **Vérification** : 4 parties lancées dans le navigateur (débutant terminé après un « Recommencer », SP80, SSB). En base : 2 débutant, 1 SP80, 1 SSB et 1 course terminée. Affiché : 4 lancées, 1 terminée, 25 % d'achèvement, « Traversée débutant · 2 », barre empilée par mode. Aucune erreur JavaScript.
 - **Limite** : le suivi des parties lancées commence avec cette version ; avant, seules les parties terminées sont connues.
+
+## 35. Lien vers aetherswisskite.ch sur l'accueil
+- **Heure du prompt** : 2026-10-13 12:28:51 (message envoyé pendant le prompt 34) · **Heure du résultat** : 2026-10-13 12:29:52 · **Temps de calcul** : 1 min 01 s
+- **Demande** : ajouter un lien vers https://www.aetherswisskite.ch sur la page d'accueil, idéalement à droite dans « La vision du jeu ».
+- **Modifications** :
+  - Dans « La vision du jeu », à droite du texte, une carte bleu marine cliquable : « Notre site · aetherswisskite.ch ↗ », avec une phrase de présentation du projet. Elle s'ouvre dans un nouvel onglet.
+  - Sur petit écran, la carte passe sous le texte. Textes en FR, EN, DE et IT.
+- **Vérification** : lien vers https://www.aetherswisskite.ch/ avec ouverture dans un nouvel onglet ; affichage contrôlé sur capture. Aucune erreur JavaScript.
 

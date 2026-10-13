@@ -169,6 +169,14 @@
   /* ---------- Accueil ---------- */
   .home-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }   /* vision au-dessus des 5 cartes de mode */
   .vision { padding: 14px 16px; }
+  .vision-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 280px); gap: 18px; align-items: center; }
+  .vision-link { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 12px; text-decoration: none; color: #fff;
+    background: linear-gradient(135deg, #1f3a68, #3d5f94); box-shadow: 0 6px 18px rgba(31, 58, 104, .25); transition: transform .15s, box-shadow .15s; }
+  .vision-link:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(31, 58, 104, .32); }
+  .vision-link small { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
+  .vision-link b { font-family: var(--head); font-size: 18px; }
+  .vision-link span { font-size: 12px; line-height: 1.45; opacity: .9; }
+  @media (max-width: 760px) { .vision-body { grid-template-columns: minmax(0, 1fr); } }
   .vision p { margin: 0 0 8px; line-height: 1.55; color: #4a4f6c; font-size: 12.5px; }
   .vision ul { margin: 4px 0 0; padding-left: 18px; color: #4a4f6c; line-height: 1.55; font-size: 12.5px; }
   .cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
@@ -391,7 +399,12 @@
     <div class="home-grid">
       <div class="panel vision">
         <p class="eyebrow" data-i="vision_title"></p>
-        <div data-ih="vision_html"></div>
+        <div class="vision-body">
+          <div data-ih="vision_html"></div>
+          <a class="vision-link" href="https://www.aetherswisskite.ch" target="_blank" rel="noopener">
+            <small data-i="site_eyebrow"></small><b>aetherswisskite.ch ↗</b><span data-i="site_desc"></span>
+          </a>
+        </div>
       </div>
       <div class="cards">
         <div class="panel card">

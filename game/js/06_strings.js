@@ -2,6 +2,7 @@
 //  TEXTES DE L'INTERFACE — français, anglais, allemand, italien
 // ================================================================
 Object.assign(I18N.fr, {
+ site_eyebrow: "Notre site", site_desc: "Découvre le projet Aether Swiss Kite : la traction par kite pour des bateaux plus sobres.",
  tr_m_conns: "Connexions", tr_m_plays: "Parties lancées", tr_m_runs: "Parties terminées", tr_rate: "Taux d'achèvement", tr_top_mode: "Mode le plus joué", tr_players: "Joueurs différents",
  routes_n_label: "Afficher les meilleures", ghosts_on: "Traces du top 3 affichées ({n}) — T pour masquer", ghosts_off: "Traces du top 3 masquées",
  restart: "↺ Recommencer", restart_toast: "Tentative relancée depuis le départ",
@@ -107,6 +108,7 @@ Object.assign(I18N.fr, {
 });
 
 Object.assign(I18N.en, {
+ site_eyebrow: "Our website", site_desc: "Discover the Aether Swiss Kite project: kite traction for cleaner boats.",
  tr_m_conns: "Connections", tr_m_plays: "Games started", tr_m_runs: "Games finished", tr_rate: "Completion rate", tr_top_mode: "Most played mode", tr_players: "Different players",
  routes_n_label: "Show the best", ghosts_on: "Top 3 tracks shown ({n}) — T to hide", ghosts_off: "Top 3 tracks hidden",
  restart: "↺ Restart", restart_toast: "Attempt restarted from the start",
@@ -212,6 +214,7 @@ Object.assign(I18N.en, {
 });
 
 Object.assign(I18N.de, {
+ site_eyebrow: "Unsere Website", site_desc: "Entdecke das Projekt Aether Swiss Kite: Kite-Antrieb für sparsamere Schiffe.",
  tr_m_conns: "Verbindungen", tr_m_plays: "Gestartete Spiele", tr_m_runs: "Beendete Spiele", tr_rate: "Abschlussquote", tr_top_mode: "Meistgespielter Modus", tr_players: "Verschiedene Spieler",
  routes_n_label: "Die besten anzeigen", ghosts_on: "Top-3-Spuren angezeigt ({n}) — T zum Ausblenden", ghosts_off: "Top-3-Spuren ausgeblendet",
  restart: "↺ Neu starten", restart_toast: "Versuch neu gestartet",
@@ -317,6 +320,7 @@ Object.assign(I18N.de, {
 });
 
 Object.assign(I18N.it, {
+ site_eyebrow: "Il nostro sito", site_desc: "Scopri il progetto Aether Swiss Kite: la trazione a kite per barche più sobrie.",
  tr_m_conns: "Connessioni", tr_m_plays: "Partite iniziate", tr_m_runs: "Partite finite", tr_rate: "Tasso di completamento", tr_top_mode: "Modalità più giocata", tr_players: "Giocatori diversi",
  routes_n_label: "Mostra i migliori", ghosts_on: "Tracce dei top 3 visibili ({n}) — T per nascondere", ghosts_off: "Tracce dei top 3 nascoste",
  restart: "↺ Ricomincia", restart_toast: "Tentativo ripartito dall'inizio",

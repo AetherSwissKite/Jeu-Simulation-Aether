@@ -83,7 +83,13 @@
   .hero-text h1 em { font-style: normal; color: #1d4f91; }
   .spacepop { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 12px; padding: 14px 22px; z-index: 4; pointer-events: none;
     font-family: var(--head); font-size: 20px; font-weight: 700; color: var(--text); animation: spacepulse 1.4s ease-in-out infinite; }
-  .spacepop kbd { min-width: 120px; height: 34px; font-size: 14px; box-shadow: 0 3px 0 #b9c3d6; }
+  .spacepop { flex-direction: column; align-items: stretch; max-width: min(760px, 92%); }
+  .spacepop .pop-row { display: flex; align-items: center; gap: 12px; }
+  .spacepop .pop-row kbd { min-width: 120px; height: 34px; font-size: 14px; box-shadow: 0 3px 0 #b9c3d6; }
+  .spacepop .pop-help { font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1.45; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+  .spacepop .pop-help kbd { min-width: 26px; height: 22px; font-size: 13px; box-shadow: 0 2px 0 #b9c3d6; }
+  .spacepop.steer .pop-row { display: none; }   /* kite lancé : on ne garde que l'explication du pilotage */
+  .spacepop.steer .pop-help { border-top: 0; padding-top: 0; color: var(--text); }
   @keyframes spacepulse { 50% { transform: translate(-50%, -50%) scale(1.04); } }
   .hero-text p { margin: 0 0 12px; color: #4a4f6c; line-height: 1.5; font-size: 13.5px; }
 
@@ -563,7 +569,7 @@
     </div>
     <div class="glass kwarn only-race" id="kwarn" hidden></div>
     <div class="bigcount" id="bigCount" hidden></div>
-    <div class="glass spacepop only-race" id="spacePop" hidden><kbd data-i="key_space"></kbd><span data-ih="space_pop"></span></div>
+    <div class="glass spacepop only-race" id="spacePop" hidden><div class="pop-row"><kbd data-i="key_space"></kbd><span data-ih="space_pop"></span></div><small class="pop-help only-manual" data-ih="kite_steer_help"></small></div>
   </div>
 
   <div class="toasts" id="toasts"></div>

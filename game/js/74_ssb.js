@@ -44,7 +44,7 @@ function ssbDynamics(dt, w, B, C) {
   // panne moteur à l'entrée de la tempête : à partir de là, seul le kite propulse le bateau
   if (!S.broken && RACE.f >= SSB_BREAK_F) {
     S.broken = true; S.chase = true; RACE.throttle = 0;
-    const sp = $("spacePop").querySelector("span"); sp.dataset.ih = "ssb_break_pop"; sp.innerHTML = T("ssb_break_pop"); $("spacePop").hidden = KS.deployed; RACE.popT = 0; RACE.popSticky = true;
+    const sp = $("spacePop").querySelector("span"); sp.dataset.ih = "ssb_break_pop"; sp.innerHTML = T("ssb_break_pop"); $("spacePop").classList.remove("steer"); $("spacePop").hidden = KS.deployed; RACE.popT = 0; RACE.popSticky = true;
     toast(T("ssb_break_toast"), "bad", null); RACE.shake = 0.8;
   }
   if (S.chase && !S.chaseDone && RACE.f >= SSB_RADE_F) { S.chase = false; S.chaseDone = true; toast(T("ssb_pirate_gone"), "good", null); }

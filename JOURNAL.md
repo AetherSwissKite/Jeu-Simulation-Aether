@@ -39,6 +39,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 27 | Vitesse max non enregistrée en ligne : rechargement des modules | 10-12 22:35:35 | 10-12 22:39:47 | 4 min 12 s |
 | 28 | Descriptif SSB qui garde la surprise | 10-12 22:44:18 | 10-12 22:44:47 | 0 min 29 s |
 | 29 | Classement : toutes les tentatives affichées | 10-13 08:36:21 | 10-13 08:37:36 | 1 min 15 s |
+| 30 | Explication du pilotage du kite dans la bulle « Espace » | 10-13 09:28:00 | 10-13 09:30:47 | 2 min 47 s |
 
 ---
 
@@ -580,4 +581,16 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Le tableau défile ; son en-tête reste visible.
   - Ta propre tentative est amenée dans la zone visible.
 - **Vérification** : base de test avec 28 tentatives débutant (9 joueurs, 3 équipes). Compteur « 9 joueur(s) · 28 tentative(s) », 28 lignes affichées jusqu'à la 28ᵉ, 3 équipes. Aucune erreur.
+
+## 30. Explication du pilotage du kite dans la bulle « Espace »
+- **Heure du prompt** : 2026-10-13 09:28:00 · **Heure du résultat** : 2026-10-13 09:30:47 · **Temps de calcul** : 2 min 47 s
+- **Demande** : quand la bulle invite à appuyer sur Espace pour envoyer le kite, ajouter l'explication : « Pour piloter le kite : après l'avoir envoyé en l'air avec la touche Espace, appuyez longuement sur ← ou → : le kite a un peu d'inertie mais va peu à peu descendre dans la fenêtre ».
+- **Modifications** :
+  - La bulle a une seconde ligne avec cette explication et les touches ← → dessinées. Textes en FR, EN, DE et IT.
+  - Dès que le kite est envoyé, la bulle ne garde que l'explication du pilotage, pendant 9 s.
+  - L'explication s'affiche dans les modes où l'on pilote le kite aux flèches : expert, SP80, et SSB au moment de la panne. En débutant, le kite vole seul et les flèches dirigent la barge : la bulle reste inchangée.
+- **Vérification** :
+  - Expert : bulle complète au départ, seulement l'explication après Espace, disparition au bout de 9 s.
+  - Débutant : bulle d'origine. SP80 : bulle affichée.
+  - Aucune erreur JavaScript.
 

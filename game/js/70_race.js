@@ -528,12 +528,18 @@ function frameRace(dt) {
       setTimeout(() => { if ($("bigCount").textContent === T("go")) $("bigCount").hidden = true; }, 700);
       toast(T(RACE.mode === "ssb" ? "start_tip_ssb" : RACE.mode === "sp80" ? "start_tip_sp80" : RACE.mode === "expert" ? "start_tip_expert" : "start_tip"), "", null);
       $("spacePop").querySelector("span").dataset.ih = "space_pop"; $("spacePop").querySelector("span").innerHTML = T("space_pop"); RACE.popSticky = false;
-      $("spacePop").hidden = RACE.mode === "ssb"; RACE.popT = 0;   // SSB : pas d'invitation au kite au départ (moteur électrique)
+      $("spacePop").hidden = RACE.mode === "ssb"; $("spacePop").classList.remove("steer"); RACE.popT = 0; RACE.steerT = 0;   // SSB : pas d'invitation au kite au départ (moteur électrique)
     }
   } else if (RACE.state === "run") {
     stepRace(dt);
     // invitation à lancer le kite : disparaît dès qu'il est sorti (ou après 9 s)
-    if (!$("spacePop").hidden) { RACE.popT += dt; if (KS.deployed || (!RACE.popSticky && RACE.popT > 9)) $("spacePop").hidden = true; }
+    const pop = $("spacePop");
+    if (!pop.hidden) {
+      RACE.popT += dt;
+      if (KS.deployed && manualKite() && !pop.classList.contains("steer")) { pop.classList.add("steer"); RACE.steerT = 0; }   // kite envoyé : place à l'explication du pilotage
+      else if (pop.classList.contains("steer")) { RACE.steerT += dt; if (RACE.steerT > 9) pop.hidden = true; }
+      else if (KS.deployed || (!RACE.popSticky && RACE.popT > 9)) pop.hidden = true;
+    }
   } else if (RACE.state === "finish") {
     RACE.finishT += dt;
     RACE.boat.u = lerp(RACE.boat.u, 0.8, damp(0.8, dt));

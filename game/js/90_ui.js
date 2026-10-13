@@ -115,6 +115,7 @@ function initForms() {
   $("helpSkip").addEventListener("click", closeHelp);   // passer le tutoriel d'un coup
   $("helpBack").addEventListener("click", () => setHelpPage(helpPage - 1));
   $("pauseResume").addEventListener("click", togglePause);
+  $("pauseRestart").addEventListener("click", restartRace);
   $("pauseQuit").addEventListener("click", () => goView("home"));
   $("endAgain").addEventListener("click", () => goView(RACE.mode === "attract" ? "beginner" : RACE.mode));
   $("endHome").addEventListener("click", () => goView("home"));
@@ -129,6 +130,15 @@ function initForms() {
   // après un clic sur un bouton, le clavier revient au jeu
   document.addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.type !== "submit") setTimeout(() => b.blur(), 0); });
   $("world").addEventListener("pointerdown", () => window.focus());
+}
+// Recommencer la tentative depuis la pause : même mode, même joueur, sans repasser par le pseudo ni le tutoriel
+// (la tentative abandonnée n'est pas enregistrée)
+function restartRace() {
+  if (RACE.state !== "pause") return;
+  hideOverlay(); KEYS.clear();
+  $("tPause").classList.remove("on"); $("tPauseIco").textContent = "⏸"; $("tPauseTxt").textContent = T("pause");
+  toast(T("restart_toast"), "", null);
+  startIntro();
 }
 function startIntro() {
   resetRace();
@@ -243,6 +253,7 @@ function initKeyboard() {
     if (overlay === "ovBoard" && (k === "Escape" || k === "Enter")) { e.preventDefault(); closeBoard(); return; }
     if (overlay === "ovEnd" && k === "Enter") { e.preventDefault(); goView(RACE.mode); return; }
     if (overlay === "ovEnd" && k === "Escape") { e.preventDefault(); goView("home"); return; }
+    if (RACE.state === "pause" && lk === "r") { e.preventDefault(); restartRace(); return; }
     if ((RACE.state === "run" || RACE.state === "pause") && (lk === "p" || k === "Escape")) { e.preventDefault(); togglePause(); return; }
     if (overlay) return;
     if (RACE_MODES.includes(VIEW)) {

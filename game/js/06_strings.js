@@ -2,6 +2,7 @@
 //  TEXTES DE L'INTERFACE — français, anglais, allemand, italien
 // ================================================================
 Object.assign(I18N.fr, {
+ restart: "↺ Recommencer", restart_toast: "Tentative relancée depuis le départ",
  tr_title: "Fréquentation du site", tr_day: "Aujourd'hui", tr_week: "Cette semaine", tr_all: "Historique", tr_conns: "Connexions", tr_unique: "Visiteurs différents", tr_total: "Visiteurs depuis le lancement", tr_peak: "Pic", tr_peak_hour: "Pic de fréquentation aujourd'hui : {h}", tr_peak_day: "Jour le plus fréquenté cette semaine : {d}", tr_peak_week: "Semaine la plus fréquentée : {w}", tr_weekname: "semaine", tr_empty: "Pas encore de connexion sur cette période.",
  kite_steer_help: "<b>Pour piloter le kite</b> : après l'avoir envoyé en l'air avec la touche Espace, appuie longuement sur <kbd>←</kbd> ou <kbd>→</kbd> de ton clavier : le kite a un peu d'inertie mais va peu à peu descendre dans la fenêtre.",
   s_vmax: "Vitesse max", podium_rule_vmax: "Podium SP80 : vitesse de pointe atteinte pendant la traversée, la plus haute gagne.", end_rank_vmax: "rang {r} sur {n} en vitesse de pointe",
@@ -58,7 +59,7 @@ Object.assign(I18N.fr, {
   name_eyebrow: "{mode} · Villeneuve → Genève", name_title: "Qui est à la <em>barre</em> ?", name_intro: "Ton pseudo et ton équipe apparaîtront dans les classements de tous les joueurs.",
   pseudo: "Pseudo", pseudo_ph: "Ton pseudo", team: "Équipe", team_new_name: "Nom de la nouvelle équipe", team_ph: "Ex. Les Mouettes",
   team_none: "— Sans équipe —", team_members: "{t} · {n} membre(s)", team_create: "＋ Créer une nouvelle équipe…", err_name: "Écris un pseudo pour enregistrer ton temps.", err_team: "Donne un nom à ta nouvelle équipe (ou choisis « Sans équipe »).",
-  pause_title: "Tout est <em>figé</em>", pause_text: "Appuie sur <kbd>P</kbd> ou <kbd>Échap</kbd> pour reprendre.",
+  pause_title: "Tout est <em>figé</em>", pause_text: "Appuie sur <kbd>P</kbd> ou <kbd>Échap</kbd> pour reprendre, <kbd>R</kbd> pour recommencer.",
   race_abandoned: "Traversée abandonnée",
   w_vaudaire: "La Vaudaire souffle du sud-est : vent dans le dos, sors le kite !", w_vent: "Devant Lausanne, le Vent du sud-ouest souffle de travers : le kite tire encore, garde-le en l'air !",
   w_joran: "Coup de Joran ! Le vent du nord-ouest forcit brutalement.", w_bise: "La Bise du nord-est te pousse vers Genève : c'est le moment d'attraper les risées.",
@@ -104,6 +105,7 @@ Object.assign(I18N.fr, {
 });
 
 Object.assign(I18N.en, {
+ restart: "↺ Restart", restart_toast: "Attempt restarted from the start",
  tr_title: "Site traffic", tr_day: "Today", tr_week: "This week", tr_all: "All time", tr_conns: "Connections", tr_unique: "Unique visitors", tr_total: "Visitors since launch", tr_peak: "Peak", tr_peak_hour: "Busiest hour today: {h}", tr_peak_day: "Busiest day this week: {d}", tr_peak_week: "Busiest week: {w}", tr_weekname: "week", tr_empty: "No connections in this period yet.",
  kite_steer_help: "<b>To fly the kite</b>: once you've launched it with the Space key, press and hold <kbd>←</kbd> or <kbd>→</kbd> on your keyboard: the kite has a little inertia but will gradually come down into the window.",
   s_vmax: "Top speed", podium_rule_vmax: "SP80 podium: peak speed reached during the crossing, highest wins.", end_rank_vmax: "rank {r} of {n} for top speed",
@@ -160,7 +162,7 @@ Object.assign(I18N.en, {
   name_eyebrow: "{mode} · Villeneuve → Geneva", name_title: "Who's at the <em>helm</em>?", name_intro: "Your name and team will appear in everyone's leaderboards.",
   pseudo: "Player name", pseudo_ph: "Your name", team: "Team", team_new_name: "New team name", team_ph: "e.g. The Seagulls",
   team_none: "— No team —", team_members: "{t} · {n} member(s)", team_create: "＋ Create a new team…", err_name: "Enter a name to record your time.", err_team: "Give your new team a name (or pick “No team”).",
-  pause_title: "Everything is <em>frozen</em>", pause_text: "Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume.",
+  pause_title: "Everything is <em>frozen</em>", pause_text: "Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume, <kbd>R</kbd> to restart.",
   race_abandoned: "Crossing abandoned",
   w_vaudaire: "The Vaudaire blows from the south-east: wind from behind, launch the kite!", w_vent: "Off Lausanne, the south-westerly “Vent” blows abeam: the kite still pulls, keep it flying!",
   w_joran: "Joran squall! The north-westerly wind picks up suddenly.", w_bise: "The north-easterly Bise pushes you towards Geneva: time to catch the gusts.",
@@ -206,6 +208,7 @@ Object.assign(I18N.en, {
 });
 
 Object.assign(I18N.de, {
+ restart: "↺ Neu starten", restart_toast: "Versuch neu gestartet",
  tr_title: "Besucherstatistik", tr_day: "Heute", tr_week: "Diese Woche", tr_all: "Gesamt", tr_conns: "Verbindungen", tr_unique: "Verschiedene Besucher", tr_total: "Besucher seit dem Start", tr_peak: "Spitze", tr_peak_hour: "Meistbesuchte Stunde heute: {h}", tr_peak_day: "Meistbesuchter Tag dieser Woche: {d}", tr_peak_week: "Meistbesuchte Woche: {w}", tr_weekname: "Woche", tr_empty: "Noch keine Verbindungen in diesem Zeitraum.",
  kite_steer_help: "<b>Kite steuern</b>: Sobald du ihn mit der Leertaste gestartet hast, halte <kbd>←</kbd> oder <kbd>→</kbd> auf deiner Tastatur gedrückt: der Kite ist etwas träge, sinkt aber nach und nach ins Windfenster.",
   s_vmax: "Höchsttempo", podium_rule_vmax: "SP80-Podest: Spitzentempo während der Überfahrt, das höchste gewinnt.", end_rank_vmax: "Rang {r} von {n} beim Höchsttempo",
@@ -262,7 +265,7 @@ Object.assign(I18N.de, {
   name_eyebrow: "{mode} · Villeneuve → Genf", name_title: "Wer steht am <em>Ruder</em>?", name_intro: "Dein Spielername und dein Team erscheinen in den Ranglisten aller Spieler.",
   pseudo: "Spielername", pseudo_ph: "Dein Name", team: "Team", team_new_name: "Name des neuen Teams", team_ph: "z. B. Die Möwen",
   team_none: "— Kein Team —", team_members: "{t} · {n} Mitglied(er)", team_create: "＋ Neues Team erstellen …", err_name: "Gib einen Namen ein, um deine Zeit zu speichern.", err_team: "Gib deinem neuen Team einen Namen (oder wähle « Kein Team »).",
-  pause_title: "Alles <em>angehalten</em>", pause_text: "Drücke <kbd>P</kbd> oder <kbd>Esc</kbd>, um weiterzuspielen.",
+  pause_title: "Alles <em>angehalten</em>", pause_text: "Drücke <kbd>P</kbd> oder <kbd>Esc</kbd>, um weiterzuspielen, <kbd>R</kbd> für einen Neustart.",
   race_abandoned: "Überfahrt abgebrochen",
   w_vaudaire: "Die Vaudaire weht aus Südost: Rückenwind, setze den Kite!", w_vent: "Vor Lausanne weht der Südwestwind „Vent“ von der Seite: der Kite zieht noch, halte ihn in der Luft!",
   w_joran: "Joran-Bö! Der Nordwestwind frischt schlagartig auf.", w_bise: "Die Bise aus Nordost schiebt dich nach Genf: jetzt die Böen erwischen.",
@@ -308,6 +311,7 @@ Object.assign(I18N.de, {
 });
 
 Object.assign(I18N.it, {
+ restart: "↺ Ricomincia", restart_toast: "Tentativo ripartito dall'inizio",
  tr_title: "Frequentazione del sito", tr_day: "Oggi", tr_week: "Questa settimana", tr_all: "Sempre", tr_conns: "Connessioni", tr_unique: "Visitatori diversi", tr_total: "Visitatori dal lancio", tr_peak: "Picco", tr_peak_hour: "Ora di punta oggi: {h}", tr_peak_day: "Giorno più frequentato questa settimana: {d}", tr_peak_week: "Settimana più frequentata: {w}", tr_weekname: "settimana", tr_empty: "Ancora nessuna connessione in questo periodo.",
  kite_steer_help: "<b>Per pilotare il kite</b>: dopo averlo lanciato con la barra spaziatrice, tieni premuto <kbd>←</kbd> o <kbd>→</kbd> sulla tastiera: il kite ha un po' d'inerzia ma scenderà a poco a poco nella finestra.",
   s_vmax: "Velocità max", podium_rule_vmax: "Podio SP80: velocità di punta raggiunta nella traversata, vince la più alta.", end_rank_vmax: "posizione {r} su {n} per velocità di punta",
@@ -364,7 +368,7 @@ Object.assign(I18N.it, {
   name_eyebrow: "{mode} · Villeneuve → Ginevra", name_title: "Chi è al <em>timone</em>?", name_intro: "Il tuo nome e la tua squadra compariranno nelle classifiche di tutti.",
   pseudo: "Nome", pseudo_ph: "Il tuo nome", team: "Squadra", team_new_name: "Nome della nuova squadra", team_ph: "es. I Gabbiani",
   team_none: "— Nessuna squadra —", team_members: "{t} · {n} membro/i", team_create: "＋ Crea una nuova squadra…", err_name: "Inserisci un nome per registrare il tuo tempo.", err_team: "Dai un nome alla nuova squadra (o scegli «Nessuna squadra»).",
-  pause_title: "Tutto è <em>fermo</em>", pause_text: "Premi <kbd>P</kbd> o <kbd>Esc</kbd> per riprendere.",
+  pause_title: "Tutto è <em>fermo</em>", pause_text: "Premi <kbd>P</kbd> o <kbd>Esc</kbd> per riprendere, <kbd>R</kbd> per ricominciare.",
   race_abandoned: "Traversata abbandonata",
   w_vaudaire: "Soffia la Vaudaire da sud-est: vento in poppa, lancia il kite!", w_vent: "Davanti a Losanna il «Vent» da sud-ovest soffia di traverso: il kite tira ancora, tienilo in volo!",
   w_joran: "Colpo di Joran! Il vento da nord-ovest rinforza all'improvviso.", w_bise: "La Bise da nord-est ti spinge verso Ginevra: è il momento di cogliere le raffiche.",

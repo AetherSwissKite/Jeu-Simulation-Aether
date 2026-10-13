@@ -41,6 +41,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 29 | Classement : toutes les tentatives affichées | 10-13 08:36:21 | 10-13 08:37:36 | 1 min 15 s |
 | 30 | Explication du pilotage du kite dans la bulle « Espace » | 10-13 09:28:00 | 10-13 09:30:47 | 2 min 47 s |
 | 31 | Statistiques de fréquentation du site | 10-13 10:45:44 | 10-13 10:47:52 | 2 min 08 s |
+| 32 | Bouton « Recommencer » dans la pause | 10-13 11:48:00 | 10-13 11:49:54 | 1 min 54 s |
 
 ---
 
@@ -611,4 +612,14 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Avec 430 connexions simulées sur 2 mois, les trois onglets affichent leurs barres, leurs chiffres et leur pic, aussi en allemand.
   - Aucune erreur JavaScript.
 - **Limite** : comme le classement, ces statistiques sont stockées sur le disque temporaire de Streamlit Cloud et repartent de zéro quand il est effacé.
+
+## 32. Bouton « Recommencer » dans la pause
+- **Heure du prompt** : 2026-10-13 11:48:00 · **Heure du résultat** : 2026-10-13 11:49:54 · **Temps de calcul** : 1 min 54 s
+- **Demande** : ajouter un bouton pour recommencer la tentative quand on met le jeu en pause.
+- **Modifications** :
+  - La fenêtre de pause propose « Reprendre », « ↺ Recommencer » et « Quitter ». Raccourci clavier : R pendant la pause.
+  - Recommencer relance la même traversée depuis le départ (compte à rebours compris), avec le même pseudo et la même équipe, sans repasser par l'inscription ni le tutoriel. La tentative abandonnée n'est pas enregistrée.
+  - Textes en FR, EN, DE et IT ; le texte de la pause mentionne la touche R.
+  - Fonctionne dans toutes les traversées (débutant, expert, SP80, SSB).
+- **Vérification** : en débutant puis en SP80, pause au bout de 5 s, « Recommencer » : retour au compte à rebours, progression remise à zéro, pseudo conservé, puis la course repart. Même résultat avec la touche R. Aucune course enregistrée, aucune erreur JavaScript.
 

@@ -51,7 +51,7 @@ function goView(v) {
   } else if (v === "board") {
     $("heroSlot").appendChild(world);
     RACE.mode = "attract"; resetRace(); RACE.state = "idle";
-    renderBoards(); requestAnimationFrame(renderRoutes);
+    renderBoards(); requestAnimationFrame(() => { renderRoutes(); renderTraffic(); });
   } else if (v === "sandbox") {
     recompute();
     if (!seenHelp.sandbox) { seenHelp.sandbox = true; openHelp("sandbox"); }

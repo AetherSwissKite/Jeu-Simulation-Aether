@@ -181,6 +181,12 @@
   .boards { padding: 12px 14px; }
   .board-count { margin: -4px 0 8px; font-weight: 600; color: var(--accent) !important; }
   .routes { padding: 12px 14px; }
+  .traffic { padding: 12px 14px; }
+  .tr-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 4px 0 10px; }
+  .tr-kpis div { background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+  .tr-kpis small { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .tr-kpis b { font-family: var(--mono); font-size: 18px; }
+  .tr-chart { width: 100%; height: 220px; display: block; }
   .routes-map { width: 100%; height: 360px; display: block; border-radius: 10px; background: #eef3f8; }
   .routes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
   .routes-grid figure { margin: 0; background: #f6f8fb; border: 1px solid var(--line); border-radius: 10px; padding: 6px; }
@@ -525,6 +531,12 @@
       <div class="legend-grad" style="background:linear-gradient(90deg,#6271b7,#39a0c8,#4cbf7f,#e1c54a,#e08a3c,#d33d3d)"></div>
       <div class="row" style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted)"><span id="routesVmin"></span><span id="routesVmax"></span></div>
       <div class="routes-grid" id="routesGrid"></div>
+    </div>
+    <div class="panel traffic">
+      <p class="eyebrow" data-i="tr_title"></p>
+      <div class="board-tabs"><div class="seg small" id="trSeg"><button data-v="day" data-i="tr_day"></button><button data-v="week" data-i="tr_week"></button><button data-v="all" data-i="tr_all"></button></div><p class="board-src" id="trNote" style="margin:0"></p></div>
+      <div class="tr-kpis" id="trKpis"></div>
+      <canvas class="tr-chart" id="trChart"></canvas>
     </div>
   </section>
 

@@ -40,6 +40,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 28 | Descriptif SSB qui garde la surprise | 10-12 22:44:18 | 10-12 22:44:47 | 0 min 29 s |
 | 29 | Classement : toutes les tentatives affichées | 10-13 08:36:21 | 10-13 08:37:36 | 1 min 15 s |
 | 30 | Explication du pilotage du kite dans la bulle « Espace » | 10-13 09:28:00 | 10-13 09:30:47 | 2 min 47 s |
+| 31 | Statistiques de fréquentation du site | 10-13 10:45:44 | 10-13 10:47:52 | 2 min 08 s |
 
 ---
 
@@ -593,4 +594,21 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Expert : bulle complète au départ, seulement l'explication après Espace, disparition au bout de 9 s.
   - Débutant : bulle d'origine. SP80 : bulle affichée.
   - Aucune erreur JavaScript.
+
+## 31. Statistiques de fréquentation du site
+- **Heure du prompt** : 2026-10-13 10:45:44 · **Heure du résultat** : 2026-10-13 10:47:52 · **Temps de calcul** : 2 min 08 s
+- **Demande** : en bas de la page Classements, des statistiques de connexion (aujourd'hui, semaine, historique) pour évaluer la fréquentation, avec les pics : par heure pour la journée, par jour pour la semaine, par semaine pour l'historique.
+- **Modifications** :
+  - **Journal des connexions** (nouvelle table `connections`, ajoutée sans perte) : chaque ouverture du site est notée avec l'identifiant anonyme du navigateur. Deux ouvertures à moins de 30 min d'écart comptent pour une seule connexion. La première visite des visiteurs déjà connus y est reprise.
+  - Le serveur envoie au jeu les 50 000 dernières connexions, sous forme d'horodatage et de numéro anonyme. Aucun identifiant n'est transmis.
+  - **Section « Fréquentation du site »**, en bas de la page Classements :
+    - onglets Aujourd'hui (24 barres, une par heure), Cette semaine (7 barres, du lundi au dimanche), Historique (une barre par semaine ISO depuis la première connexion) ;
+    - 4 chiffres clés : connexions, visiteurs différents sur la période, visiteurs depuis le lancement, pic ;
+    - la barre du pic est mise en valeur et une phrase le résume (« Pic de fréquentation aujourd'hui : 10h », « Jour le plus fréquenté cette semaine : mar. 13 », « Semaine la plus fréquentée : semaine 42 (12 oct.) ») ;
+    - heures et jours dans le fuseau du navigateur. Textes en FR, EN, DE et IT.
+- **Vérification** :
+  - Une base de l'ancienne version (5 visiteurs) est mise à jour au démarrage : 5 connexions reprises. Une réouverture immédiate n'ajoute pas de connexion.
+  - Avec 430 connexions simulées sur 2 mois, les trois onglets affichent leurs barres, leurs chiffres et leur pic, aussi en allemand.
+  - Aucune erreur JavaScript.
+- **Limite** : comme le classement, ces statistiques sont stockées sur le disque temporaire de Streamlit Cloud et repartent de zéro quand il est effacé.
 

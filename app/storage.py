@@ -40,6 +40,8 @@ CREATE INDEX IF NOT EXISTS runs_mode_total ON runs(mode, total_s);
 CREATE INDEX IF NOT EXISTS runs_ts ON runs(ts);
 CREATE TABLE IF NOT EXISTS visits (vid TEXT PRIMARY KEY, ts INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE IF NOT EXISTS connections (vid TEXT NOT NULL, ts INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS connections_ts ON connections(ts);
 """
 # à incrémenter quand le calcul des scores change : toutes les courses enregistrées sont alors effacées
 DATA_VERSION = "3"   # v2 : le CO₂ ne compte plus que le moteur ; v3 : remise à zéro demandée le 12.10.2026
@@ -68,6 +70,10 @@ def init():
             for rid, track in c.execute("SELECT id, track FROM runs").fetchall():
                 speeds = [q[2] for q in json.loads(track or "[]") if isinstance(q, list) and len(q) >= 3]
                 c.execute("UPDATE runs SET max_kn = ? WHERE id = ?", (max(speeds) if speeds else None, rid))
+        # historique des connexions (ajouté le 13.10.2026) : on y reprend la première visite connue de chaque visiteur
+        if not c.execute("SELECT 1 FROM meta WHERE key = 'connections_seeded'").fetchone():
+            c.execute("INSERT INTO connections (vid, ts) SELECT vid, ts FROM visits WHERE vid NOT IN (SELECT vid FROM connections)")
+            c.execute("INSERT INTO meta VALUES ('connections_seeded', 'done')")
         # nettoyages ponctuels demandés : exécutés une seule fois par base (les nouvelles courses ne sont pas touchées)
         for key, mode, name in CLEANUPS:
             if not c.execute("SELECT 1 FROM meta WHERE key = ?", (key,)).fetchone():
@@ -186,13 +192,30 @@ def ranked_runs(mode, since_ts=0, sort="score", limit=None, with_track=False):
     return rows[:limit] if limit else rows
 
 
+SESSION_GAP = 30 * 60   # deux ouvertures du site à moins de 30 min d'écart = une seule connexion
+
+
 def add_visit(vid):
-    """Compte un visiteur (identifiant anonyme tiré au hasard par le navigateur), une seule fois."""
+    """Compte un visiteur (identifiant anonyme tiré au hasard par le navigateur) une seule fois,
+    et note chaque connexion (pour les statistiques de fréquentation)."""
     vid = re.sub(r"[^a-z0-9]", "", str(vid or "").lower())[:40]
     if len(vid) < 8:
         return False
+    now = int(time.time())
     with _LOCK, _conn() as c:
-        return c.execute("INSERT OR IGNORE INTO visits VALUES (?, ?)", (vid, int(time.time()))).rowcount == 1
+        new = c.execute("INSERT OR IGNORE INTO visits VALUES (?, ?)", (vid, now)).rowcount == 1
+        last = c.execute("SELECT MAX(ts) FROM connections WHERE vid = ?", (vid,)).fetchone()[0]
+        if last is None or now - last > SESSION_GAP:
+            c.execute("INSERT INTO connections VALUES (?, ?)", (vid, now))
+        return new
+
+
+def connections(limit=50000):
+    """Connexions récentes [horodatage, n° de visiteur anonyme] pour les statistiques (aucun identifiant transmis)."""
+    with _conn() as c:
+        rows = c.execute("SELECT vid, ts FROM connections ORDER BY ts DESC LIMIT ?", (limit,)).fetchall()
+    ids = {}
+    return [[r["ts"], ids.setdefault(r["vid"], len(ids))] for r in rows]
 
 
 def visits():

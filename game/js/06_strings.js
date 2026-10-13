@@ -2,6 +2,7 @@
 //  TEXTES DE L'INTERFACE — français, anglais, allemand, italien
 // ================================================================
 Object.assign(I18N.fr, {
+ tr_title: "Fréquentation du site", tr_day: "Aujourd'hui", tr_week: "Cette semaine", tr_all: "Historique", tr_conns: "Connexions", tr_unique: "Visiteurs différents", tr_total: "Visiteurs depuis le lancement", tr_peak: "Pic", tr_peak_hour: "Pic de fréquentation aujourd'hui : {h}", tr_peak_day: "Jour le plus fréquenté cette semaine : {d}", tr_peak_week: "Semaine la plus fréquentée : {w}", tr_weekname: "semaine", tr_empty: "Pas encore de connexion sur cette période.",
  kite_steer_help: "<b>Pour piloter le kite</b> : après l'avoir envoyé en l'air avec la touche Espace, appuie longuement sur <kbd>←</kbd> ou <kbd>→</kbd> de ton clavier : le kite a un peu d'inertie mais va peu à peu descendre dans la fenêtre.",
   s_vmax: "Vitesse max", podium_rule_vmax: "Podium SP80 : vitesse de pointe atteinte pendant la traversée, la plus haute gagne.", end_rank_vmax: "rang {r} sur {n} en vitesse de pointe",
  ssb_motor_short: "En panne",
@@ -103,6 +104,7 @@ Object.assign(I18N.fr, {
 });
 
 Object.assign(I18N.en, {
+ tr_title: "Site traffic", tr_day: "Today", tr_week: "This week", tr_all: "All time", tr_conns: "Connections", tr_unique: "Unique visitors", tr_total: "Visitors since launch", tr_peak: "Peak", tr_peak_hour: "Busiest hour today: {h}", tr_peak_day: "Busiest day this week: {d}", tr_peak_week: "Busiest week: {w}", tr_weekname: "week", tr_empty: "No connections in this period yet.",
  kite_steer_help: "<b>To fly the kite</b>: once you've launched it with the Space key, press and hold <kbd>←</kbd> or <kbd>→</kbd> on your keyboard: the kite has a little inertia but will gradually come down into the window.",
   s_vmax: "Top speed", podium_rule_vmax: "SP80 podium: peak speed reached during the crossing, highest wins.", end_rank_vmax: "rank {r} of {n} for top speed",
  ssb_motor_short: "Failed",
@@ -204,6 +206,7 @@ Object.assign(I18N.en, {
 });
 
 Object.assign(I18N.de, {
+ tr_title: "Besucherstatistik", tr_day: "Heute", tr_week: "Diese Woche", tr_all: "Gesamt", tr_conns: "Verbindungen", tr_unique: "Verschiedene Besucher", tr_total: "Besucher seit dem Start", tr_peak: "Spitze", tr_peak_hour: "Meistbesuchte Stunde heute: {h}", tr_peak_day: "Meistbesuchter Tag dieser Woche: {d}", tr_peak_week: "Meistbesuchte Woche: {w}", tr_weekname: "Woche", tr_empty: "Noch keine Verbindungen in diesem Zeitraum.",
  kite_steer_help: "<b>Kite steuern</b>: Sobald du ihn mit der Leertaste gestartet hast, halte <kbd>←</kbd> oder <kbd>→</kbd> auf deiner Tastatur gedrückt: der Kite ist etwas träge, sinkt aber nach und nach ins Windfenster.",
   s_vmax: "Höchsttempo", podium_rule_vmax: "SP80-Podest: Spitzentempo während der Überfahrt, das höchste gewinnt.", end_rank_vmax: "Rang {r} von {n} beim Höchsttempo",
  ssb_motor_short: "Defekt",
@@ -305,6 +308,7 @@ Object.assign(I18N.de, {
 });
 
 Object.assign(I18N.it, {
+ tr_title: "Frequentazione del sito", tr_day: "Oggi", tr_week: "Questa settimana", tr_all: "Sempre", tr_conns: "Connessioni", tr_unique: "Visitatori diversi", tr_total: "Visitatori dal lancio", tr_peak: "Picco", tr_peak_hour: "Ora di punta oggi: {h}", tr_peak_day: "Giorno più frequentato questa settimana: {d}", tr_peak_week: "Settimana più frequentata: {w}", tr_weekname: "settimana", tr_empty: "Ancora nessuna connessione in questo periodo.",
  kite_steer_help: "<b>Per pilotare il kite</b>: dopo averlo lanciato con la barra spaziatrice, tieni premuto <kbd>←</kbd> o <kbd>→</kbd> sulla tastiera: il kite ha un po' d'inerzia ma scenderà a poco a poco nella finestra.",
   s_vmax: "Velocità max", podium_rule_vmax: "Podio SP80: velocità di punta raggiunta nella traversata, vince la più alta.", end_rank_vmax: "posizione {r} su {n} per velocità di punta",
  ssb_motor_short: "Guasto",

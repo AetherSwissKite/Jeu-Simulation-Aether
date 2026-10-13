@@ -36,7 +36,7 @@ function init() {
   const saved = store.get("aether.lang");
   setLang(I18N[saved] && Object.keys(I18N[saved]).length ? saved : "fr", true);
   if (PLAYER.name) { $("playerChip").hidden = false; $("playerChip").textContent = PLAYER.team ? `${PLAYER.name} · ${PLAYER.team}` : PLAYER.name; }
-  langListeners.push(showVisits, () => { if (VIEW === "board") renderRoutes(); });
+  langListeners.push(showVisits, () => { if (VIEW === "board") { renderRoutes(); renderTraffic(); } });
   goView("home");
   requestAnimationFrame(() => drawCards());
   new ResizeObserver(() => drawCards()).observe($("viewHome"));

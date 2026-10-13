@@ -51,6 +51,7 @@ window.addEventListener("message", ev => {
     }
     if (m.routes && typeof m.routes === "object") BOARD.routes = m.routes;
     if (Number.isFinite(m.visits)) { BOARD.visits = m.visits; showVisits(); }
+    if (Array.isArray(m.conns)) { BOARD.conns = m.conns.filter(c => Array.isArray(c) && Number.isFinite(c[0])); if (VIEW === "board") renderTraffic(); }
     if (m.lang && m.lang !== LANG) setLang(m.lang, true);
     renderBoards();
     if (VIEW === "board") renderRoutes();
@@ -290,4 +291,74 @@ function drawRouteMap(cv, tracks, range) {
     ctx.beginPath(); ctx.moveTo(X(track[i - 1][0]), Y(track[i - 1][1])); ctx.lineTo(X(track[i][0]), Y(track[i][1])); ctx.stroke();
   }
   return [vmin, vmax];
+}
+
+// ---------------- Fréquentation du site (page Classements) ----------------
+// Chaque connexion = [horodatage, n° de visiteur anonyme]. Heures et jours dans le fuseau du navigateur.
+BOARD.trPeriod = "day"; BOARD.conns = BOARD.conns || [];
+function weekStart(d) { const m = new Date(d); m.setHours(0, 0, 0, 0); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; }
+function isoWeek(d) {   // numéro de semaine ISO 8601
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())), day = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - day);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return [t.getUTCFullYear(), Math.ceil(((t - y0) / 864e5 + 1) / 7)];
+}
+function trafficBins(period) {
+  const now = new Date(), list = BOARD.conns.map(([ts, v]) => ({ d: new Date(ts * 1000), v }));
+  if (period === "day") {
+    const d0 = new Date(now); d0.setHours(0, 0, 0, 0);
+    const sel = list.filter(c => c.d >= d0), bins = Array.from({ length: 24 }, (_, h) => ({ label: `${h}h`, n: 0 }));
+    sel.forEach(c => bins[c.d.getHours()].n++);
+    return { sel, bins, peakFmt: b => T("tr_peak_hour", { h: b.label }) };
+  }
+  if (period === "week") {
+    const w0 = weekStart(now), sel = list.filter(c => c.d >= w0);
+    const names = Array.from({ length: 7 }, (_, i) => { const d = new Date(w0); d.setDate(d.getDate() + i); return d.toLocaleDateString(LOCALES[LANG], { weekday: "short", day: "numeric" }); });
+    const bins = names.map(label => ({ label, n: 0 }));
+    sel.forEach(c => bins[(c.d.getDay() + 6) % 7].n++);
+    return { sel, bins, peakFmt: b => T("tr_peak_day", { d: b.label }) };
+  }
+  // historique : une barre par semaine ISO, de la première connexion à aujourd'hui
+  const sel = list;
+  if (!sel.length) return { sel, bins: [], peakFmt: () => "" };
+  const first = weekStart(new Date(Math.min(...sel.map(c => c.d)))), bins = [], idx = new Map();
+  for (let w = new Date(first); w <= now; w.setDate(w.getDate() + 7)) {
+    const [y, n] = isoWeek(w); idx.set(`${y}-${n}`, bins.length);
+    bins.push({ label: `S${n}`, full: `${T("tr_weekname")} ${n} (${w.toLocaleDateString(LOCALES[LANG], { day: "numeric", month: "short" })})`, n: 0 });
+  }
+  sel.forEach(c => { const [y, n] = isoWeek(c.d), i = idx.get(`${y}-${n}`); if (i !== undefined) bins[i].n++; });
+  return { sel, bins, peakFmt: b => T("tr_peak_week", { w: b.full }) };
+}
+function renderTraffic() {
+  const seg = $("trSeg"); if (!seg) return;
+  seg.querySelectorAll("button").forEach(b => { b.classList.toggle("on", b.dataset.v === BOARD.trPeriod); b.onclick = () => { BOARD.trPeriod = b.dataset.v; renderTraffic(); }; });
+  const { sel, bins, peakFmt } = trafficBins(BOARD.trPeriod);
+  const peak = bins.reduce((a, b) => (b.n > (a ? a.n : 0) ? b : a), null);
+  const uniq = new Set(sel.map(c => c.v)).size;
+  const kpi = (k, v) => `<div><small>${T(k)}</small><b>${v}</b></div>`;
+  $("trKpis").innerHTML = kpi("tr_conns", fmt0(sel.length)) + kpi("tr_unique", fmt0(uniq)) + kpi("tr_total", fmt0(BOARD.visits || 0))
+    + kpi("tr_peak", peak && peak.n ? `${peak.label} · ${fmt0(peak.n)}` : "—");
+  $("trNote").textContent = peak && peak.n ? peakFmt(peak) : T("tr_empty");
+  requestAnimationFrame(() => drawTraffic($("trChart"), bins, peak));
+}
+function drawTraffic(cv, bins, peak) {
+  const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  if (r.width < 10) return;
+  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const w = r.width, h = r.height, pl = 30, pb = 22, pt = 14;
+  ctx.clearRect(0, 0, w, h);
+  ctx.font = '500 9.5px "JetBrains Mono", monospace'; ctx.fillStyle = "#8a8fa8";
+  if (!bins.length) { ctx.textAlign = "center"; ctx.fillText(T("tr_empty"), w / 2, h / 2); return; }
+  const mx = Math.max(1, ...bins.map(b => b.n)), bw = (w - pl - 6) / bins.length;
+  ctx.strokeStyle = "rgba(38,43,69,.08)";
+  for (const f of [0.5, 1]) { const y = h - pb - (h - pb - pt) * f; ctx.beginPath(); ctx.moveTo(pl, y); ctx.lineTo(w - 4, y); ctx.stroke(); ctx.textAlign = "right"; ctx.fillText(fmt0(mx * f), pl - 4, y + 3); }
+  const every = Math.ceil(bins.length / Math.max(1, Math.floor((w - pl) / 42)));
+  bins.forEach((b, i) => {
+    const bh = (h - pb - pt) * b.n / mx, x = pl + i * bw;
+    ctx.fillStyle = b === peak && b.n ? "#1f3a68" : "#9fb4d6";
+    ctx.fillRect(x + Math.min(2, bw * 0.15), h - pb - bh, Math.max(1, bw - Math.min(4, bw * 0.3)), bh);
+    if (b.n && bw > 14) { ctx.fillStyle = "#262b45"; ctx.textAlign = "center"; ctx.fillText(String(b.n), x + bw / 2, h - pb - bh - 3); }
+    if (i % every === 0) { ctx.fillStyle = "#8a8fa8"; ctx.textAlign = "center"; ctx.fillText(b.label, x + bw / 2, h - 8); }
+  });
 }

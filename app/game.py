@@ -75,7 +75,7 @@ def _on_visit():
 @st.fragment(run_every=15)
 def _live_bridge():
     """Rafraîchi toutes les 15 s : chaque joueur voit arriver les scores des autres sans recharger la page."""
-    _bridge(data={"runs": storage.list_runs(), "ghosts": storage.ghosts(), "routes": storage.routes(), "visits": storage.visits(),
+    _bridge(data={"runs": storage.list_runs(), "ghosts": storage.ghosts(), "routes": storage.routes(), "visits": storage.visits(), "conns": storage.connections(),
                   "lang": st.session_state.get("lang", "fr")},
             key="aether_bridge", on_score_change=_on_score, on_lang_change=_on_lang, on_visit_change=_on_visit)
 

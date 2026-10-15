@@ -171,7 +171,7 @@ def page_physics(pdf):
         ("Taux de lacet max", "17 °/s", "9,5 °/s", "la barre n'agit qu'avec de la vitesse"),
         ("Moteur · résistance", "500 kW · 80 kN", "idem", "R = 4,2 kN/(m/s)² · u²"),
         ("Carburant · CO$_2$", "0,215 kg/kWh", "3,17 kg/kg", "CO$_2$ évité = poussée utile du kite"),
-        ("Mode Turbo-Pédalo (kite 25 m²)", "≈ 90 s", "jusqu'à ~200 nd", "sans moteur, foils vers 20 nd, classé au temps"),
+        ("Mode Turbo-Pédalo (kite 25 m²)", "≈ 30 s", "jusqu'à ~200 nd", "sans moteur, foils vers 20 nd, classé au temps"),
         ("Mode SSB (Lobst'Air)", "≈ 2 min 30", "~25 nd + kite", "foils vers 12 nd, panne en tempête, pirate"),
     ]
     tx, ty, cw = 4, 38, [24, 15, 23, 30]

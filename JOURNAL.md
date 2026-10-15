@@ -47,6 +47,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 35 | Lien vers aetherswisskite.ch sur l'accueil | 10-13 12:28:51 | 10-13 12:29:52 | 1 min 01 s |
 | 36 | Minimum 1 kg de CO₂ (barges), retrait de la course de MXL | 10-13 19:45:37 | 10-13 19:46:31 | 0 min 54 s |
 | 37 | Le mode de vitesse devient le Turbo-Pédalo (jusqu'à 200 nd) | 10-15 16:48:48 | 10-15 17:14:26 | 25 min 38 s |
+| 38 | Turbo-Pédalo : traversée en ~30 s, effets de vitesse | 10-15 17:17:32 | 10-15 17:21:08 | 3 min 36 s |
 
 ---
 
@@ -697,4 +698,20 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - migration testée : 2 anciennes courses retrouvées sous `pedalo` ; une pointe à 213,8 nœuds enregistrée et classée ;
   - débutant, expert et SSB inchangés ; aucune erreur JavaScript.
 - **Reste** : l'historique git (anciens commits) contient toujours l'ancien nom. Le réécrire exige une réécriture forcée de l'historique sur GitHub, à décider séparément.
+
+## 38. Turbo-Pédalo : traversée en ~30 s et sensation de vitesse
+- **Heure du prompt** : 2026-10-15 17:17:32 · **Heure du résultat** : 2026-10-15 17:21:08 · **Temps de calcul** : 3 min 36 s
+- **Demande** : qu'on voie qu'on va beaucoup plus vite en pédalo, et que la traversée dure environ 30 secondes.
+- **Modifications** :
+  - **Durée** : temps de traversée nominal de 30 s au lieu de 90 (le décor défile 3 fois plus vite). La météo, les risées, la tempête, les vapeurs CGN et le pirate restent calés sur l'avancement : même scénario, joué en accéléré.
+  - **Accélérations plus franches** : masse effective 1,6 au lieu de 3.
+  - **Sensation de vitesse** (à partir de ~30 nœuds, croissante jusqu'à ~140 nœuds) :
+    - traits de vitesse qui jaillissent du point de fuite, plus nombreux et plus longs avec la vitesse, à double trait sombre et blanc pour se voir sur le ciel comme sur l'eau ;
+    - léger voile clair sur les bords de l'écran ;
+    - champ de vision élargi jusqu'à +16° (effet tunnel) en vue 3ᵉ personne ;
+    - tremblement de la caméra à haute vitesse.
+    - Le nombre de traits baisse automatiquement en qualité graphique basse.
+  - **Serveur** : temps minimum accepté abaissé à 10 s pour ce mode.
+  - **Textes** : carte d'accueil « ≈ 30 s » dans les 4 langues ; schéma PDF mis à jour.
+- **Vérification** (pilote de test) : traversée en 32,8 puis 33,1 s, 132 nœuds de moyenne, pointe à 214 nœuds, 60 images/s ; traits de vitesse visibles en vue 3ᵉ personne et en vue pilote. Aucune erreur JavaScript.
 

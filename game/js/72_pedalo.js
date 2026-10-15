@@ -138,3 +138,29 @@ function drawPedaloCockpit(ctx, w, h, storm, t) {
   }
   ctx.restore();
 }
+
+// --- Effets de vitesse : traits qui jaillissent du point de fuite, plus nombreux et plus longs avec la vitesse,
+// et léger voile sur les bords de l'écran (seulement au-delà de ~40 nd ; nombre de traits réduit en qualité basse)
+function drawSpeedLines(ctx, cam, B, t) {
+  const k = clamp((B.u / KN - 30) / 110, 0, 1);
+  if (k <= 0 || RACE.state !== "run") return;
+  const w = cam.w, h = cam.h, vp = cam.p(B.x + Math.sin(rad(B.hdg)) * 2000, B.y + Math.cos(rad(B.hdg)) * 2000, 0);
+  const cx = Math.abs(vp[3]) < 90 ? vp[0] : w / 2, cy = clamp(Math.abs(vp[3]) < 90 ? vp[1] : h * 0.45, h * 0.2, h * 0.7);
+  const n = Math.round((QUALITY.level > 0 ? 110 : 55) * (0.3 + 0.7 * k)), R = Math.hypot(w, h) / 2;
+  ctx.save(); ctx.lineCap = "round";
+  for (let i = 0; i < n; i++) {
+    const a = i * 2.39996 + Math.sin(i * 12.9898) * 0.3;            // angles répartis (nombre d'or)
+    const ph = (t * (1.2 + 2.2 * k) + (i * 0.618) % 1) % 1;          // avance le long du rayon
+    const r0 = R * (0.18 + ph * 0.9), r1 = r0 + R * (0.06 + 0.22 * k) * ph;
+    const x0 = cx + Math.cos(a) * r0, y0 = cy + Math.sin(a) * r0, x1 = cx + Math.cos(a) * r1, y1 = cy + Math.sin(a) * r1;
+    // trait sombre dessous (visible sur le ciel clair) puis trait blanc dessus (visible sur l'eau)
+    ctx.strokeStyle = `rgba(20,40,70,${(0.12 + 0.3 * k) * ph})`; ctx.lineWidth = 2.5 + 3 * ph * k;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    ctx.strokeStyle = `rgba(255,255,255,${(0.25 + 0.6 * k) * ph})`; ctx.lineWidth = 1.2 + 2 * ph * k;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  }
+  const g = ctx.createRadialGradient(cx, cy, R * 0.45, cx, cy, R * 1.15);
+  g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(1, `rgba(215,232,248,${0.45 * k})`);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+}

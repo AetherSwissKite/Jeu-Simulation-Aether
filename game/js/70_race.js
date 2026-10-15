@@ -8,9 +8,9 @@ const BARGE = { CD: 4.2, FE: 80, PMAX: 500, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, 
 const MODES = {
   beginner: { TN: 60, M: 80, RMAX: 17, TAUR: 0.45, TMAX: 95, camD: 58, camH: 19 },
   expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 115, camD: 62, camH: 20 },
-  // Turbo-pédalo : ~1 min 30 à ~130 nd de moyenne (vent de travers propre au mode, voir WIND_KEYS_PEDALO) ;
+  // Turbo-pédalo : ~30 s à ~140 nd de moyenne (temps très compressé : le décor défile 3 fois plus vite qu'à 1 min 30) (vent de travers propre au mode, voir WIND_KEYS_PEDALO) ;
   // masse effective faible = accélérations violentes
-  pedalo: { TN: 90, VNOM: 130, M: 3, RMAX: 22, TAUR: 0.2, TMAX: 1600, camD: 15, camH: 4.5, boat: "pedalo", half: 2.2 },
+  pedalo: { TN: 30, VNOM: 130, M: 1.6, RMAX: 22, TAUR: 0.2, TMAX: 1600, camD: 15, camH: 4.5, boat: "pedalo", half: 2.2 },
   // SSB (Lobst'Air) : foiler électrique ~25 nd ; VNOM ≈ vitesse moyenne réelle (météo calée sur l'avancement), ~2 min 30
   ssb: { TN: 150, VNOM: 24, M: 2.4, RMAX: 16, TAUR: 0.3, TMAX: 120, camD: 26, camH: 7.5, boat: "ssb", half: 3.6 }
 };
@@ -251,10 +251,13 @@ function computeCamera(dt, w, h) {
   const elB = deg(Math.atan2(3 - z, Math.hypot(tx - x, ty - y)));
   // champ vertical nécessaire : barge aux 3/4 bas de l'écran, kite à 15 % du haut ; on dézoome au besoin
   const fracB = 0.62 + 0.06 * FRAME.wt, needHalf = clamp((FRAME.elK - elB) / (fracB - 0.1) * (w / 2) / h, 50, 88);
-  FRAME.half = lerp(FRAME.half, lerp(50, needHalf, FRAME.wt), damp(2, dt));
+  // turbo-pédalo : le champ de vision s'élargit avec la vitesse (effet « tunnel »)
+  const fovBoost = cfg().boat === "pedalo" ? 16 * clamp(B.u / 100, 0, 1) : 0;
+  FRAME.half = lerp(FRAME.half, lerp(50, needHalf, FRAME.wt) + fovBoost, damp(2, dt));
   half = FRAME.half;
   pitch = lookPitch({ x, y, z }, tx, ty, 3, h, (w / 2) / half, fracB);
   if (RACE.shake > 0) { yaw += (Math.random() - 0.5) * RACE.shake * 1.5; pitch += (Math.random() - 0.5) * RACE.shake; }
+  if (cfg().boat === "pedalo" && RACE.state === "run") { const k = Math.pow(clamp(B.u / 100, 0, 1.1), 2), t = performance.now() / 1000; yaw += Math.sin(t * 37) * 0.35 * k; pitch += Math.sin(t * 43 + 1) * 0.3 * k; }   // tremblement à haute vitesse
   roll = B.heelR * 0.15;
   return makeCam(w, h, x, y, z, yaw, pitch, roll, half);
 }
@@ -285,6 +288,7 @@ function renderWorld(dt) {
   const info = RACE.mode === "attract" ? drawBarge(ctx, cam, B, L) : cfg().boat === "pedalo" ? drawPedalo(ctx, cam, B, L, dt) : cfg().boat === "ssb" ? drawSSB(ctx, cam, B, L, dt) : drawBarge(ctx, cam, B, L);
   if (info.exhaust) drawSmoke(ctx, cam, dt, info.exhaust);
   drawRaceKite(ctx, cam, dt, info);
+  if (cfg().boat === "pedalo" && RACE.mode !== "attract") drawSpeedLines(ctx, cam, B, t);   // traits de vitesse
   if (storm > 0.02) {
     ctx.fillStyle = `rgba(60,70,92,${0.28 * storm})`; ctx.fillRect(-w * 0.3, -h * 0.3, w * 1.6, h * 1.6);
     if (Math.sin(tau * 211) > 0.995 || RACE.flash > 0) RACE.flash = RACE.flash > 0 ? RACE.flash - dt : 0.18;

@@ -7,13 +7,13 @@ const DASH_CELLS = [
   { id: "speed", tone: "sky", label: "d_speed", hud: true },
   { id: "wind", tone: "mint", label: "d_wind", hud: true },
   { id: "thrust", tone: "rose", label: "d_kite", hud: true },
-  { id: "engine", tone: "peach", label: "d_engine", no: "sp80" },
+  { id: "engine", tone: "peach", label: "d_engine", no: "pedalo" },
   { id: "vmg", tone: "peach", label: "d_vmg", only: "foiler" },
   { id: "kite", tone: "rose", label: "kb_tension" },
-  { id: "share", tone: "lilac", label: "d_share", no: ["sp80", "ssb"] },
+  { id: "share", tone: "lilac", label: "d_share", no: ["pedalo", "ssb"] },
   { id: "foil", tone: "lilac", label: "d_foil", only: "foiler" },
-  { id: "co2", tone: "sand", label: "d_co2", no: ["sp80", "ssb"] },
-  { id: "vmax", tone: "sand", label: "d_vmax", only: "sp80" },
+  { id: "co2", tone: "sand", label: "d_co2", no: ["pedalo", "ssb"] },
+  { id: "vmax", tone: "sand", label: "d_vmax", only: "pedalo" },
   { id: "heel", tone: "sky", label: "d_heel" },
   { id: "pen", tone: "peach", label: "d_pen" },
   { id: "tchart", tone: "rose", label: "d_thrust_chart", chart: true },
@@ -153,9 +153,9 @@ function updateDash() {
   // en haut à gauche
   gArc(DASH.cv.time, f, [[0, "#a8e6d3"], [1, "#3d5f94"]], { text: `${fmt0(f * 100)}` });
   set("time", fmtClock(RACE.t), `${RACE.pen ? `+${fmt1(RACE.pen)} s · ` : ""}${fmt1((1 - f) * COURSE_LEN / SCALE)} km`);
-  const sp = RACE.mode === "sp80", isSsb = RACE.mode === "ssb", vScale = sp ? 90 : isSsb ? 30 : 12;
-  // SP80 : cadran jusqu'à 90 nd, repère au record du monde à la voile (65,45 nd)
-  gArc(DASH.cv.speed, kn / vScale, SPEED_STOPS, { needle: true, zones: sp ? [[65.45 / 90, 1, "#c8102e"]] : isSsb ? [[12 / 30, 1, "#d23b2f"]] : [[8.5 / 12, 1, "#3d5f94"]] });   // SSB : repère au décollage des foils (~12 nd)
+  const sp = RACE.mode === "pedalo", isSsb = RACE.mode === "ssb", vScale = sp ? 220 : isSsb ? 30 : 12;
+  // turbo-pédalo : cadran jusqu'à 220 nd, repère au record du monde à la voile (65,45 nd)
+  gArc(DASH.cv.speed, kn / vScale, SPEED_STOPS, { needle: true, zones: sp ? [[65.45 / 220, 1, "#f08a3c"]] : isSsb ? [[12 / 30, 1, "#d23b2f"]] : [[8.5 / 12, 1, "#3d5f94"]] });   // SSB : repère au décollage des foils (~12 nd)
   set("speed", `${fmt1(kn)} ${T("u_kn")}`, sp || isSsb ? `${fmt0(kn * 1.852)} km/h` : `⚙ ${fmt0(Math.max(0, RACE.Fe || 0))} kN`);
   gWind(DASH.cv.wind, norm180(wd.from - B.hdg), wd.kn);
   set("wind", `${fmt0(wd.kn)} ${T("u_kn")} ${cardinal(wd.from)}`, wd.gust > 0.3 ? `💨 ${T("d_gust")}` : wd.storm > 0.3 ? `⛈ ${T("d_storm")}` : "");
@@ -188,12 +188,12 @@ function updateDash() {
   }
   if (sp) {
     const c = coursePoint(clamp(RACE.f, 0, 1) * COURSE_LEN), vmg = kn * Math.cos(rad(B.hdg - c.bearing));
-    gArc(DASH.cv.vmg, Math.max(0, vmg) / 60, SPEED_STOPS, { needle: true });
+    gArc(DASH.cv.vmg, Math.max(0, vmg) / 200, SPEED_STOPS, { needle: true });
     set("vmg", `${fmt1(vmg)} ${T("u_kn")}`, `${fmt0(Math.abs(norm180(wd.from - B.hdg)))}° ${T("d_twa")}`);
-    const foil = (RACE.sp80 && RACE.sp80.foil) || 0;
+    const foil = (RACE.pedalo && RACE.pedalo.foil) || 0;
     gDonut(DASH.cv.foil, foil, "#c8102e", `${fmt0(foil * 100)}`);
     set("foil", T(foil > 0.5 ? "foil_on" : "foil_off"), T("foil_note"));
-    gArc(DASH.cv.vmax, RACE.maxKn / 90, SPEED_STOPS, { zones: [[65.45 / 90, 1, "#c8102e"]], text: `${fmt0(RACE.maxKn)}` });
+    gArc(DASH.cv.vmax, RACE.maxKn / 220, SPEED_STOPS, { zones: [[65.45 / 220, 1, "#f08a3c"]], text: `${fmt0(RACE.maxKn)}` });
     set("vmax", `${fmt1(RACE.maxKn)} ${T("u_kn")}`, `${T("record")} 65,45`);
   }
   // graphiques d'évolution (30 dernières secondes, seulement pendant la course)

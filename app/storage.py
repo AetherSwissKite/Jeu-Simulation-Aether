@@ -18,9 +18,9 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 DB_PATH = Path(__file__).resolve().parent.parent / "aether_scores.db"
-MODES = ("beginner", "expert", "sp80", "ssb")   # sp80 et ssb : classement au temps réel (pas de CO₂)
+MODES = ("beginner", "expert", "pedalo", "ssb")   # pedalo et ssb : classement au temps réel (pas de CO₂)
 # temps de course plausibles (s) : en dessous, la course est refusée (vitesse impossible pour la barge)
-TIME_RANGE = {"beginner": (35, 1800), "expert": (105, 1800), "sp80": (30, 1800), "ssb": (40, 1800)}
+TIME_RANGE = {"beginner": (35, 1800), "expert": (105, 1800), "pedalo": (15, 1800), "ssb": (40, 1800)}
 _LOCK = threading.Lock()
 _CTRL = re.compile(r"[\x00-\x1f\x7f]")
 SCHEMA = """
@@ -67,7 +67,7 @@ def init():
         if not row or row[0] != DATA_VERSION:
             c.execute("DELETE FROM runs")
             c.execute("INSERT OR REPLACE INTO meta VALUES ('data_version', ?)", (DATA_VERSION,))
-        # colonne ajoutée sans perte de données : vitesse max de pointe (classement SP80) ; les anciennes courses
+        # colonne ajoutée sans perte de données : vitesse max de pointe (classement turbo-pédalo) ; les anciennes courses
         # la reprennent de leur trace (échantillonnée toutes les 0,5 s)
         cols = {r[1] for r in c.execute("PRAGMA table_info(runs)").fetchall()}
         if "max_kn" not in cols:
@@ -79,6 +79,9 @@ def init():
         if not c.execute("SELECT 1 FROM meta WHERE key = 'connections_seeded'").fetchone():
             c.execute("INSERT INTO connections (vid, ts) SELECT vid, ts FROM visits WHERE vid NOT IN (SELECT vid FROM connections)")
             c.execute("INSERT INTO meta VALUES ('connections_seeded', 'done')")
+        # 15.10.2026 : l'ancien mode de vitesse devient le turbo-pédalo ; ses courses sont conservées sous le nouveau nom
+        for table in ("runs", "plays"):
+            c.execute(f"UPDATE {table} SET mode = 'pedalo' WHERE mode = ?", ("sp" + "80",))
         # nettoyages ponctuels demandés : exécutés une seule fois par base (les nouvelles courses ne sont pas touchées)
         # 13.10.2026 : retrait de la course de MXL (expert, 13/10/2026 17h24, 0 kg de CO₂), puis plancher de 1 kg
         # appliqué aux courses de barge déjà enregistrées à 0 kg
@@ -121,9 +124,9 @@ def add_run(entry):
         track = []
         for q in (entry.get("track") or [])[:4000]:
             if isinstance(q, (list, tuple)) and len(q) >= 3:
-                track.append([round(_num(q[0], -1e5, 1e5), 1), round(_num(q[1], -1e5, 1e5), 1), round(_num(q[2], -20, 120), 2)])
+                track.append([round(_num(q[0], -1e5, 1e5), 1), round(_num(q[1], -1e5, 1e5), 1), round(_num(q[2], -20, 260), 2)])
         speeds = [q[2] for q in track]
-        max_kn = round(max(_num(entry.get("maxKn", 0) or 0, 0, 120), max(speeds) if speeds else 0), 2)
+        max_kn = round(max(_num(entry.get("maxKn", 0) or 0, 0, 260), max(speeds) if speeds else 0), 2)
         row = (
             clean_text(entry.get("id"), 40) or f"run-{time.time_ns()}",
             entry["mode"], name, clean_text(entry.get("team"), 20),
@@ -183,10 +186,10 @@ def best_runs(mode, since_ts=0, limit=None, with_track=False):
 
 def ghosts():
     """Tracés des 3 meilleures tentatives historiques de chaque mode (touche T dans le jeu), selon le même critère
-    que le podium : indice CO₂ × temps pour les barges, temps réel pour le SP80 et le SSB."""
+    que le podium : indice CO₂ × temps pour les barges, temps réel pour le turbo-pédalo et le SSB."""
     out = {}
     for m in MODES:
-        rows = [r for r in ranked_runs(m, sort="time" if m in ("sp80", "ssb") else "score", with_track=True) if len(r["track"]) > 1][:3]
+        rows = [r for r in ranked_runs(m, sort="time" if m in ("pedalo", "ssb") else "score", with_track=True) if len(r["track"]) > 1][:3]
         out[m] = [{"name": r["name"], "total": r["total_s"], "track": r["track"]} for r in rows]
     return out
 
@@ -260,7 +263,7 @@ def routes(limit=50):
     out = {}
     for m in MODES:
         rows = ranked_runs(m, sort="score", limit=limit, with_track=True)
-        if m == "sp80":   # SP80 : aussi les meilleures vitesses de pointe (second classement)
+        if m == "pedalo":   # turbo-pédalo : aussi les meilleures vitesses de pointe (second classement)
             seen = {r["id"] for r in rows}
             rows += [r for r in ranked_runs(m, sort="vmax", limit=limit, with_track=True) if r["id"] not in seen]
         out[m] = [{"id": r["id"], "name": r["name"], "team": r["team"], "ts": r["ts"], "total": r["total_s"], "co2": r["co2_kg"], "vmax": r["max_kn"], "track": r["track"]}

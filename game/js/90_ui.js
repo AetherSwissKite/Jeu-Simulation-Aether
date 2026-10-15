@@ -46,7 +46,7 @@ function goView(v) {
   } else if (race) {
     $("raceSlot").appendChild(world);
     RACE.mode = v; resetRace(); RACE.state = "name";
-    $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin");
+    $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "pedalo" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin");
     openNameForm();
   } else if (v === "board") {
     $("heroSlot").appendChild(world);
@@ -187,13 +187,13 @@ function helpPages(mode) {
     </div><p class="note">${T("ctrl_ssb_note")}</p>`,
     `<h2>${T("read_title")}</h2>${read(["rr_hud", "rr_progress", "rr_minimap", "rr_wind", "rr_kitebox", "rr_ssb_dash"])}<p>${T("rr_ssb")}</p>`
   ];
-  if (mode === "sp80") return [
+  if (mode === "pedalo") return [
     `<h2>${T("hp_title")}</h2><p>${T("hp_text")}</p>${rules(["hp_r1", "hp_r2", "hp_r3"])}`,
     `<h2>${T("ctrl_title")}</h2><div class="help-grid">
-      ${keyRow(["Q", "D"], T("k_helm_sp80"))}${keyRow(["←", "→"], T("k_kite_steer"))}${keyRow(["↑", "↓"], T("k_kite_trim"))}
-      ${keyRow([T("key_space"), "E"], T("k_kite_toggle"))}${keyRow(["V"], T("k_view_sp80"))}${keyRow(["F"], T("k_window"))}${keyRow(["T"], T("k_ghost"))}${common.join("")}
-    </div><p class="note">${T("ctrl_sp80_note")}</p>`,
-    `<h2>${T("read_title")}</h2>${read(["rr_hud", "rr_progress", "rr_minimap", "rr_wind", "rr_kitebox", "rr_sp80_dash"])}<p>${T("rr_sp80")}</p>`
+      ${keyRow(["Q", "D"], T("k_helm_pedalo"))}${keyRow(["←", "→"], T("k_kite_steer"))}${keyRow(["↑", "↓"], T("k_kite_trim"))}
+      ${keyRow([T("key_space"), "E"], T("k_kite_toggle"))}${keyRow(["V"], T("k_view_pedalo"))}${keyRow(["F"], T("k_window"))}${keyRow(["T"], T("k_ghost"))}${common.join("")}
+    </div><p class="note">${T("ctrl_pedalo_note")}</p>`,
+    `<h2>${T("read_title")}</h2>${read(["rr_hud", "rr_progress", "rr_minimap", "rr_wind", "rr_kitebox", "rr_pedalo_dash"])}<p>${T("rr_pedalo")}</p>`
   ];
   const isE = mode === "expert";
   return [
@@ -233,7 +233,7 @@ function closeHelp() {
 langListeners.push(() => {
   if (overlay === "ovHelp") setHelpPage(helpPage);
   if (overlay === "ovName") { $("nameEyebrow").textContent = T("name_eyebrow", { mode: T("nav_" + RACE.mode) }); fillTeams(PLAYER.team); }
-  $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin");
+  $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "pedalo" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin");
   renderBoards(); drawCards();
 });
 
@@ -318,19 +318,20 @@ function drawCards() {
       ctx.fillStyle = "#5b7392"; ctx.beginPath(); ctx.moveTo(bx + L * 0.1, wl - lift - 16); ctx.lineTo(bx + L * 0.2, wl - lift - 26); ctx.lineTo(bx + L * 0.24, wl - lift - 16); ctx.fill();
       ctx.fillStyle = "#d23b2f"; ctx.font = `800 ${Math.round(h * 0.1)}px "Inter Tight", Arial, sans-serif`; ctx.fillText("LOBST'AIR", 10, h * 0.18);
       ctx.fillStyle = "#1f3a68"; ctx.font = `700 ${Math.round(h * 0.075)}px "Inter Tight", Arial, sans-serif`; ctx.fillText("☀ + H₂ · 25 kn", 10, h * 0.3);
-    } else if (kind === "sp80") {
-      // SP80 de profil, lancé sur l'eau, tracté par son kite noir
-      const sky = ctx.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, "#22324f"); sky.addColorStop(0.62, "#7d9cc2"); sky.addColorStop(0.63, "#3e6f8f"); sky.addColorStop(1, "#1f4762");
+    } else if (kind === "pedalo") {
+      // turbo-pédalo de plage lancé à pleine vitesse, tracté par son kite jaune
+      const sky = ctx.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, "#7cc4ef"); sky.addColorStop(0.62, "#d8eef8"); sky.addColorStop(0.63, "#3fa4c2"); sky.addColorStop(1, "#1f7593");
       ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
-      const bx = w * 0.34, by = h * 0.7, L = w * 0.42;
-      ctx.fillStyle = "rgba(255,255,255,.7)"; for (let i = 0; i < 12; i++) { ctx.beginPath(); ctx.arc(bx - L * 0.55 - i * 7, by - Math.sin(i / 11 * Math.PI) * h * 0.12, 2 + i * 0.6, 0, Math.PI * 2); ctx.fill(); }
-      ctx.fillStyle = "#16171c"; ctx.beginPath(); ctx.moveTo(bx - L / 2, by); ctx.quadraticCurveTo(bx - L * 0.1, by - h * 0.13, bx + L / 2, by - h * 0.02); ctx.lineTo(bx + L / 2, by + 2); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = "#c8102e"; ctx.fillRect(bx - L * 0.12, by - h * 0.085, L * 0.18, h * 0.06);
-      ctx.fillStyle = "#46597a"; ctx.beginPath(); ctx.ellipse(bx + L * 0.12, by - h * 0.1, L * 0.14, h * 0.035, -0.05, Math.PI, 0); ctx.fill();
-      ctx.strokeStyle = "#0d0e12"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(bx - L * 0.15, by - h * 0.1); ctx.lineTo(bx - L * 0.02, by - h * 0.2); ctx.stroke();
-      ctx.strokeStyle = "rgba(255,255,255,.6)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(bx - L * 0.02, by - h * 0.2); ctx.lineTo(w * 0.8, h * 0.24); ctx.stroke();
-      drawSP80Kite(ctx, w * 0.8, h * 0.24, h * 0.42, 0.35, 1);
-      ctx.fillStyle = "#fff"; ctx.font = `800 ${Math.round(h * 0.12)}px "Inter Tight", Arial, sans-serif`; ctx.fillText("80 kn", 10, h * 0.2);
+      const bx = w * 0.32, by = h * 0.72, L = w * 0.3;
+      ctx.fillStyle = "rgba(255,255,255,.75)"; for (let i = 0; i < 14; i++) { ctx.beginPath(); ctx.arc(bx - L * 0.6 - i * 7, by - Math.sin(i / 13 * Math.PI) * h * 0.14, 2 + i * 0.6, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = "#f4f6f8"; ctx.beginPath(); ctx.moveTo(bx - L / 2, by); ctx.lineTo(bx + L * 0.4, by); ctx.quadraticCurveTo(bx + L / 2, by - 2, bx + L / 2, by - h * 0.07); ctx.lineTo(bx - L / 2, by - h * 0.07); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#f08a3c"; ctx.fillRect(bx - L / 2, by - h * 0.045, L * 0.92, 2.5);
+      ctx.fillStyle = "#2bb3b1"; ctx.fillRect(bx - L * 0.4, by - h * 0.11, L * 0.7, h * 0.04);
+      ctx.fillStyle = "#f6c933"; ctx.fillRect(bx - L * 0.15, by - h * 0.2, L * 0.08, h * 0.1); ctx.fillRect(bx + L * 0.02, by - h * 0.2, L * 0.08, h * 0.1);
+      ctx.beginPath(); ctx.moveTo(bx - L * 0.4, by - h * 0.11); ctx.lineTo(bx - L * 0.62, by - h * 0.02); ctx.lineTo(bx - L * 0.58, by); ctx.lineTo(bx - L * 0.36, by - h * 0.08); ctx.fill();
+      ctx.strokeStyle = "rgba(40,50,70,.6)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(bx + L * 0.3, by - h * 0.13); ctx.lineTo(w * 0.8, h * 0.24); ctx.stroke();
+      drawPedaloKite(ctx, w * 0.8, h * 0.24, h * 0.42, 0.35, 1);
+      ctx.fillStyle = "#1f3a68"; ctx.font = `800 ${Math.round(h * 0.12)}px "Inter Tight", Arial, sans-serif`; ctx.fillText("200 kn", 10, h * 0.2);
     } else {
       ctx.fillStyle = "#f2f4f9"; ctx.fillRect(0, 0, w, h);
       const cx = w / 2, cy = h - 6, R = Math.min(w / 2 - 8, h - 12);

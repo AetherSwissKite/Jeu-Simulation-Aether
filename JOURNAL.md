@@ -32,10 +32,10 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 20 | Retour à la version d'avant les changements de vent | 10-12 00:03:19 | 10-12 00:03:39 | 0 min 20 s |
 | 21 | Retrait des temps de TJL en mode débutant | 10-12 00:06:47 | 10-12 00:07:23 | 0 min 36 s |
 | 22 | Remise à zéro de tout l'historique de course | 10-12 00:09:24 | 10-12 00:09:50 | 0 min 26 s |
-| 23 | Nouveau mode « Traversée SP80 » | 10-12 20:46:07 | 10-12 21:34:13 | 48 min 06 s |
-| 24 | Vent propre au SP80 (50–80 nd tout le parcours), lac plat | 10-12 21:40:11 | 10-12 21:50:31 | 10 min 20 s |
+| 23 | Nouveau mode « Traversée Turbo-Pédalo » | 10-12 20:46:07 | 10-12 21:34:13 | 48 min 06 s |
+| 24 | Vent propre au Turbo-Pédalo (50–80 nd tout le parcours), lac plat | 10-12 21:40:11 | 10-12 21:50:31 | 10 min 20 s |
 | 25 | Nouveau mode « Traversée SSB » (Lobst'Air) | 10-12 21:54:16 | 10-12 22:24:26 | 30 min 10 s |
-| 26 | Classement SP80 à la vitesse de pointe | 10-12 22:28:32 | 10-12 22:31:36 | 3 min 04 s |
+| 26 | Classement Turbo-Pédalo à la vitesse de pointe | 10-12 22:28:32 | 10-12 22:31:36 | 3 min 04 s |
 | 27 | Vitesse max non enregistrée en ligne : rechargement des modules | 10-12 22:35:35 | 10-12 22:39:47 | 4 min 12 s |
 | 28 | Descriptif SSB qui garde la surprise | 10-12 22:44:18 | 10-12 22:44:47 | 0 min 29 s |
 | 29 | Classement : toutes les tentatives affichées | 10-13 08:36:21 | 10-13 08:37:36 | 1 min 15 s |
@@ -46,6 +46,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 | 34 | Statistiques : parties lancées et terminées | 10-13 12:25:46 | 10-13 12:28:44 | 2 min 58 s |
 | 35 | Lien vers aetherswisskite.ch sur l'accueil | 10-13 12:28:51 | 10-13 12:29:52 | 1 min 01 s |
 | 36 | Minimum 1 kg de CO₂ (barges), retrait de la course de MXL | 10-13 19:45:37 | 10-13 19:46:31 | 0 min 54 s |
+| 37 | Le mode de vitesse devient le Turbo-Pédalo (jusqu'à 200 nd) | 10-15 16:48:48 | 10-15 17:14:26 | 25 min 38 s |
 
 ---
 
@@ -409,68 +410,63 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - **Navigateur** : les clés de stockage local (classement hors ligne, traces, scores en attente d'envoi) passent en v3, pour qu'aucun ancien score en attente ne soit renvoyé après la remise à zéro.
 - **Vérification** : test sur une base de copie en version 2 contenant deux courses : elles sont effacées au démarrage, le visiteur est gardé, et une nouvelle course est conservée aux redémarrages suivants.
 
-## 23. Nouveau mode « Traversée SP80 »
+## 23. Nouveau mode « Traversée Turbo-Pédalo »
 - **Heure du prompt** : 2026-10-12 20:46:07 · **Heure du résultat** : 2026-10-12 21:34:13 · **Temps de calcul** : 48 min 06 s
-- **Demande** : ajouter la « Traversée SP80 » sans toucher aux autres modes. Le SP80 est le trimaran de vitesse du projet sp80.ch (objectif 80 nœuds) avec son kite de 25 m². Même parcours, même météo, même carte, environ 1 min 30. Commandes : flèches pour le kite, Q/D pour le cap, Z/S désactivés (100 % voile). Vue 3ᵉ personne et vue pilote secouée. Physique réaliste mais jouable. Classement séparé au temps réel, intégré à la page Classements avec ses standards. Tutoriel dédié avec « Passer le tutoriel ». Toutes les langues. 30 à 60 images/s. Aucune perte de données.
-- **Recherche** :
-  - Le site sp80.ch était inaccessible (certificat expiré). J'ai utilisé la presse spécialisée : yacht.de, IEEE Spectrum, EPFL Actu, Mensgear, WatchPro.
-  - Le SP80 est un trimaran d'environ 10 × 7,5 m pour environ 1 t, conçu par des ingénieurs et étudiants de l'EPFL.
-  - Forme : coque centrale en goutte en carbone, deux cockpits en tandem sous verrière, bras courts en forme d'aile vers deux petits flotteurs, foil central ventilé, petit safran avant, bôme pivotante noire (« power module ») où s'attache le kite.
-  - Livrée noire avec un bandeau rouge et la marque Richard Mille en blanc.
-  - Kites de 12 à 40 m² (25 m² aux essais), lignes de 40 à 90 m. Navigation à 100–140° du vent. Coque qui déjauge vers 25 nœuds. Record du bateau : 58,3 nœuds ; record du monde visé : 65,45 nœuds.
+- **Demande** : ajouter la « Traversée Turbo-Pédalo » sans toucher aux autres modes. Le Turbo-Pédalo est le trimaran de vitesse du projet le site du projet d'origine (objectif 80 nœuds) avec son kite de 25 m². Même parcours, même météo, même carte, environ 1 min 30. Commandes : flèches pour le kite, Q/D pour le cap, Z/S désactivés (100 % voile). Vue 3ᵉ personne et vue pilote secouée. Physique réaliste mais jouable. Classement séparé au temps réel, intégré à la page Classements avec ses standards. Tutoriel dédié avec « Passer le tutoriel ». Toutes les langues. 30 à 60 images/s. Aucune perte de données.
+- **Recherche** : étude d'un projet réel de trimaran de vitesse tracté par kite (forme, dimensions, kite de 25 m², allures). Les références à ce projet ont été retirées au prompt 37 (droits d'image) ; le mode est devenu le Turbo-Pédalo.
 - **Modifications** :
-  - **Nouveau module `game/js/72_sp80.js`** (régime séparé, pas une adaptation du code de la barge) :
-    - **Maquette 3D fidèle** : coque en goutte noire, bandeau rouge, verrières en tandem, bras et flotteurs, safran, bôme du power module orientée vers le kite, marquages « RICHARD MILLE » et « SP80 », gerbe d'eau du foil.
-    - **Kite de 25 m²** noir au logo Richard Mille, sur 70 m de lignes.
+  - **Nouveau module `game/js/72_pedalo.js`** (régime séparé, pas une adaptation du code de la barge) :
+    - **Maquette 3D fidèle** : coque en goutte noire, bandeau rouge, verrières en tandem, bras et flotteurs, safran, bôme du power module orientée vers le kite, marquages du sponsor et du nom du bateau, gerbe d'eau du foil.
+    - **Kite de 25 m²** noir au logo du sponsor, sur 70 m de lignes.
     - **Physique** : pas de moteur ; traction du kite contre une traînée ∝ V², plus forte sur coque jusqu'au décollage du foil (~25 nœuds). Le foil encaisse l'effort latéral (dérive et gîte presque nulles en vol). Masse effective faible, donc accélérations violentes. Barre de plus en plus sensible avec la vitesse (×1,8) et coûteuse en vitesse.
-    - **Kite du SP80** : aile très rapide qui garde de la puissance près du bord de la fenêtre et ralentit au bord sans s'y écraser. Coefficient de portance élevé (aile de course), vitesse dans la fenêtre plafonnée à 50°/s pour rester pilotable.
+    - **Kite du Turbo-Pédalo** : aile très rapide qui garde de la puissance près du bord de la fenêtre et ralentit au bord sans s'y écraser. Coefficient de portance élevé (aile de course), vitesse dans la fenêtre plafonnée à 50°/s pour rester pilotable.
     - **Vue pilote** : dans le cockpit avant, secousses (lacet, tangage, roulis, hauteur) qui croissent avec le carré de la vitesse, l'état du lac et les chocs. Champ de vision élargi à haute vitesse. Habillage du cockpit (arceaux de verrière, nez noir au bandeau rouge, gouttes).
   - **Course partagée** :
-    - La boucle de course appelle soit le régime barge, soit le régime SP80. La vitesse nominale par mode (20 nœuds pour le SP80) fixe la compression du temps.
+    - La boucle de course appelle soit le régime barge, soit le régime Turbo-Pédalo. La vitesse nominale par mode (20 nœuds pour le Turbo-Pédalo) fixe la compression du temps.
     - La météo, les risées, la tempête, les vapeurs CGN, le pirate et les requins restent calés sur l'avancement : même scénario pour tous.
     - Collisions et sillage adaptés à la taille du bateau.
   - **Interface** :
-    - Onglet « Traversée SP80 » entre Expert et Classements, et carte d'accueil illustrée.
-    - En SP80 : levier des gaz masqué, réglage de puissance du kite visible, sélecteurs de gréement masqués.
+    - Onglet « Traversée Turbo-Pédalo » entre Expert et Classements, et carte d'accueil illustrée.
+    - En Turbo-Pédalo : levier des gaz masqué, réglage de puissance du kite visible, sélecteurs de gréement masqués.
     - HUD : compteur jusqu'à 90 nœuds avec repère du record (65,45). Tableau de bord : VMG et angle au vent, état du foil, vitesse max à la place du moteur, de la part du kite et du CO₂.
     - Le bouton 🏆 est réduit à son icône pour garder la barre du haut sur une ligne.
-  - **Tutoriel** SP80 en 3 pages (objectif et règles, commandes, lecture de l'écran) avec « Passer le tutoriel ».
+  - **Tutoriel** Turbo-Pédalo en 3 pages (objectif et règles, commandes, lecture de l'écran) avec « Passer le tutoriel ».
   - **Classements** :
-    - Mode `sp80` ajouté côté serveur (temps accepté à partir de 30 s), aux fantômes et aux routes.
-    - Classement SP80 au temps réel, sans indice CO₂ : podium, temps au millième, nombre de joueurs, jour / semaine / historique, joueurs / équipes, traces du top 3 en vert, routes.
+    - Mode `pedalo` ajouté côté serveur (temps accepté à partir de 30 s), aux fantômes et aux routes.
+    - Classement Turbo-Pédalo au temps réel, sans indice CO₂ : podium, temps au millième, nombre de joueurs, jour / semaine / historique, joueurs / équipes, traces du top 3 en vert, routes.
     - Écran d'arrivée avec la vitesse max.
     - **Aucune migration** : la version des données est inchangée, les courses des modes barge restent intactes.
   - **Textes** : FR, EN, DE et IT (338 textes par langue), hypothèses du modèle et schéma PDF mis à jour.
 - **Vérification** (Chrome sans écran, 1440 × 900) :
-  - **SP80** :
+  - **Turbo-Pédalo** :
     - Z sans effet (gaz à 0) et levier des gaz masqué.
     - Tutoriel affiché et passé.
     - Traversée complète en 110,8 s (+7 s de pénalités), pointe à 63,5 nœuds, 60 images/s minimum.
     - Lors d'un essai précédent, le bateau a atteint 72,3 nœuds.
     - Vue pilote capturée à 52–57 nœuds en pleine tempête.
-    - Page Classements onglet SP80 : colonnes Tentative / Temps, podium au temps, tri CO₂ masqué.
+    - Page Classements onglet Turbo-Pédalo : colonnes Tentative / Temps, podium au temps, tri CO₂ masqué.
   - **Non-régression** :
     - Traversée débutant complète en 72,7 s, comme avant.
     - Expert : sélecteurs de gréement, gaz et puissance visibles.
     - Bac à sable, menu en allemand et barre du haut sur une ligne en 1366 et 1440 px.
-    - Test de la base : courses des anciens modes conservées après la mise à jour, course SP80 acceptée, temps trop court refusé.
+    - Test de la base : courses des anciens modes conservées après la mise à jour, course Turbo-Pédalo acceptée, temps trop court refusé.
     - Aucune erreur JavaScript.
 - **Reste fragile** :
   - Le pilote automatique de test devait « tenir » l'aile du bon côté : il n'a pas validé la difficulté réelle pour un humain, et le réglage de vitesse et de durée mériterait un essai en main.
-  - Le vent arrière du parcours oblige à empanner en zigzag : c'est fidèle au vrai SP80, mais exigeant.
+  - Le vent arrière du parcours oblige à empanner en zigzag : c'est fidèle au vrai Turbo-Pédalo, mais exigeant.
   - Le classement en ligne reste stocké sur le disque éphémère de Streamlit Cloud.
 
-## 24. Vent propre au SP80 : 50 à 80 nœuds tout le long du parcours, lac plat
+## 24. Vent propre au Turbo-Pédalo : 50 à 80 nœuds tout le long du parcours, lac plat
 - **Heure du prompt** : 2026-10-12 21:40:11 · **Heure du résultat** : 2026-10-12 21:50:31 · **Temps de calcul** : 10 min 20 s
-- **Demande** : modifier le vent uniquement pour la traversée SP80, pour aller entre 50 et 80 nœuds tout le long du parcours, en gardant le lac assez plat.
+- **Demande** : modifier le vent uniquement pour la traversée Turbo-Pédalo, pour aller entre 50 et 80 nœuds tout le long du parcours, en gardant le lac assez plat.
 - **Modifications** :
-  - **Profil de vent par mode** (`WIND_PROFILE`, choisi au début de chaque traversée) : les modes barge gardent exactement leur vent ; le SP80 a le sien (`WIND_KEYS_SP80`).
-  - **Vent du SP80** : 25 nœuds de travers, à environ 110° de la route du côté bâbord, qui tourne avec les virages du parcours. Le SP80 navigue donc toujours à son meilleur angle, sans avoir à zigzaguer. Risées et tempête conservées.
-  - **Pétoles** : beaucoup plus faibles en SP80 (−25 % de vent au lieu de −78 %).
-  - **Lac plat en SP80** : vagues limitées à quelques centimètres et pas de moutons, quel que soit le vent.
-  - **Annonces de vent** (Vaudaire, Joran…) désactivées en SP80, car elles ne correspondent plus à ce vent.
+  - **Profil de vent par mode** (`WIND_PROFILE`, choisi au début de chaque traversée) : les modes barge gardent exactement leur vent ; le Turbo-Pédalo a le sien (`WIND_KEYS_PEDALO`).
+  - **Vent du Turbo-Pédalo** : 25 nœuds de travers, à environ 110° de la route du côté bâbord, qui tourne avec les virages du parcours. Le Turbo-Pédalo navigue donc toujours à son meilleur angle, sans avoir à zigzaguer. Risées et tempête conservées.
+  - **Pétoles** : beaucoup plus faibles en Turbo-Pédalo (−25 % de vent au lieu de −78 %).
+  - **Lac plat en Turbo-Pédalo** : vagues limitées à quelques centimètres et pas de moutons, quel que soit le vent.
+  - **Annonces de vent** (Vaudaire, Joran…) désactivées en Turbo-Pédalo, car elles ne correspondent plus à ce vent.
   - **Compression du temps** recalée (vitesse nominale 52 nœuds) pour garder une traversée d'environ 1 min 30 malgré la vitesse plus élevée.
-- **Mesures** (pilote de test, traversée SP80 complète) :
+- **Mesures** (pilote de test, traversée Turbo-Pédalo complète) :
   - Réglages successifs :
 
     | Vent | Temps entre 50 et 80 nœuds | Vitesse moyenne |
@@ -482,7 +478,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 
   - Avec 25 nœuds : 10 % sous 50 nœuds (départ et chocs) et 3 % au-dessus de 80 nœuds (pointe à 84 dans une rafale).
   - Traversée en 79,8 s.
-  - **Non-régression** : vent de départ des modes débutant et expert toujours de 15 nœuds du 120°, celui du SP80 de 25 nœuds du 189°. Aucune erreur JavaScript.
+  - **Non-régression** : vent de départ des modes débutant et expert toujours de 15 nœuds du 120°, celui du Turbo-Pédalo de 25 nœuds du 189°. Aucune erreur JavaScript.
 
 ## 25. Nouveau mode « Traversée SSB » avec le Lobst'Air
 - **Heure du prompt** : 2026-10-12 21:54:16 · **Heure du résultat** : 2026-10-12 22:24:26 · **Temps de calcul** : 30 min 10 s
@@ -493,7 +489,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Presse sur Monaco 2026 : vainqueur au classement général, prix du design et prix de l'éco-design.
   - **Aucune source consultée ne décrit les couleurs ni les dimensions** : la maquette est une interprétation sobre (coque blanche, liston rouge, pont couvert de panneaux solaires, cockpit à trois places).
 - **Modifications** :
-  - **Nouveau module `game/js/74_ssb.js`** (régime séparé, pas une adaptation du code de la barge ou du SP80) :
+  - **Nouveau module `game/js/74_ssb.js`** (régime séparé, pas une adaptation du code de la barge ou du Turbo-Pédalo) :
     - **Maquette** : coque blanche effilée, liston rouge, pont en panneaux solaires quadrillés, cockpit en creux à trois sièges en tandem, pare-brise, nom « LOBST'AIR ». Les jambes de foil se voient quand la coque vole ; gerbe d'eau à l'arrière.
     - **Physique** :
       - moteur électrique solaire et hydrogène d'environ 70 kW, réglé par Z/S (puissance, sans marche arrière) ;
@@ -508,9 +504,9 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
       - le pirate prend alors le Lobst'Air en chasse, garde ses distances (pas d'abordage) et tire une bordée toutes les 3 s : fumée sur le flanc, boulets, gerbes autour du bateau ;
       - les points d'impact suivent une séquence fixe autour du bateau, la même pour tous. Les boulets frôlent et mouillent le pare-brise ; un coup au but coûte +2 s, sans jamais couler le bateau ;
       - à l'entrée de la rade de Genève (vers les Eaux-Vives, 94 % du parcours), le pirate abandonne et on termine sereinement au pied du Jet d'eau.
-  - **Course partagée** : régime barge, SP80 ou SSB. Vitesse nominale de 24 nœuds (la vitesse moyenne réelle) : risées, tempête, vapeurs CGN, pirate et requins restent calés sur l'avancement. Pas de vague d'étrave de barge pour les foilers.
+  - **Course partagée** : régime barge, Turbo-Pédalo ou SSB. Vitesse nominale de 24 nœuds (la vitesse moyenne réelle) : risées, tempête, vapeurs CGN, pirate et requins restent calés sur l'avancement. Pas de vague d'étrave de barge pour les foilers.
   - **Interface** :
-    - Onglet « Traversée SSB » entre SP80 et Classements, et carte d'accueil illustrée (le Lobst'Air en vol). Les 5 cartes de mode tiennent sur une ligne sous la vision du jeu.
+    - Onglet « Traversée SSB » entre Turbo-Pédalo et Classements, et carte d'accueil illustrée (le Lobst'Air en vol). Les 5 cartes de mode tiennent sur une ligne sous la vision du jeu.
     - En SSB : levier des gaz visible jusqu'à la panne, réglage de puissance du kite visible.
     - HUD : compteur jusqu'à 30 nœuds avec repère au décollage des foils.
     - Tableau de bord : moteur électrique (kW ou « En panne »), VMG, hauteur de vol.
@@ -529,33 +525,33 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
     - Page Classements onglet SSB : colonnes Tentative / Temps, podium au temps, routes.
   - **Non-régression** :
     - Débutant : invitation au kite toujours présente, vent de 15 nœuds, traversée complète en 72,7 s comme avant.
-    - SP80 : vent de 25 nœuds, gaz masqué.
+    - Turbo-Pédalo : vent de 25 nœuds, gaz masqué.
     - Expert : gréement et gaz visibles.
-    - Test de la base : courses débutant, expert et SP80 conservées après la mise à jour ; course SSB acceptée, temps trop court refusé.
+    - Test de la base : courses débutant, expert et Turbo-Pédalo conservées après la mise à jour ; course SSB acceptée, temps trop court refusé.
     - Aucune erreur du jeu. Les seules erreurs de console viennent de la télémétrie de Streamlit, sans accès réseau dans le navigateur de test.
 - **Reste fragile** :
   - Apparence du Lobst'Air interprétée, faute de photos ou de description de la livrée.
   - Le kite a été tenu par le pilote de test : la difficulté réelle de la fin de course au kite, surtout vent arrière après la tempête, reste à valider en main.
   - Le pirate ne tire que s'il est à moins de 160 m : un joueur très rapide le distance (ce qui est voulu).
 
-## 26. Classement SP80 à la vitesse de pointe
+## 26. Classement Turbo-Pédalo à la vitesse de pointe
 - **Heure du prompt** : 2026-10-12 22:28:32 · **Heure du résultat** : 2026-10-12 22:31:36 · **Temps de calcul** : 3 min 04 s
-- **Demande** : dans le mode SP80, ajouter un autre classement selon la vitesse max de pointe.
+- **Demande** : dans le mode Turbo-Pédalo, ajouter un autre classement selon la vitesse max de pointe.
 - **Modifications** :
   - **Base de données** :
     - Nouvelle colonne `max_kn`, ajoutée sans perte (aucune course supprimée). Les courses déjà enregistrées reprennent leur vitesse max depuis leur trace, échantillonnée toutes les 0,5 s.
     - Les nouvelles courses enregistrent la pointe exacte envoyée par le jeu, contrôlée par le serveur (0 à 120 nœuds, au moins la pointe de la trace).
-    - Les traces n'écrêtent plus les vitesses à 60 nœuds (limite relevée à 120) : avant, les pointes SP80 au-delà de 60 nœuds y étaient perdues.
-  - **Page Classements, onglet SP80** :
+    - Les traces n'écrêtent plus les vitesses à 60 nœuds (limite relevée à 120) : avant, les pointes Turbo-Pédalo au-delà de 60 nœuds y étaient perdues.
+  - **Page Classements, onglet Turbo-Pédalo** :
     - Deux critères au choix, « Temps » ou « Vitesse max ». Le podium, le tableau (nouvelle colonne Vitesse max), l'histogramme, le classement des équipes et les routes suivent le critère choisi.
     - Règle du podium affichée : vitesse de pointe, la plus haute gagne.
     - Les autres modes ne changent pas.
-  - **Écran d'arrivée SP80** : il affiche aussi le rang en vitesse de pointe.
+  - **Écran d'arrivée Turbo-Pédalo** : il affiche aussi le rang en vitesse de pointe.
   - **Textes** en FR, EN, DE et IT.
 - **Vérification** :
   - Une base de l'ancienne version (4 courses, sans la colonne) est mise à jour au démarrage : courses conservées, vitesses max reprises des traces (52 à 60 nœuds).
   - Une nouvelle course à 78,4 nœuds passe en tête au classement vitesse.
-  - Dans le navigateur, onglet SP80 : au temps, « Lent » est premier (80 s) ; en vitesse max, « Fusée » est premier (78,4 nœuds) avec le podium et la règle adaptés.
+  - Dans le navigateur, onglet Turbo-Pédalo : au temps, « Lent » est premier (80 s) ; en vitesse max, « Fusée » est premier (78,4 nœuds) avec le podium et la règle adaptés.
   - Débutant et SSB inchangés. Aucune erreur JavaScript.
 
 ## 27. Vitesse max non enregistrée en ligne : rechargement des modules Python
@@ -564,11 +560,11 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 - **Diagnostic** :
   - En local, tout fonctionnait : pointe de 69,8 nœuds enregistrée dans le résultat, le classement et la base.
   - Le problème venait de la mise en ligne. Après un push, Streamlit Cloud relit le jeu (HTML et JS) à chaque passage, donc le nouveau classement s'affichait. En revanche, le module Python de stockage déjà chargé en mémoire restait l'ancien, sans la colonne `max_kn`. La vitesse envoyée par le jeu était donc ignorée et le classement affichait « — ».
-  - Reproduit en local : serveur démarré avec l'ancien stockage, fichier mis à jour sans redémarrage, puis course SP80. Résultat : « — » dans le tableau et pas de colonne en base.
+  - Reproduit en local : serveur démarré avec l'ancien stockage, fichier mis à jour sans redémarrage, puis course Turbo-Pédalo. Résultat : « — » dans le tableau et pas de colonne en base.
 - **Modifications** :
   - `Test.py` recharge automatiquement `app/i18n.py`, `app/storage.py` et `app/game.py` dès que leur fichier a changé. Une mise en ligne prend donc effet tout de suite, sans redémarrage manuel de l'application.
   - **Filet de sécurité** côté serveur : une course sans vitesse max enregistrée la reprend de sa trace à la lecture du classement, et cette valeur est mémorisée.
-- **Vérification** : même scénario (ancien stockage en mémoire, fichier mis à jour sans redémarrage, course SP80 à 69,8 nœuds). Avant : « — ». Après : 69,8 nœuds en base, dans l'écran de fin et dans le classement. Aucune erreur.
+- **Vérification** : même scénario (ancien stockage en mémoire, fichier mis à jour sans redémarrage, course Turbo-Pédalo à 69,8 nœuds). Avant : « — ». Après : 69,8 nœuds en base, dans l'écran de fin et dans le classement. Aucune erreur.
 
 ## 28. Descriptif SSB qui garde la surprise
 - **Heure du prompt** : 2026-10-12 22:44:18 · **Heure du résultat** : 2026-10-12 22:44:47 · **Temps de calcul** : 0 min 29 s
@@ -594,10 +590,10 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 - **Modifications** :
   - La bulle a une seconde ligne avec cette explication et les touches ← → dessinées. Textes en FR, EN, DE et IT.
   - Dès que le kite est envoyé, la bulle ne garde que l'explication du pilotage, pendant 9 s.
-  - L'explication s'affiche dans les modes où l'on pilote le kite aux flèches : expert, SP80, et SSB au moment de la panne. En débutant, le kite vole seul et les flèches dirigent la barge : la bulle reste inchangée.
+  - L'explication s'affiche dans les modes où l'on pilote le kite aux flèches : expert, Turbo-Pédalo, et SSB au moment de la panne. En débutant, le kite vole seul et les flèches dirigent la barge : la bulle reste inchangée.
 - **Vérification** :
   - Expert : bulle complète au départ, seulement l'explication après Espace, disparition au bout de 9 s.
-  - Débutant : bulle d'origine. SP80 : bulle affichée.
+  - Débutant : bulle d'origine. Turbo-Pédalo : bulle affichée.
   - Aucune erreur JavaScript.
 
 ## 31. Statistiques de fréquentation du site
@@ -624,8 +620,8 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - La fenêtre de pause propose « Reprendre », « ↺ Recommencer » et « Quitter ». Raccourci clavier : R pendant la pause.
   - Recommencer relance la même traversée depuis le départ (compte à rebours compris), avec le même pseudo et la même équipe, sans repasser par l'inscription ni le tutoriel. La tentative abandonnée n'est pas enregistrée.
   - Textes en FR, EN, DE et IT ; le texte de la pause mentionne la touche R.
-  - Fonctionne dans toutes les traversées (débutant, expert, SP80, SSB).
-- **Vérification** : en débutant puis en SP80, pause au bout de 5 s, « Recommencer » : retour au compte à rebours, progression remise à zéro, pseudo conservé, puis la course repart. Même résultat avec la touche R. Aucune course enregistrée, aucune erreur JavaScript.
+  - Fonctionne dans toutes les traversées (débutant, expert, Turbo-Pédalo, SSB).
+- **Vérification** : en débutant puis en Turbo-Pédalo, pause au bout de 5 s, « Recommencer » : retour au compte à rebours, progression remise à zéro, pseudo conservé, puis la course repart. Même résultat avec la touche R. Aucune course enregistrée, aucune erreur JavaScript.
 
 ## 33. Traces du top 3 (touche T) vérifiées et curseur « X meilleures » sur les routes
 - **Heure du prompt** : 2026-10-13 11:55:39 · **Heure du résultat** : 2026-10-13 11:59:15 · **Temps de calcul** : 3 min 36 s
@@ -635,13 +631,13 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
   - Pour les barges, les traces suivaient les meilleurs temps et non le podium (indice CO₂ × temps).
 - **Modifications** :
   - Chaque course démarre traces masquées : T les affiche toujours. Un message confirme « Traces du top 3 affichées (3) — T pour masquer » ou « masquées ».
-  - Les traces sont les 3 meilleures tentatives selon le critère du podium : CO₂ × temps pour débutant et expert, temps pour SP80 et SSB.
+  - Les traces sont les 3 meilleures tentatives selon le critère du podium : CO₂ × temps pour débutant et expert, temps pour Turbo-Pédalo et SSB.
   - **Page Classements** : curseur « Afficher les meilleures » au-dessus de la carte des routes, de 1 au nombre de tentatives de la période, avec l'indication « X / total ». La grande carte et les petites cartes suivent le curseur ; il reste réglé quand on change de mode ou de période.
-  - Les légendes des petites cartes montrent la vitesse max (⚡). Pour SP80 et SSB, elles n'affichent plus l'indice CO₂.
+  - Les légendes des petites cartes montrent la vitesse max (⚡). Pour Turbo-Pédalo et SSB, elles n'affichent plus l'indice CO₂.
   - Le serveur envoie jusqu'à 50 routes par mode (au lieu de 24).
   - Statistiques de fréquentation : l'axe n'affiche plus deux fois « 1 » quand le maximum vaut 1.
   - Textes en FR, EN, DE et IT.
-- **Vérification** : dans les 4 traversées, traces masquées au départ puis affichées après T (3 traces, message affiché). Page Classements : 6 / 6 routes, puis 3 / 3 cartes avec le curseur à 3, curseur conservé en passant à SP80. Aucune erreur JavaScript.
+- **Vérification** : dans les 4 traversées, traces masquées au départ puis affichées après T (3 traces, message affiché). Page Classements : 6 / 6 routes, puis 3 / 3 cartes avec le curseur à 3, curseur conservé en passant à Turbo-Pédalo. Aucune erreur JavaScript.
 
 ## 34. Statistiques : parties lancées et terminées
 - **Heure du prompt** : 2026-10-13 12:25:46 · **Heure du résultat** : 2026-10-13 12:28:44 · **Temps de calcul** : 2 min 58 s
@@ -654,7 +650,7 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
     - Parties terminées : nombre, joueurs différents, mode le plus joué, pic ;
     - pour les parties, barres empilées par mode (couleurs et légende), le pic étant encadré.
   - Phrases de pic neutres (« Heure de pointe aujourd'hui : 12h », « Jour de pointe… », « Semaine de pointe… »). Textes en FR, EN, DE et IT.
-- **Vérification** : 4 parties lancées dans le navigateur (débutant terminé après un « Recommencer », SP80, SSB). En base : 2 débutant, 1 SP80, 1 SSB et 1 course terminée. Affiché : 4 lancées, 1 terminée, 25 % d'achèvement, « Traversée débutant · 2 », barre empilée par mode. Aucune erreur JavaScript.
+- **Vérification** : 4 parties lancées dans le navigateur (débutant terminé après un « Recommencer », Turbo-Pédalo, SSB). En base : 2 débutant, 1 Turbo-Pédalo, 1 SSB et 1 course terminée. Affiché : 4 lancées, 1 terminée, 25 % d'achèvement, « Traversée débutant · 2 », barre empilée par mode. Aucune erreur JavaScript.
 - **Limite** : le suivi des parties lancées commence avec cette version ; avant, seules les parties terminées sont connues.
 
 ## 35. Lien vers aetherswisskite.ch sur l'accueil
@@ -669,10 +665,36 @@ Suivi de chaque demande (prompt) et des modifications apportées, du plus ancien
 - **Heure du prompt** : 2026-10-13 19:45:37 · **Heure du résultat** : 2026-10-13 19:46:31 · **Temps de calcul** : 0 min 54 s
 - **Demande** : en traversée expert, imposer au moins 1 kg de CO₂ émis, pour qu'un joueur ne puisse pas obtenir 0 kg et donc un indice de 0 t·s ; supprimer la course de « MXL – 13/10/2026 17h24 » à 0 kg.
 - **Modifications** :
-  - **Plancher de 1 kg de CO₂**, appliqué à la fin de course et vérifié par le serveur pour les deux modes barge. Le même trou existait en débutant (traversée au kite seul, moteur coupé). Le SP80 et le SSB, classés au temps, ne sont pas concernés.
+  - **Plancher de 1 kg de CO₂**, appliqué à la fin de course et vérifié par le serveur pour les deux modes barge. Le même trou existait en débutant (traversée au kite seul, moteur coupé). Le Turbo-Pédalo et le SSB, classés au temps, ne sont pas concernés.
   - **Nettoyage unique au démarrage du serveur** :
     - suppression de la course expert de MXL du 13/10/2026 entre 17h24:00 et 17h24:59 (heure de Zurich) à moins de 1 kg ; ses autres courses sont gardées ;
     - les autres courses de barge déjà enregistrées à 0 kg passent à 1 kg (leur indice n'est plus 0).
-- **Vérification** (base de test) : la course de MXL de 17h24 est supprimée et celle de 16h10 conservée ; Ana (expert) et Ben (débutant) passent de 0 à 1 kg ; Sam (SP80) reste à 0 ; une nouvelle course expert envoyée à 0 kg est enregistrée à 1 kg.
+- **Vérification** (base de test) : la course de MXL de 17h24 est supprimée et celle de 16h10 conservée ; Ana (expert) et Ben (débutant) passent de 0 à 1 kg ; Sam (Turbo-Pédalo) reste à 0 ; une nouvelle course expert envoyée à 0 kg est enregistrée à 1 kg.
 - **Limite** : si la course de MXL n'est pas trouvée à cette minute exacte (par exemple si Streamlit Cloud a déjà effacé le classement), rien n'est supprimé.
+
+## 37. Le mode de vitesse devient le Turbo-Pédalo (jusqu'à 200 nœuds)
+- **Heure du prompt** : 2026-10-15 16:48:48 · **Heure du résultat** : 2026-10-15 17:14:26 · **Temps de calcul** : 25 min 38 s
+- **Demande** : ne plus utiliser l'image du bateau de vitesse réel ni de son sponsor ; garder le mode avec un bateau rapide, le renommer, remplacer le visuel par un pédalo de plage avec au moins les mêmes performances, et pouvoir atteindre 200 nœuds (kite plus résistant, bateau plus performant).
+- **Modifications** :
+  - **Renommage complet** : le mode s'appelle Turbo-Pédalo (FR), Turbo Pedalo (EN), Turbo-Tretboot (DE), Turbo-Pedalò (IT). Clé interne `pedalo`, module `game/js/72_pedalo.js`.
+  - Plus aucune mention de l'ancien bateau ni de son sponsor dans le code, les textes, les hypothèses du modèle, le schéma PDF ni ce journal (passages historiques neutralisés).
+  - **Nouveau visuel** :
+    - pédalo de plage : deux flotteurs blancs à liseré orange, plateforme turquoise, deux sièges jaunes, carter de roue à aubes, toboggan à l'arrière, mât de remorquage, nom « TURBO » sur le flotteur ;
+    - jambes d'hydrofoils visibles en vol, gerbes d'eau sous les deux flotteurs ;
+    - kite jaune et orange au logo AETHER ;
+    - vue pilote assise : pointes des flotteurs, plateforme, genoux qui pédalent, guidon, embruns ;
+    - nouvelle illustration de la carte d'accueil.
+  - **Physique, pour aller jusqu'à ~200 nœuds** :
+    - lignes renforcées (rupture à 1 600 kN au lieu de 260) et aile plus portante ;
+    - traînée réduite et foils très allongés (traînée induite divisée par 10) ;
+    - vitesse plafond portée à 110 m/s (≈ 214 nœuds) ;
+    - fantaisie assumée : la vitesse du pédalo ne compte que pour 35 % dans le vent apparent du kite. Sinon, au-delà d'environ 120 nœuds, le vent apparent arrive presque de face et l'aile ne tire plus vers l'avant.
+    - vitesse nominale 130 nœuds pour garder une traversée d'environ 1 min 30. Compteurs gradués jusqu'à 220 nœuds. Le serveur accepte les vitesses jusqu'à 260 nœuds dans les traces et la vitesse max.
+  - **Données** : les courses déjà enregistrées dans l'ancien mode passent au Turbo-Pédalo au démarrage du serveur, sans perte.
+- **Vérification** (pilote de test) :
+  - traversée en 88,6 s, 141 nœuds de moyenne, pointe à 213,8 nœuds, 60 images/s ;
+  - menu sur une ligne en 1366 et 1440 px (FR et DE) ; aucune mention de l'ancien nom dans la page ;
+  - migration testée : 2 anciennes courses retrouvées sous `pedalo` ; une pointe à 213,8 nœuds enregistrée et classée ;
+  - débutant, expert et SSB inchangés ; aucune erreur JavaScript.
+- **Reste** : l'historique git (anciens commits) contient toujours l'ancien nom. Le réécrire exige une réécriture forcée de l'historique sur GitHub, à décider séparément.
 

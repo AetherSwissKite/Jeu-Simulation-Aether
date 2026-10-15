@@ -140,12 +140,12 @@ const LANDMARKS = GEO.landmarks.map(l => ({ type: l.type, x: l.x * SCALE, y: l.y
 // Les vents du Léman : Vaudaire (sud-est) au départ, Vent (sud-ouest) au milieu, coup de Joran (nord-ouest), Bise (nord-est) vers Genève.
 // vent portant presque tout le parcours, un bout de vent de travers devant Lausanne, et le coup de Joran au milieu
 const WIND_KEYS = [[0, 120, 15], [0.18, 115, 15], [0.25, 195, 12], [0.38, 200, 12], [0.44, 110, 14], [0.49, 320, 22], [0.6, 330, 20], [0.67, 45, 16], [1, 45, 18]];
-// Profil propre au SP80 : vent de travers régulier (~110° de la route, du côté bâbord) qui tourne avec le parcours,
+// Profil propre au turbo-pédalo : vent de travers régulier (~110° de la route, du côté bâbord) qui tourne avec le parcours,
 // pour tenir 50 à 80 nœuds de bout en bout ; pétoles très atténuées et lac lissé. Les modes barge gardent WIND_KEYS.
-const WIND_KEYS_SP80 = [[0, 189, 25], [0.18, 171, 25], [0.38, 156, 25], [0.5, 142, 25], [0.67, 123, 25], [0.8, 105, 25], [1, 92, 25]];
+const WIND_KEYS_PEDALO = [[0, 189, 25], [0.18, 171, 25], [0.38, 156, 25], [0.5, 142, 25], [0.67, 123, 25], [0.8, 105, 25], [1, 92, 25]];
 const WIND_PROFILE = { keys: WIND_KEYS, calm: 0.78, flat: false };
 function setWindProfile(mode) {
-  Object.assign(WIND_PROFILE, mode === "sp80" ? { keys: WIND_KEYS_SP80, calm: 0.25, flat: true } : { keys: WIND_KEYS, calm: 0.78, flat: false });
+  Object.assign(WIND_PROFILE, mode === "pedalo" ? { keys: WIND_KEYS_PEDALO, calm: 0.25, flat: true } : { keys: WIND_KEYS, calm: 0.78, flat: false });
 }
 const WIND_NAMES = [[0, "w_vaudaire"], [0.25, "w_vent"], [0.46, "w_joran"], [0.65, "w_bise"]];
 function baseWind(f) {

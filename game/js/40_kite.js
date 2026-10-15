@@ -2,7 +2,7 @@
 //  KITE : dessin en forme de parapente + physique de traction (pilote automatique et pilotage manuel)
 // ================================================================
 // --- Dessin vu de derrière (traversées). Origine = boîtier de pilotage ; l'aile est au-dessus.
-// opts : couleurs de la voile et logo (kite EPFL blanc par défaut, kite SP80 noir « RICHARD MILLE »)
+// opts : couleurs de la voile et logo (kite EPFL blanc par défaut, kite jaune « AETHER » du turbo-pédalo)
 function drawParagliderFront(ctx, x, y, span, roll, power = 1, opts = {}) {
   const s = span, Ra = s * (0.56 + 0.12 * (1 - power)), hc = s * 0.66, N = 16;
   const top = [], bot = [], mid = [];
@@ -114,7 +114,7 @@ const RIG_AREAS = [10, 25, 100], RIG_LINES = [25, 100, 300];
 const RIG = (() => { let r = {}; try { r = JSON.parse(store.get("aether.rig") || "{}") || {}; } catch { /* valeur illisible */ } return { area: RIG_AREAS.includes(r.area) ? r.area : 25, line: RIG_LINES.includes(r.line) ? r.line : 100 }; })();
 // surface, longueur réelle, longueur affichée (échelle du décor), tension de rupture et agilité du gréement courant
 function kiteRig() {
-  if (RACE.mode === "sp80") return SP80_RIG;   // kite de 25 m², gréement fixe (72_sp80.js)
+  if (RACE.mode === "pedalo") return PEDALO_RIG;   // kite de 25 m², gréement fixe (72_pedalo.js)
   if (RACE.mode === "ssb") return SSB_RIG;     // kite de secours de 25 m² sur 200 m (74_ssb.js)
   if (RACE.mode !== "expert") return { area: KITE.area, L: KITE.LREAL, Lvis: KITE.LVIS, tmax: cfg().TMAX, agil: 1 };
   return {
@@ -193,7 +193,7 @@ function kiteStepManual(dt, air, steer, trimDir, rig) {
     return;
   }
   KS.state = "flying";
-  // rig.edge < 1 : aile très rapide qui garde de la puissance près des bords de la fenêtre (SP80) ;
+  // rig.edge < 1 : aile très rapide qui garde de la puissance près des bords de la fenêtre (turbo-pédalo) ;
   // sa vitesse de déplacement suit, elle, la vraie position dans la fenêtre (elle ralentit au bord et ne s'y écrase pas)
   const wfPos = Math.max(0, Math.cos(rad(KS.theta)) * Math.cos(rad(KS.phi)));
   const wf = rig.edge ? Math.max(0, Math.cos(rad(KS.theta)) * Math.cos(rad(KS.phi * rig.edge))) : wfPos;

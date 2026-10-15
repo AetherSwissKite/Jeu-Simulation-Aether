@@ -4,7 +4,7 @@
 //  sans serveur (fichier ouvert seul), ils restent dans le navigateur.
 // ================================================================
 const PLAYER = { name: store.get("aether.name") || "", team: store.get("aether.team") || "" };
-const BOARD = { remote: false, runs: [], mode: "beginner", period: "all", group: "players", sort: "score", sort80: "time" };   // sort80 : classement SP80 au temps ou à la vitesse de pointe
+const BOARD = { remote: false, runs: [], mode: "beginner", period: "all", group: "players", sort: "score", sortPed: "time" };   // sortPed : classement turbo-pédalo au temps ou à la vitesse de pointe
 const LS_RUNS = "aether.runs.v3", LS_GHOSTS = "aether.ghosts.v3";   // v3 : historique remis à zéro (12.10.2026)
 const host = (() => { try { return window.parent !== window ? window.parent : null; } catch { return null; } })();
 function hostSend(msg) { if (host) { try { host.postMessage({ source: "aether", ...msg }, "*"); } catch { /* hôte indisponible */ } } }
@@ -84,7 +84,7 @@ function showVisits() { const el = $("visitCount"); if (el && Number.isFinite(BO
 // page Classements : routes des meilleures tentatives (mode, période et critère du classement choisis)
 function renderRoutes() {
   const all = (BOARD.routes && BOARD.routes[BOARD.mode]) || [];
-  const f = BOARD.mode === "sp80" ? METRICS[BOARD.sort80] : BOARD.mode === "ssb" ? METRICS.time : (METRICS[BOARD.sort] || METRICS.score);
+  const f = BOARD.mode === "pedalo" ? METRICS[BOARD.sortPed] : BOARD.mode === "ssb" ? METRICS.time : (METRICS[BOARD.sort] || METRICS.score);
   const list = all.map(e => ({ ...e, ...cleanRun({ ...e, mode: BOARD.mode }), track: e.track })).filter(e => e.track && e.track.length > 1 && inPeriod(e.ts, BOARD.period)).sort((a, b) => f(a) - f(b));
   // curseur : afficher seulement les X meilleures performances
   const nIn = $("routesN"); nIn.max = String(Math.max(1, list.length));
@@ -95,7 +95,7 @@ function renderRoutes() {
   $("routesEmpty").hidden = list.length > 0;
   const big = $("routesMap"), grid = $("routesGrid");
   const vs = shown.flatMap(e => e.track.map(q => q[2])), range = vs.length ? [Math.min(...vs), Math.max(...vs, Math.min(...vs) + 0.1)] : null;
-  grid.innerHTML = shown.map((e, i) => `<figure><canvas></canvas><figcaption><b>${i + 1}.</b> ${cleanText(attemptLabel(e), 60)}<br><span>${BOARD.mode === "sp80" || BOARD.mode === "ssb" ? "" : `${fmtMetric("score", e.score)} · ${fmtMetric("co2", e.co2 ?? NaN)} · `}${fmtTime(e.total)} · ⚡ ${fmt1(e.vmax ?? Math.max(...e.track.map(q => q[2])))} ${T("u_kn")}</span></figcaption></figure>`).join("");
+  grid.innerHTML = shown.map((e, i) => `<figure><canvas></canvas><figcaption><b>${i + 1}.</b> ${cleanText(attemptLabel(e), 60)}<br><span>${BOARD.mode === "pedalo" || BOARD.mode === "ssb" ? "" : `${fmtMetric("score", e.score)} · ${fmtMetric("co2", e.co2 ?? NaN)} · `}${fmtTime(e.total)} · ⚡ ${fmt1(e.vmax ?? Math.max(...e.track.map(q => q[2])))} ${T("u_kn")}</span></figcaption></figure>`).join("");
   requestAnimationFrame(() => {
     drawRouteMap(big, shown.map(e => e.track), range);
     grid.querySelectorAll("canvas").forEach((cv, i) => drawRouteMap(cv, shown[i].track, range));
@@ -159,20 +159,20 @@ const boardHosts = [];
 function mountBoard(container, opts = {}) { boardHosts.push({ container, opts }); renderBoard(container, opts); }
 function renderBoards() { boardHosts.forEach(b => { if (b.container.isConnected && !b.container.closest("[hidden]")) renderBoard(b.container, b.opts); }); }
 function renderBoard(container, opts) {
-  const mode = opts.mode || BOARD.mode, isP = BOARD.group === "players", timeOnly = mode === "sp80" || mode === "ssb", is80 = mode === "sp80";
-  const sort = is80 ? BOARD.sort80 : timeOnly ? "time" : BOARD.sort, podK = is80 ? sort : timeOnly ? "time" : "score";   // SP80 : podium au critère choisi
+  const mode = opts.mode || BOARD.mode, isP = BOARD.group === "players", timeOnly = mode === "pedalo" || mode === "ssb", isPed = mode === "pedalo";
+  const sort = isPed ? BOARD.sortPed : timeOnly ? "time" : BOARD.sort, podK = isPed ? sort : timeOnly ? "time" : "score";   // turbo-pédalo : podium au critère choisi
   container.innerHTML = `
     <p class="eyebrow">${T("boards")} <b>· ${T(BOARD.remote ? "src_remote" : "src_local")}</b></p>
     <div class="board-tabs">
-      <div class="seg small" data-k="mode"><button data-v="beginner">${T("nav_beginner")}</button><button data-v="expert">${T("nav_expert")}</button><button data-v="sp80">${T("nav_sp80")}</button><button data-v="ssb">${T("nav_ssb")}</button></div>
+      <div class="seg small" data-k="mode"><button data-v="beginner">${T("nav_beginner")}</button><button data-v="expert">${T("nav_expert")}</button><button data-v="pedalo">${T("nav_pedalo")}</button><button data-v="ssb">${T("nav_ssb")}</button></div>
       <div class="seg small" data-k="sort"${timeOnly ? ' style="display:none"' : ""}><button data-v="score">${T("s_score")}</button><button data-v="co2">${T("s_co2")}</button><button data-v="time">${T("s_time")}</button></div>
-      <div class="seg small" data-k="sort80"${is80 ? "" : ' style="display:none"'}><button data-v="time">${T("s_time")}</button><button data-v="vmax">${T("s_vmax")}</button></div>
+      <div class="seg small" data-k="sortPed"${isPed ? "" : ' style="display:none"'}><button data-v="time">${T("s_time")}</button><button data-v="vmax">${T("s_vmax")}</button></div>
       <div class="seg small" data-k="period"><button data-v="day">${T("p_day")}</button><button data-v="week">${T("p_week")}</button><button data-v="all">${T("p_all")}</button></div>
       <div class="seg small" data-k="group"><button data-v="players">${T("g_players")}</button><button data-v="teams">${T("g_teams")}</button></div>
     </div>
     <p class="board-src board-count"></p>
     <div class="board-body">
-      <div><div class="podium"></div><p class="board-src" style="margin:4px 0 0;text-align:center">${T(mode === "ssb" ? "podium_rule_ssb" : is80 && sort === "vmax" ? "podium_rule_vmax" : timeOnly ? "podium_rule_sp80" : "podium_rule")}</p></div>
+      <div><div class="podium"></div><p class="board-src" style="margin:4px 0 0;text-align:center">${T(mode === "ssb" ? "podium_rule_ssb" : isPed && sort === "vmax" ? "podium_rule_vmax" : timeOnly ? "podium_rule_pedalo" : "podium_rule")}</p></div>
       <div class="board-scroll"><table class="board"><thead></thead><tbody></tbody></table><p class="board-src" style="margin:6px 0 0"></p></div>
       <div><canvas class="dist"></canvas><p class="board-src" style="margin:4px 0 0">${T("dist_note")} · ${T("s_" + sort)}</p></div>
     </div>`;
@@ -203,11 +203,11 @@ function renderBoard(container, opts) {
   });
   // tableau
   const head = container.querySelector("thead"), body = container.querySelector("tbody");
-  const hr = head.insertRow(), sortCol = is80 ? { time: 2, vmax: 3 }[sort] : timeOnly ? 2 : { score: 2, co2: 3, time: 4 }[sort];
-  const cols = isP ? (is80 ? ["#", T("col_attempt"), T("s_time"), T("s_vmax")] : timeOnly ? ["#", T("col_attempt"), T("s_time")] : ["#", T("col_attempt"), T("s_score"), T("s_co2"), T("s_time")]) : ["#", T("team"), `${T("avg")} · ${T("s_" + sort)}`, T("members"), T("best")];
+  const hr = head.insertRow(), sortCol = isPed ? { time: 2, vmax: 3 }[sort] : timeOnly ? 2 : { score: 2, co2: 3, time: 4 }[sort];
+  const cols = isP ? (isPed ? ["#", T("col_attempt"), T("s_time"), T("s_vmax")] : timeOnly ? ["#", T("col_attempt"), T("s_time")] : ["#", T("col_attempt"), T("s_score"), T("s_co2"), T("s_time")]) : ["#", T("team"), `${T("avg")} · ${T("s_" + sort)}`, T("members"), T("best")];
   cols.forEach((c, i) => { const th = document.createElement("th"); th.textContent = c; if (i >= 2) th.className = "n"; if (isP && i === sortCol) th.classList.add("sorted"); hr.appendChild(th); });
   // toutes les tentatives (et toutes les équipes) : le tableau défile, l'en-tête reste visible
-  const rows = isP ? list.map(e => ({ me: e.id === mine, cells: is80 ? [attemptLabel(e), fmtTime(e.total), fmtMetric("vmax", METRICS.vmax(e))] : timeOnly ? [attemptLabel(e), fmtTime(e.total)] : [attemptLabel(e), fmtMetric("score", e.score), fmtMetric("co2", e.co2 ?? NaN), fmtTime(e.total)] }))
+  const rows = isP ? list.map(e => ({ me: e.id === mine, cells: isPed ? [attemptLabel(e), fmtTime(e.total), fmtMetric("vmax", METRICS.vmax(e))] : timeOnly ? [attemptLabel(e), fmtTime(e.total)] : [attemptLabel(e), fmtMetric("score", e.score), fmtMetric("co2", e.co2 ?? NaN), fmtTime(e.total)] }))
     : teams(mode, BOARD.period, sort).map(t => ({ me: PLAYER.team && t.team.toLowerCase() === PLAYER.team.toLowerCase(), cells: [t.team, fmtMetric(sort, t.avg), String(t.members), fmtMetric(sort, t.best)] }));
   if (!rows.length) { const td = body.insertRow().insertCell(); td.colSpan = 5; td.style.color = "var(--muted)"; td.textContent = T(isP ? "no_scores" : "no_teams"); }
   rows.forEach((r, i) => {
@@ -255,7 +255,7 @@ function showEnd() {
   RACE.state = "end";
   const r = RACE.result;
   if (!r) return;
-  const sp = r.mode === "sp80" || r.mode === "ssb", pl = attempts(r.mode, "all", sp ? "time" : "score"), rank = pl.findIndex(e => e.id === r.id) + 1;
+  const sp = r.mode === "pedalo" || r.mode === "ssb", pl = attempts(r.mode, "all", sp ? "time" : "score"), rank = pl.findIndex(e => e.id === r.id) + 1;
   $("endEyebrow").textContent = T("end_eyebrow", { mode: T("nav_" + r.mode) });
   $("endTitle").innerHTML = T(rank === 1 ? "end_title_1" : rank > 0 && rank <= 3 ? "end_title_podium" : "end_title");
   $("endScore").innerHTML = `${fmt3(r.total)}<small>s</small>`;
@@ -264,9 +264,9 @@ function showEnd() {
   if (r.rig) rows.push([T("e_rig"), r.rig]);
   if (r.mode === "ssb") rows.push([T("e_cannon"), String(r.hits || 0)]);
   $("endBreak").innerHTML = rows.map(([a, b]) => `<span>${a}</span><span>${b}</span>`).join("");
-  $("endRank").textContent = rank > 0 ? T(r.mode === "ssb" ? "end_rank_ssb" : sp ? "end_rank_sp80" : "end_rank", { r: rank, n: pl.length }) : "";
-  if (r.mode === "sp80") {   // second classement : vitesse de pointe
-    const pv = attempts("sp80", "all", "vmax"), rv = pv.findIndex(e => e.id === r.id) + 1;
+  $("endRank").textContent = rank > 0 ? T(r.mode === "ssb" ? "end_rank_ssb" : sp ? "end_rank_pedalo" : "end_rank", { r: rank, n: pl.length }) : "";
+  if (r.mode === "pedalo") {   // second classement : vitesse de pointe
+    const pv = attempts("pedalo", "all", "vmax"), rv = pv.findIndex(e => e.id === r.id) + 1;
     if (rv > 0) $("endRank").textContent += ` · ${T("end_rank_vmax", { r: rv, n: pv.length })}`;
   }
   showOverlay("ovEnd");
@@ -303,7 +303,7 @@ function drawRouteMap(cv, tracks, range) {
 // ---------------- Fréquentation du site (page Classements) ----------------
 // Chaque connexion = [horodatage, n° de visiteur anonyme]. Heures et jours dans le fuseau du navigateur.
 BOARD.trPeriod = "day"; BOARD.trMetric = "conns"; BOARD.conns = BOARD.conns || []; BOARD.plays = BOARD.plays || [];
-const TR_MODE_COLS = { beginner: "#9fb4d6", expert: "#3d5f94", sp80: "#c8102e", ssb: "#e8a33d" };
+const TR_MODE_COLS = { beginner: "#9fb4d6", expert: "#3d5f94", pedalo: "#c8102e", ssb: "#e8a33d" };
 // événements comptés selon l'indicateur choisi : connexions, parties lancées ou parties terminées (enregistrées)
 function trafficEvents(metric) {
   if (metric === "plays") return BOARD.plays.map(([ts, mode]) => ({ d: new Date(ts * 1000), mode }));

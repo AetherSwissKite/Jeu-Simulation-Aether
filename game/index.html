@@ -37,9 +37,9 @@
   }
   /* Visibilité selon la vue et le mode */
   body:not(.view-home) .only-home, body:not(.view-sandbox) .only-sandbox, body:not(.view-race) .only-race, body:not(.view-board) .only-board,
-  body:not(.mode-beginner) .only-beginner, body:not(.mode-expert) .only-expert, body:not(.mode-sp80) .only-sp80,
-  body:not(.mode-expert):not(.mode-sp80):not(.mode-ssb) .only-manual, body.mode-sp80 .no-sp80, body.mode-ssb .no-ssb,
-  body:not(.mode-ssb) .only-ssb, body:not(.mode-sp80):not(.mode-ssb) .only-foiler { display: none !important; }
+  body:not(.mode-beginner) .only-beginner, body:not(.mode-expert) .only-expert, body:not(.mode-pedalo) .only-pedalo,
+  body:not(.mode-expert):not(.mode-pedalo):not(.mode-ssb) .only-manual, body.mode-pedalo .no-pedalo, body.mode-ssb .no-ssb,
+  body:not(.mode-ssb) .only-ssb, body:not(.mode-pedalo):not(.mode-ssb) .only-foiler { display: none !important; }
 
   .app { position: relative; max-width: none; margin: 0 auto; padding: 4px 4px 8px; display: flex; flex-direction: column; gap: 10px; }
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 1px 2px rgba(25, 45, 85, .04), 0 8px 24px rgba(25, 45, 85, .05); }
@@ -383,7 +383,7 @@
       <button data-view="sandbox" data-i="nav_sandbox"></button>
       <button data-view="beginner" data-i="nav_beginner"></button>
       <button data-view="expert" data-i="nav_expert"></button>
-      <button data-view="sp80" data-i="nav_sp80"></button>
+      <button data-view="pedalo" data-i="nav_pedalo"></button>
       <button data-view="ssb" data-i="nav_ssb"></button>
       <button data-view="board" data-i="nav_board"></button>
     </div>
@@ -429,11 +429,11 @@
           <div class="row"><button class="btn primary" data-go="expert" data-i="play"></button><button class="btn" data-tuto="expert" data-i="tutorial"></button></div>
         </div>
         <div class="panel card">
-          <span class="tag" data-i="card_sp80_tag"></span>
-          <h3 data-i="nav_sp80"></h3>
-          <canvas data-card="sp80"></canvas>
-          <p data-i="card_sp80_desc"></p>
-          <div class="row"><button class="btn primary" data-go="sp80" data-i="play"></button><button class="btn" data-tuto="sp80" data-i="tutorial"></button></div>
+          <span class="tag" data-i="card_pedalo_tag"></span>
+          <h3 data-i="nav_pedalo"></h3>
+          <canvas data-card="pedalo"></canvas>
+          <p data-i="card_pedalo_desc"></p>
+          <div class="row"><button class="btn primary" data-go="pedalo" data-i="play"></button><button class="btn" data-tuto="pedalo" data-i="tutorial"></button></div>
         </div>
         <div class="panel card">
           <span class="tag" data-i="card_ssb_tag"></span>
@@ -588,7 +588,7 @@
       </div>
       <canvas class="glass minimap" id="minimap"></canvas>
     </div>
-    <div class="glass throttle only-race no-sp80" id="throttle"><small data-i="throttle"></small><div class="rail" id="thrRail"><div class="knob" id="thrKnob"></div></div><b id="thrVal">0 %</b></div>
+    <div class="glass throttle only-race no-pedalo" id="throttle"><small data-i="throttle"></small><div class="rail" id="thrRail"><div class="knob" id="thrKnob"></div></div><b id="thrVal">0 %</b></div>
     <div class="glass helm only-race" id="helm"><small data-i="helm"></small><div class="rail" id="helmRail"><div class="knob" id="helmKnob"></div></div></div>
     <div class="glass kitebox only-race" id="kitebox">
       <small data-i="kite"></small>

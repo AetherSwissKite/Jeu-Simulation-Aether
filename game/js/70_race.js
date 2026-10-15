@@ -1,6 +1,6 @@
 // ================================================================
-//  TRAVERSÉES DU LÉMAN (débutant / expert / SP80) : physique de la barge, commandes, caméras, course
-//  Le SP80 a son propre régime physique (72_sp80.js) ; tout le reste (météo, kite, course) est partagé.
+//  TRAVERSÉES DU LÉMAN (débutant / expert / turbo-pédalo / SSB) : physique de la barge, commandes, caméras, course
+//  Le turbo-pédalo (72_pedalo.js) et le Lobst'Air (74_ssb.js) ont leur propre régime physique ; tout le reste (météo, kite, course) est partagé.
 // ================================================================
 const BARGE = { CD: 4.2, FE: 80, PMAX: 500, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, AF: 70, CX: 0.9 };
 // Les deux modes partagent la même physique ; seules la masse effective (inertie ressentie), l'agilité
@@ -8,14 +8,14 @@ const BARGE = { CD: 4.2, FE: 80, PMAX: 500, ETA: 0.65, SFOC: 0.215, CO2F: 3.17, 
 const MODES = {
   beginner: { TN: 60, M: 80, RMAX: 17, TAUR: 0.45, TMAX: 95, camD: 58, camH: 19 },
   expert: { TN: 180, M: 190, RMAX: 9.5, TAUR: 1.0, TMAX: 115, camD: 62, camH: 20 },
-  // SP80 : ~1 min 30 à ~55 nd de moyenne (vent de travers propre au SP80, voir WIND_KEYS_SP80) ;
+  // Turbo-pédalo : ~1 min 30 à ~130 nd de moyenne (vent de travers propre au mode, voir WIND_KEYS_PEDALO) ;
   // masse effective faible = accélérations violentes
-  sp80: { TN: 90, VNOM: 52, M: 4, RMAX: 22, TAUR: 0.22, TMAX: 260, camD: 30, camH: 8.5, boat: "sp80", half: 4.5 },
+  pedalo: { TN: 90, VNOM: 130, M: 3, RMAX: 22, TAUR: 0.2, TMAX: 1600, camD: 15, camH: 4.5, boat: "pedalo", half: 2.2 },
   // SSB (Lobst'Air) : foiler électrique ~25 nd ; VNOM ≈ vitesse moyenne réelle (météo calée sur l'avancement), ~2 min 30
   ssb: { TN: 150, VNOM: 24, M: 2.4, RMAX: 16, TAUR: 0.3, TMAX: 120, camD: 26, camH: 7.5, boat: "ssb", half: 3.6 }
 };
 const RACE_MODES = Object.keys(MODES);
-const manualKite = () => RACE.mode === "expert" || RACE.mode === "sp80" || RACE.mode === "ssb";   // kite piloté aux flèches
+const manualKite = () => RACE.mode === "expert" || RACE.mode === "pedalo" || RACE.mode === "ssb";   // kite piloté aux flèches
 const INTRO_DUR = 4.2, FINISH_DUR = 3.8;
 const GHOST_COLS = ["#1e9e5a", "#46c37b", "#8fdcaa"];   // traces du top 3 en vert, du plus foncé (1er) au plus clair
 const KEYS = new Set();
@@ -24,14 +24,14 @@ const RACE = {
   boat: { x: START.x, y: START.y, hdg: START.bearing, u: 0, r: 0, heelR: 0, heelV: 0, pitchR: 0, heave: 0 },
   throttle: 0, rudder: 0, mouseHelm: false, view: "third", showWindow: true, showGhosts: false,
   cam: { x: 0, y: 0, z: 0, yaw: 0, pitch: 0 }, introT: 0, finishT: 0, cool: {}, dolphins: [], wake: [], wakeT: 0, smoke: [],
-  windShown: new Set(), wind: { kn: 0, from: 0, storm: 0, gust: 0, f: 0 }, f: 0, shake: 0, flash: 0, ghosts: { beginner: [], expert: [], sp80: [], ssb: [] }, result: null, maxKn: 0
+  windShown: new Set(), wind: { kn: 0, from: 0, storm: 0, gust: 0, f: 0 }, f: 0, shake: 0, flash: 0, ghosts: { beginner: [], expert: [], pedalo: [], ssb: [] }, result: null, maxKn: 0
 };
 const cfg = () => MODES[RACE.mode] || MODES.beginner;
 const VK = () => COURSE_LEN / (cfg().TN * (cfg().VNOM || 9.5));        // m de jeu par seconde et par nœud (vitesse nominale du mode)
 const FTIME = () => VK() * 1000 / (SCALE * KN);                         // secondes réelles par seconde de jeu
 
 function resetRace() {
-  setWindProfile(RACE.mode);   // vent propre au SP80, inchangé pour les autres modes
+  setWindProfile(RACE.mode);   // vent propre au turbo-pédalo, inchangé pour les autres modes
   RACE.ssb = null; RACE.ssbInfo = null; RACE.popSticky = false;
   RACE.showGhosts = false; const tg = document.getElementById("tGhost"); if (tg) tg.classList.remove("on");   // chaque course part traces masquées : T les affiche
   Object.assign(RACE, { t: 0, tau: 0.02, pen: 0, coll: 0, fuel: 0, saved: 0, track: [], trackT: 0, throttle: 0, rudder: 0, mouseHelm: false,
@@ -59,7 +59,7 @@ function stepRace(dt) {
   const w = windAt(B.x, B.y, RACE.tau, cp);
   RACE.wind = w;
   // commandes
-  const kb = KEYS, sail = C.boat === "sp80";   // SP80 : 100 % à la voile, Z/S sans effet
+  const kb = KEYS, sail = C.boat === "pedalo";   // turbo-pédalo : 100 % au kite, Z/S sans effet
   const up = !sail && (kb.has("z") || kb.has("w") || (RACE.mode === "beginner" && kb.has("ArrowUp")));
   const down = !sail && (kb.has("s") || (RACE.mode === "beginner" && kb.has("ArrowDown")));
   if (sail) RACE.throttle = 0;
@@ -71,14 +71,15 @@ function stepRace(dt) {
   // kite
   const rig = kiteRig();
   const altReal = (sail ? 6 : C.boat === "ssb" ? 3 : 40) + rig.L * Math.sin(rad(clamp(KS.el || 30, 5, 85)));
-  const air = kiteAir(w.kn, w.from, B.hdg, B.u, altReal);
+  // rig.appK < 1 (turbo-pédalo) : vent apparent atténué, sinon à 200 nd il arriverait presque de face et l'aile ne tirerait plus vers l'avant
+  const air = kiteAir(w.kn, w.from, B.hdg, B.u * (rig.appK || 1), altReal);
   if (manualKite()) {
     const steer = (kb.has("ArrowRight") ? 1 : 0) - (kb.has("ArrowLeft") ? 1 : 0);
     const trim = (kb.has("ArrowDown") ? 1 : 0) - (kb.has("ArrowUp") ? 1 : 0);   // ↓ border (puissance) · ↑ choquer
     kiteStepManual(dt, air, steer, trim, rig);
   } else kiteStepAuto(dt, air, C.TMAX);
   RACE.air = air;
-  if (sail) sp80Dynamics(dt, w, B, C); else if (C.boat === "ssb") ssbDynamics(dt, w, B, C); else bargeDynamics(dt, w, B, C);
+  if (sail) pedaloDynamics(dt, w, B, C); else if (C.boat === "ssb") ssbDynamics(dt, w, B, C); else bargeDynamics(dt, w, B, C);
   RACE.maxKn = Math.max(RACE.maxKn, B.u / KN);
   collisions(dt);
   raceAnnounces(w);
@@ -122,7 +123,7 @@ function bargeDynamics(dt, w, B, C) {
 }
 // annonces : vents du Léman, tempête, dauphins
 function raceAnnounces(w) {
-  if (RACE.mode !== "sp80") for (const [f0, key] of WIND_NAMES) if (RACE.f >= f0 && !RACE.windShown.has(key)) { RACE.windShown.add(key); toast(T(key), "", null); }
+  if (RACE.mode !== "pedalo") for (const [f0, key] of WIND_NAMES) if (RACE.f >= f0 && !RACE.windShown.has(key)) { RACE.windShown.add(key); toast(T(key), "", null); }
   if (RACE.f > 0.42 && RACE.f < 0.47 && KS.deployed) toast(T(manualKite() ? "storm_warn_expert" : "storm_warn"), "warn", "stormw", 8);   // (SSB : kite encore rangé, pas d'alerte)
   if (RACE.f >= 0.48 && !RACE.windShown.has("sharks")) { RACE.windShown.add("sharks"); toast(T("sharks_toast"), "warn", null); }
   for (const fs of DOLPHIN_SPOTS) if (RACE.f >= fs && !RACE.windShown.has("d" + fs)) { RACE.windShown.add("d" + fs); spawnDolphins(); toast(T("dolphins"), "good", null); }
@@ -131,7 +132,7 @@ function raceAnnounces(w) {
 function collisions(dt) {
   const B = RACE.boat;
   for (const k in RACE.cool) RACE.cool[k] -= dt;
-  const hl = cfg().half || 15;   // demi-longueur de la coque (barge 40 m, SP80 ~10 m)
+  const hl = cfg().half || 15;   // demi-longueur de la coque (barge 40 m, pédalo ~4 m)
   const pts = [-hl, 0, hl].map(ly => bargeToWorld(B, 0, ly, 0));
   // rives
   const bow = bargeToWorld(B, 0, hl * 1.33, 0);
@@ -218,7 +219,7 @@ function computeCamera(dt, w, h) {
     return makeCam(w, h, x, y, z, yaw, pitch, 0, half);
   }
   if (RACE.view === "cabin" && RACE.state !== "intro") {
-    if (cfg().boat === "sp80") return sp80PilotCam(w, h, dt);   // vue pilote secouée, dans le cockpit
+    if (cfg().boat === "pedalo") return pedaloPilotCam(w, h, dt);   // vue pilote secouée, dans le cockpit
     if (cfg().boat === "ssb") return ssbPilotCam(w, h, dt);
     const p = bargeToWorld(B, 0, -15.1, 4.8);
     half = 56;
@@ -244,7 +245,7 @@ function computeCamera(dt, w, h) {
     return makeCam(w, h, x, y, z, yaw, pitch, 0, half);
   }
   // hauteur angulaire du kite vue de la caméra (lissée pour ne pas suivre chaque huit)
-  const A = bargeToWorld(B, ...(cfg().boat === "sp80" ? SP80_ANCHOR : cfg().boat === "ssb" ? SSB_ANCHOR : BARGE_ANCHOR)), azW = rad(B.hdg + (KS.azRel || 0)), elW = rad(KS.el || 30);
+  const A = bargeToWorld(B, ...(cfg().boat === "pedalo" ? PEDALO_ANCHOR : cfg().boat === "ssb" ? SSB_ANCHOR : BARGE_ANCHOR)), azW = rad(B.hdg + (KS.azRel || 0)), elW = rad(KS.el || 30);
   const Lk = rig.Lvis * KS.dep, kx = A[0] + Lk * Math.cos(elW) * Math.sin(azW), ky = A[1] + Lk * Math.cos(elW) * Math.cos(azW), kz = A[2] + Lk * Math.sin(elW);
   FRAME.elK = lerp(FRAME.elK, deg(Math.atan2(kz - z, Math.hypot(kx - x, ky - y))), damp(2.5, dt));
   const elB = deg(Math.atan2(3 - z, Math.hypot(tx - x, ty - y)));
@@ -281,7 +282,7 @@ function renderWorld(dt) {
   drawQuay(ctx, cam, L, t);
   drawObstacles(ctx, cam, L, tau, t);
   drawWake(ctx, cam, dt);
-  const info = RACE.mode === "attract" ? drawBarge(ctx, cam, B, L) : cfg().boat === "sp80" ? drawSP80(ctx, cam, B, L, dt) : cfg().boat === "ssb" ? drawSSB(ctx, cam, B, L, dt) : drawBarge(ctx, cam, B, L);
+  const info = RACE.mode === "attract" ? drawBarge(ctx, cam, B, L) : cfg().boat === "pedalo" ? drawPedalo(ctx, cam, B, L, dt) : cfg().boat === "ssb" ? drawSSB(ctx, cam, B, L, dt) : drawBarge(ctx, cam, B, L);
   if (info.exhaust) drawSmoke(ctx, cam, dt, info.exhaust);
   drawRaceKite(ctx, cam, dt, info);
   if (storm > 0.02) {
@@ -291,7 +292,7 @@ function renderWorld(dt) {
     drawRainLayer(ctx, w, h, t, storm, -10, QUALITY.rain);
   }
   ctx.restore();
-  if (RACE.view === "cabin" && RACE.mode !== "attract" && RACE.state !== "intro" && RACE.state !== "finish" && RACE.state !== "end") (cfg().boat === "sp80" ? drawSP80Cockpit : cfg().boat === "ssb" ? drawSSBCockpit : drawCabin)(ctx, w, h, storm, t);
+  if (RACE.view === "cabin" && RACE.mode !== "attract" && RACE.state !== "intro" && RACE.state !== "finish" && RACE.state !== "end") (cfg().boat === "pedalo" ? drawPedaloCockpit : cfg().boat === "ssb" ? drawSSBCockpit : drawCabin)(ctx, w, h, storm, t);
 }
 function drawGhosts(ctx, cam) {
   const ghosts = RACE.ghosts[RACE.mode] || [];
@@ -431,7 +432,7 @@ function drawRaceKite(ctx, cam, dt, info) {
   RACE.lastKitePx = [p[0], p[1]];
   const span = clamp(cam.k * 57.3 * 24 * Math.sqrt(rig.area / KITE.area) / Math.max(p[2], 1), 16, 260) * (0.4 + 0.6 * KS.dep);   // taille ∝ √surface
   if (KS.state === "crashed") { ctx.fillStyle = "rgba(255,255,255,.85)"; for (let i = 0; i < 7; i++) { ctx.beginPath(); ctx.arc(p[0] + Math.sin(i * 2.3 + performance.now() / 160) * span * 0.2, p[1] - Math.abs(Math.cos(i + performance.now() / 200)) * span * 0.15, 2.4, 0, Math.PI * 2); ctx.fill(); } return; }
-  if (cfg().boat === "sp80") drawSP80Kite(ctx, p[0], p[1], span, RACE.kiteRoll, KS.trim);   // kite SP80 (logo Richard Mille)
+  if (cfg().boat === "pedalo") drawPedaloKite(ctx, p[0], p[1], span, RACE.kiteRoll, KS.trim);   // kite de plage jaune (logo AETHER)
   else drawParagliderFront(ctx, p[0], p[1], span, RACE.kiteRoll, manualKite() ? KS.trim : 1);   // kite EPFL (barge et Lobst'Air)
 }
 function trailPt(cam, A, [az, el]) {
@@ -516,7 +517,7 @@ function toggleGhosts() {
   else toast(T(RACE.showGhosts ? "ghosts_on" : "ghosts_off", { n }), "", "ng", 2.5);
 }
 function toggleWindowView() { RACE.showWindow = !RACE.showWindow; $("tWin").classList.toggle("on", RACE.showWindow); }
-function toggleCamView() { RACE.view = RACE.view === "third" ? "cabin" : "third"; $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "sp80" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin"); }
+function toggleCamView() { RACE.view = RACE.view === "third" ? "cabin" : "third"; $("tViewTxt").textContent = T(RACE.view === "third" ? "view_third" : RACE.mode === "pedalo" || RACE.mode === "ssb" ? "view_pilot" : "view_cabin"); }
 
 // ---------------- Boucle de la traversée ----------------
 function frameRace(dt) {
@@ -530,7 +531,7 @@ function frameRace(dt) {
     if (RACE.introT >= INTRO_DUR) {
       RACE.state = "run"; RACE.throttle = 0.3;
       setTimeout(() => { if ($("bigCount").textContent === T("go")) $("bigCount").hidden = true; }, 700);
-      toast(T(RACE.mode === "ssb" ? "start_tip_ssb" : RACE.mode === "sp80" ? "start_tip_sp80" : RACE.mode === "expert" ? "start_tip_expert" : "start_tip"), "", null);
+      toast(T(RACE.mode === "ssb" ? "start_tip_ssb" : RACE.mode === "pedalo" ? "start_tip_pedalo" : RACE.mode === "expert" ? "start_tip_expert" : "start_tip"), "", null);
       $("spacePop").querySelector("span").dataset.ih = "space_pop"; $("spacePop").querySelector("span").innerHTML = T("space_pop"); RACE.popSticky = false;
       $("spacePop").hidden = RACE.mode === "ssb"; $("spacePop").classList.remove("steer"); RACE.popT = 0; RACE.steerT = 0;   // SSB : pas d'invitation au kite au départ (moteur électrique)
     }
